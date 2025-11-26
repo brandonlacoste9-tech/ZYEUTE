@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+@theme {
+  --color-gold-50: #FFF9E5;
+  --color-gold-100: #FFF2CC;
+  --color-gold-200: #FFE699;
+  --color-gold-300: #FFD966;
+  --color-gold-400: #FFCC33;
+  --color-gold-500: #FFBF00;
+  --color-gold-600: #E6AC00;
+  --color-gold-700: #CC9900;
+  --color-gold-800: #B38600;
+  --color-gold-900: #997300;
+  --color-gold-950: #664D00;
+}
+
 :root {
   --edge-color: #F5C842;
   --glow-intensity: 50%;
