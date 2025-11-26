@@ -3,7 +3,7 @@
  * Uses Google Gemini 2.0 Flash for Quebec-aware content moderation
  */
 
-import { GoogleGenerativeAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { supabase } from '../lib/supabase';
 import { toast } from '../components/ui/Toast';
 
