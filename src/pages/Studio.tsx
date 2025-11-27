@@ -7,7 +7,7 @@ import { Header } from '../components/layout/Header';
 import { BottomNav } from '../components/layout/BottomNav';
 import { Button } from '../components/ui/Button';
 import { processVideo, generateCaptions, smartTrim, type VideoProcessResult } from '../services/videoService';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 
 export default function Studio() {
   const [isUploading, setIsUploading] = useState(false);

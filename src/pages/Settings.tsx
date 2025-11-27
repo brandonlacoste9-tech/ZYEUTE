@@ -10,7 +10,7 @@ import { BottomNav } from '../components/layout/BottomNav';
 import { Avatar } from '../components/ui/Avatar';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 import { generateId } from '../lib/utils';
 import { QUEBEC_REGIONS } from '../lib/quebecFeatures';
 import type { User } from '../types';

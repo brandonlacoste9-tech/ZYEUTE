@@ -6,7 +6,7 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { supabase } from '../lib/supabase';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 
 // Initialize Gemini
 const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;

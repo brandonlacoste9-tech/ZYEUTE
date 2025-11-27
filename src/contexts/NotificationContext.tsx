@@ -4,7 +4,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 import type { Notification, User } from '../types';
 
 interface NotificationContextType {

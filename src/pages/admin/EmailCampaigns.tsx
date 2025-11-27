@@ -3,7 +3,7 @@ import { Header } from '../../components/layout/Header';
 import { BottomNav } from '../../components/layout/BottomNav';
 import { Button } from '../../components/ui/Button';
 import { generateMarketingEmail, sendMarketingEmail } from '../../services/emailService'; // Assuming these are exported
-import { toast } from '../../components/ui/Toast';
+import { toast } from '../../components/Toast';
 
 export const EmailCampaigns: React.FC = () => {
   const [campaign, setCampaign] = useState({

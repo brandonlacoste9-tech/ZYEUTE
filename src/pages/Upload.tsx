@@ -10,7 +10,7 @@ import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
 import { extractHashtags, generateId } from '../lib/utils';
 import { QUEBEC_REGIONS } from '../lib/quebecFeatures';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 
 export const Upload: React.FC = () => {
   const navigate = useNavigate();

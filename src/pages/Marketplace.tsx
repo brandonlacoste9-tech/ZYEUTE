@@ -10,7 +10,7 @@ import { BottomNav } from '../components/layout/BottomNav';
 import { Button } from '../components/ui/Button';
 import { purchaseProduct } from '../services/stripeService';
 import { supabase } from '../lib/supabase';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 import { formatNumber } from '../lib/utils';
 
 interface Product {

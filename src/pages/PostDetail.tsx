@@ -13,7 +13,7 @@ import { CommentThread } from '../components/features/CommentThread';
 import { GiftModal } from '../components/features/GiftModal';
 import { supabase } from '../lib/supabase';
 import { formatNumber, getTimeAgo } from '../lib/utils';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 import type { Post, Comment as CommentType, User } from '../types';
 
 export const PostDetail: React.FC = () => {

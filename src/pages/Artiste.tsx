@@ -8,7 +8,7 @@ import { BottomNav } from '../components/layout/BottomNav';
 import { Button } from '../components/ui/Button';
 import { TiGuy } from '../components/features/TiGuy';
 import { generateImage, type ImageGenerationResult } from '../services/imageService';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 

@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '../lib/supabase';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 
 export interface SubscriptionTier {
   id: string;
