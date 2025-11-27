@@ -1,0 +1,377 @@
+/**
+ * Settings Page - Premium Quebec Heritage Design
+ * Instagram-style layout with beaver leather & gold aesthetic
+ */
+
+import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Header } from '../components/layout/Header';
+import { BottomNav } from '../components/layout/BottomNav';
+import { Avatar } from '../components/ui/Avatar';
+import { Button } from '../components/ui/Button';
+import { supabase } from '../lib/supabase';
+import { toast } from '../components/ui/Toast';
+import { generateId } from '../lib/utils';
+import { QUEBEC_REGIONS } from '../lib/quebecFeatures';
+import type { User } from '../types';
+
+interface SettingItem {
+  icon: React.ReactNode;
+  label: string;
+  path?: string;
+  badge?: string;
+  onClick?: () => void;
+}
+
+export const Settings: React.FC = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = React.useState<User | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  // Fetch current user
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoading(true);
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+
+        if (!authUser) {
+          navigate('/login');
+          return;
+        }
+
+        const { data } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', authUser.id)
+          .single();
+
+        if (data) {
+          setUser(data);
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [navigate]);
+
+  // Sign out
+  const handleSignOut = async () => {
+    const confirmed = window.confirm('Es-tu sûr de vouloir te déconnecter?');
+    if (!confirmed) return;
+
+    toast.info('Déconnexion...');
+    await supabase.auth.signOut();
+    toast.success('À la prochaine! 👋');
+    setTimeout(() => navigate('/login'), 500);
+  };
+
+  // Settings sections
+  const yourActivitySettings: SettingItem[] = [
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+      ),
+      label: 'Tags et mentions',
+      path: '/settings/tags',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      ),
+      label: 'Commentaires',
+      path: '/settings/comments',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+        </svg>
+      ),
+      label: 'Partage et remixes',
+      path: '/settings/sharing',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+        </svg>
+      ),
+      label: 'Comptes restreints',
+      path: '/settings/restricted',
+    },
+  ];
+
+  const whatYouSeeSettings: SettingItem[] = [
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+        </svg>
+      ),
+      label: 'Favoris',
+      path: '/settings/favorites',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+        </svg>
+      ),
+      label: 'Comptes masqués',
+      path: '/settings/muted',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>
+      ),
+      label: 'Préférences de contenu',
+      path: '/settings/content',
+    },
+  ];
+
+  const quebecSettings: SettingItem[] = [
+    {
+      icon: <span className="text-2xl">⚜️</span>,
+      label: 'Région du Québec',
+      path: '/settings/region',
+      badge: user?.region ? QUEBEC_REGIONS.find(r => r.id === user.region)?.emoji : undefined,
+    },
+    {
+      icon: <span className="text-2xl">🇨🇦</span>,
+      label: 'Langue',
+      path: '/settings/language',
+      badge: 'FR',
+    },
+    {
+      icon: <span className="text-2xl">🦫</span>,
+      label: 'Ti-Guy Assistant',
+      path: '/settings/voice',
+    },
+  ];
+
+  const accountSettings: SettingItem[] = [
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+      label: 'Modifier le profil',
+      path: '/settings/profile',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      ),
+      label: 'Confidentialité et sécurité',
+      path: '/settings/privacy',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+      ),
+      label: 'Notifications',
+      path: '/settings/notifications',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      label: 'Abonnement Premium',
+      path: '/premium',
+      badge: user?.subscription_tier ? '⭐' : undefined,
+    },
+  ];
+
+  // Filter settings based on search
+  const filterSettings = (items: SettingItem[]) => {
+    if (!searchQuery) return items;
+    return items.filter(item =>
+      item.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
+  if (isLoading || !user) {
+    return (
+      <div className="min-h-screen bg-black leather-overlay flex items-center justify-center">
+        <div className="text-gold-400 animate-pulse-gold">Chargement...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black leather-overlay pb-20">
+      {/* Header */}
+      <div className="sticky top-0 z-30 nav-leather border-b border-leather-700/50">
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-gold-500 hover:text-gold-400 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-xl font-bold text-gold-500 embossed">
+            Paramètres et activité
+          </h1>
+        </div>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4 py-4">
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="input-premium flex items-center gap-3">
+            <svg className="w-5 h-5 text-leather-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher paramètres"
+              className="flex-1 bg-transparent border-none outline-none text-white placeholder-leather-400"
+            />
+          </div>
+        </div>
+
+        {/* Your Activity Section */}
+        <div className="mb-6">
+          {filterSettings(yourActivitySettings).map((item, index) => (
+            <Link
+              key={index}
+              to={item.path || '#'}
+              className="flex items-center gap-4 p-4 hover:bg-leather-800/30 transition-colors rounded-xl group"
+            >
+              <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
+                {item.icon}
+              </div>
+              <span className="flex-1 text-white font-medium">{item.label}</span>
+              <svg className="w-5 h-5 text-leather-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          ))}
+        </div>
+
+        {/* What You See Section */}
+        <div className="mb-6">
+          <h2 className="text-leather-400 text-xs font-bold uppercase tracking-wider mb-3 px-4">
+            Ce que tu vois
+          </h2>
+          {filterSettings(whatYouSeeSettings).map((item, index) => (
+            <Link
+              key={index}
+              to={item.path || '#'}
+              className="flex items-center gap-4 p-4 hover:bg-leather-800/30 transition-colors rounded-xl group"
+            >
+              <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
+                {item.icon}
+              </div>
+              <span className="flex-1 text-white font-medium">{item.label}</span>
+              <svg className="w-5 h-5 text-leather-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          ))}
+        </div>
+
+        {/* Quebec Heritage Section */}
+        <div className="mb-6">
+          <h2 className="text-gold-500 text-xs font-bold uppercase tracking-wider mb-3 px-4 flex items-center gap-2">
+            <span>🇨🇦</span>
+            <span>Québec</span>
+          </h2>
+          <div className="leather-card rounded-2xl overflow-hidden stitched">
+            {filterSettings(quebecSettings).map((item, index) => (
+              <Link
+                key={index}
+                to={item.path || '#'}
+                className="flex items-center gap-4 p-4 hover:bg-leather-700/30 transition-colors group border-b border-leather-700/30 last:border-b-0"
+              >
+                <div className="text-2xl group-hover:scale-110 transition-transform">
+                  {item.icon}
+                </div>
+                <span className="flex-1 text-white font-medium">{item.label}</span>
+                {item.badge && (
+                  <span className="badge-premium">{item.badge}</span>
+                )}
+                <svg className="w-5 h-5 text-leather-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Account Settings Section */}
+        <div className="mb-6">
+          <h2 className="text-leather-400 text-xs font-bold uppercase tracking-wider mb-3 px-4">
+            Ton compte
+          </h2>
+          {filterSettings(accountSettings).map((item, index) => (
+            <Link
+              key={index}
+              to={item.path || '#'}
+              className="flex items-center gap-4 p-4 hover:bg-leather-800/30 transition-colors rounded-xl group"
+            >
+              <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
+                {item.icon}
+              </div>
+              <span className="flex-1 text-white font-medium">{item.label}</span>
+              {item.badge && (
+                <span className="text-gold-500 text-sm">{item.badge}</span>
+              )}
+              <svg className="w-5 h-5 text-leather-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          ))}
+        </div>
+
+        {/* Sign Out Button */}
+        <div className="leather-card rounded-2xl p-4 mb-6 stitched">
+          <button
+            onClick={handleSignOut}
+            className="w-full text-center py-3 text-red-400 font-bold hover:text-red-300 transition-colors"
+          >
+            Se déconnecter
+          </button>
+        </div>
+
+        {/* App Info */}
+        <div className="text-center text-leather-400 text-sm space-y-1">
+          <p className="flex items-center justify-center gap-2">
+            <span className="text-gold-500">⚜️</span>
+            <span>Zyeuté v1.0.0</span>
+          </p>
+          <p>Fait avec fierté québécoise 🇨🇦</p>
+          <p className="text-xs text-leather-500">Propulsé par Nano Banana 🍌</p>
+        </div>
+      </div>
+
+      <BottomNav />
+    </div>
+  );
+};
+
+export default Settings;

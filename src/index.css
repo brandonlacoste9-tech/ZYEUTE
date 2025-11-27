@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold-50: #FFF9E5;
+  --color-gold-100: #FFF2CC;
+  --color-gold-200: #FFE699;
+  --color-gold-300: #FFD966;
+  --color-gold-400: #FFCC33;
+  --color-gold-500: #FFBF00;
+  --color-gold-600: #E6AC00;
+  --color-gold-700: #CC9900;
+  --color-gold-800: #B38600;
+  --color-gold-900: #997300;
+  --color-gold-950: #664D00;
+  
+  --color-leather-50: #fdf8f6;
+  --color-leather-100: #f2e8e5;
+  --color-leather-200: #eaddd7;
+  --color-leather-300: #e0cec7;
+  --color-leather-400: #d2bab0;
+  --color-leather-500: #a18e87;
+  --color-leather-600: #84746f;
+  --color-leather-700: #655955;
+  --color-leather-800: #463e3b;
+  --color-leather-900: #2a2523;
+  --color-leather-950: #0d0c0b;
+}
+
+:root {
+  --edge-color: #FFBF00;
+  --glow-intensity: 50%;
+}
+
+@layer base {
+  body {
+    @apply bg-black text-white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(255, 191, 0, 0.03) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231a1a1a' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+}
+
+@layer utilities {
+  /* --- TEXTURES & MATERIALS --- */
+  
+  /* Leather Texture */
+  .leather-overlay {
+    background-color: #0a0a0a;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  }
+
+  .leather-card {
+    @apply bg-neutral-900 border border-neutral-800 relative overflow-hidden;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  /* Gold Stitching Effect */
+  .stitched {
+    position: relative;
+    border: 2px dashed #4a3b22; /* Dark gold thread base */
+    box-shadow: 0 0 0 4px #1a1a1a, inset 0 0 10px rgba(0,0,0,0.8);
+  }
+  
+  .stitched::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border: 1px dashed rgba(255, 191, 0, 0.3); /* Gold highlight */
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  
+  .stitched-subtle {
+    border: 1px dashed rgba(255, 191, 0, 0.2);
+  }
+
+  /* Gold Gradient Text/Borders */
+  .text-gold-gradient {
+    @apply bg-gradient-to-b from-gold-300 to-gold-600 bg-clip-text text-transparent;
+  }
+  
+  .bg-gold-gradient {
+    @apply bg-gradient-to-b from-gold-400 to-gold-600;
+  }
+
+  .border-gold-gradient {
+    border-image: linear-gradient(to bottom, #FFD966, #B38600) 1;
+  }
+
+  /* Embossed/Debossed Effects */
+  .embossed {
+    text-shadow: 0 1px 1px rgba(0,0,0,0.8), 0 -1px 1px rgba(255,255,255,0.1);
+  }
+  
+  .debossed {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  /* Premium Buttons */
+  .btn-leather {
+    @apply bg-neutral-800 text-gold-400 border border-neutral-700 transition-all duration-300;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  
+  .btn-leather:hover {
+    @apply bg-neutral-750 border-gold-500/50 text-gold-300;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4), 0 0 10px rgba(255, 191, 0, 0.1);
+  }
+  
+  .btn-leather:active {
+    transform: translateY(0px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  .btn-gold {
+    @apply bg-gradient-to-b from-gold-400 to-gold-600 text-black font-bold shadow-lg;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  }
+  
+  .btn-gold:hover {
+    @apply from-gold-300 to-gold-500;
+    box-shadow: 0 0 15px rgba(255, 191, 0, 0.4);
+  }
+
+  /* Premium Inputs */
+  .input-premium {
+    @apply w-full bg-black/40 border border-neutral-700 rounded-xl px-4 py-3 text-gold-100 placeholder-neutral-500 transition-all;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+  }
+  
+  .input-premium:focus {
+    @apply border-gold-500/80 outline-none ring-1 ring-gold-500/50;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255, 191, 0, 0.1);
+  }
+
+  /* --- EXISTING UTILITIES (Preserved) --- */
+  
+  /* Glass morphism */
+  .glass-card {
+    @apply bg-neutral-900/80 backdrop-blur-xl border border-white/5;
+  }
+
+  .glass-nav {
+    @apply bg-black/90 backdrop-blur-xl border-t border-white/5;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+  }
+
+  /* Story ring */
+  .story-ring {
+    @apply bg-gradient-to-tr from-gold-600 via-gold-400 to-gold-200;
+    box-shadow: 0 0 10px rgba(255, 191, 0, 0.3);
+  }
+
+  /* Safe areas */
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+  /* Hide scrollbar */
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* Edge Lighting Effects */
+  .edge-glow {
+    box-shadow: 0 0 10px var(--edge-color), inset 0 0 5px var(--edge-color);
+    border: 1px solid var(--edge-color);
+  }
+
+  .edge-glow-strong {
+    box-shadow: 0 0 20px var(--edge-color), inset 0 0 10px var(--edge-color);
+    border: 2px solid var(--edge-color);
+  }
+  
+  .glow-gold {
+    box-shadow: 0 0 15px rgba(255, 191, 0, 0.3);
+  }
+
+  /* Card with Edge Lighting */
+  .card-edge {
+    @apply bg-neutral-900/80 backdrop-blur-xl border border-gold-500/30 rounded-2xl;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  }
+}
+
+@layer components {
+  .theme-gold { --edge-color: #FFBF00; }
+  .theme-blue { --edge-color: #0066CC; }
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in { animation: fade-in 0.5s ease-out; }

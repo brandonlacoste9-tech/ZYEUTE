@@ -1,0 +1,38 @@
+{
+  "name": "zyeute",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "L'app sociale du Québec - Fait au Québec, pour le Québec 🇨🇦⚜️",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^2.0.74",
+    "@stripe/react-stripe-js": "^2.8.0",
+    "@stripe/stripe-js": "^4.0.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "ai": "^5.0.104",
+    "clsx": "^2.1.1",
+    "openai": "^4.67.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0",
+    "tailwind-merge": "^2.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.3"
+  }
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Zyeuté - L'app sociale du Québec 🇨🇦⚜️</title>
+    <meta name="description" content="Partage tes photos et vidéos avec le Québec entier! La seule app sociale 100% québécoise." />
+    <meta name="theme-color" content="#F5C842" />
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Zyeuté" />
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Zyeuté - L'app sociale du Québec" />
+    <meta property="og:description" content="Partage tes photos et vidéos avec le Québec entier!" />
+    <meta property="og:type" content="website" />
+    
+    <style>
+      body {
+        margin: 0;
+        background: #050505;
+        color: #e5e7eb;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      #root {
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {
+              console.log('✅ SW registered:', registration.scope);
+            })
+            .catch((error) => {
+              console.error('❌ SW registration failed:', error);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
+

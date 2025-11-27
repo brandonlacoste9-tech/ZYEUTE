@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zyeuté - Hors ligne</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 500px;
+    }
+
+    .icon {
+      font-size: 100px;
+      margin-bottom: 30px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #F5C842 0%, #FF9500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    p {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #F5C842 0%, #FF9500 100%);
+      color: black;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .tips {
+      margin-top: 50px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .tips h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: #F5C842;
+    }
+
+    .tips ul {
+      list-style: none;
+      text-align: left;
+    }
+
+    .tips li {
+      padding: 10px 0;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+    }
+
+    .tips li::before {
+      content: "⚜️ ";
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📵</div>
+    <h1>Pas de connexion Internet</h1>
+    <p>
+      Oups! On dirait que t'es hors ligne.<br>
+      Vérifie ta connexion WiFi ou tes données cellulaires.
+    </p>
+    <button class="btn" onclick="window.location.reload()">
+      Réessayer 🔄
+    </button>
+
+    <div class="tips">
+      <h2>Pendant ce temps...</h2>
+      <ul>
+        <li>Assure-toi que ton WiFi est activé</li>
+        <li>Vérifie tes données cellulaires</li>
+        <li>Essaie de te rapprocher de ton routeur</li>
+        <li>Redémarre ton appareil si nécessaire</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
+
