@@ -10,7 +10,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { TiGuy } from './components/features/TiGuy';
-import { LoadingScreen } from './components/ui/LoadingScreen';
+import { LoadingScreen } from './components/LoadingScreen';
 
 // Pages
 import Feed from './pages/Feed';
