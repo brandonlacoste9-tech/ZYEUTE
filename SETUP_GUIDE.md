@@ -68,22 +68,34 @@ This will install all required packages including:
 
 ### Create Environment File
 
-Create a `.env.local` file in the project root:
+Copy the example environment file and fill in your credentials:
 
 ```bash
-# Supabase Configuration
+cp .env.example .env.local
+```
+
+Then edit `.env.local` with your actual values:
+
+```bash
+# Supabase Configuration (Required)
 VITE_SUPABASE_URL=your-supabase-url-here
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key-here
 
-# Google Gemini API
+# Google Gemini API (Required)
 VITE_GEMINI_API_KEY=your-gemini-api-key-here
 
-# App Configuration
+# Stripe (Optional - for payments)
+VITE_STRIPE_PUBLIC_KEY=your-stripe-public-key-here
+
+# App Configuration (Optional)
 VITE_APP_URL=http://localhost:5173
 VITE_APP_NAME=Zyeuté
 ```
 
-⚠️ **Important**: Never commit `.env.local` to Git. It's already in `.gitignore`.
+⚠️ **Important**: 
+- Never commit `.env.local` to Git. It's already in `.gitignore`.
+- This project uses **Supabase** for authentication. **Clerk is NOT used.**
+- See `.env.example` for a complete list of environment variables.
 
 ---
 
@@ -382,6 +394,8 @@ CREATE TRIGGER on_fire_delete
 
 ### Step 5: Enable Authentication Providers
 
+**Important**: This project uses **Supabase Authentication** - NOT Clerk or any other third-party auth provider.
+
 1. Go to **Authentication** → **Providers**
 2. Enable:
    - ✅ **Email** (already enabled)
@@ -390,6 +404,8 @@ CREATE TRIGGER on_fire_delete
    - ✅ **Apple Sign In** (optional - requires Apple Developer account)
 
 For now, **Email authentication** is enough to get started!
+
+**Note**: No Clerk configuration needed - all authentication is handled by Supabase.
 
 ---
 

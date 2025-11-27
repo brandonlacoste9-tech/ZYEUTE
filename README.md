@@ -27,7 +27,9 @@ cd brandonlacoste9-tech-ZYEUTE
 npm install
 
 # 3. Create .env.local file with your keys
-# See SETUP_GUIDE.md for details
+# Copy .env.example to .env.local and fill in your values
+cp .env.example .env.local
+# Edit .env.local with your Supabase and Gemini API keys
 
 # 4. Run the app
 npm run dev
@@ -78,11 +80,12 @@ npm run dev
 - **React Router** - Client-side routing
 
 ### Backend
-- **Supabase** - Backend-as-a-Service
-  - Authentication
+- **Supabase** - Backend-as-a-Service (100% authentication solution)
+  - Authentication (Email/Password + OAuth providers)
   - PostgreSQL database
   - Storage
   - Real-time subscriptions
+  - **Note**: This project does NOT use Clerk or any third-party auth providers
 - **Vercel Edge** - Hosting and CDN
 
 ### AI/ML
@@ -158,9 +161,12 @@ git push origin main
 # - Import your repo
 
 # 3. Add environment variables in Vercel
+# See .env.example for all required variables:
 # - VITE_SUPABASE_URL
 # - VITE_SUPABASE_ANON_KEY
 # - VITE_GEMINI_API_KEY
+# - VITE_STRIPE_PUBLIC_KEY (optional)
+# Note: NO Clerk keys required - we use Supabase Auth
 
 # 4. Deploy!
 ```
@@ -218,7 +224,7 @@ We welcome contributions! Here's how:
 ### Common Issues
 
 **Problem**: "Missing environment variables"  
-**Solution**: Create `.env.local` with your Supabase and Gemini keys
+**Solution**: Copy `.env.example` to `.env.local` and fill in your Supabase and Gemini keys. See `.env.example` for all required variables.
 
 **Problem**: "Bucket not found"  
 **Solution**: Create `posts` and `avatars` buckets in Supabase Storage (make them public)
