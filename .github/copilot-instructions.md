@@ -147,7 +147,8 @@ zyeute/
 ### React
 
 - Use **functional components** with hooks (no class components)
-- Use **TypeScript generics** for component props: `React.FC<Props>` or `(props: Props) => JSX.Element`
+- Define component props with TypeScript: `(props: Props) => JSX.Element` or `function Component(props: Props) { ... }`
+- Avoid `React.FC` (deprecated pattern) - use regular function declarations with typed props
 - Destructure props in function parameters
 - Use proper dependency arrays in `useEffect`, `useMemo`, `useCallback`
 - Memoize expensive computations and callbacks when appropriate
@@ -558,7 +559,7 @@ import { supabase } from '../lib/supabase';
 import { Header } from '../components/layout/Header';
 import { FeedGrid } from '../components/FeedGrid';
 
-const Profile: React.FC = () => {
+function Profile() {
   const { slug } = useParams();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -577,7 +578,7 @@ const Profile: React.FC = () => {
       <FeedGrid posts={posts} />
     </div>
   );
-};
+}
 
 export default Profile;
 ```
@@ -612,13 +613,18 @@ interface ProfileHeaderProps {
   onFollow: () => void;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ 
+const ProfileHeader = ({ 
   user, 
   isOwnProfile, 
   onFollow 
-}) => {
+}: ProfileHeaderProps) => {
   // Component implementation
 };
+
+// Or as a function declaration:
+function ProfileHeader({ user, isOwnProfile, onFollow }: ProfileHeaderProps) {
+  // Component implementation
+}
 ```
 
 ### State Management
