@@ -5,51 +5,51 @@
 
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { supabase } from './lib/supabase';
-import { ErrorBoundary } from './components/ErrorBoundary';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { NotificationProvider } from './contexts/NotificationContext';
-import { TiGuy } from './components/features/TiGuy';
-import { LoadingScreen } from './components/LoadingScreen';
+import { supabase } from '@/lib/supabase';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { NotificationProvider } from '@/contexts/NotificationContext';
+import { TiGuy } from '@/components/features/TiGuy';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 // Pages
-import Feed from './pages/Feed';
-import Profile from './pages/Profile';
-import Upload from './pages/Upload';
-import Explore from './pages/Explore';
-import PostDetail from './pages/PostDetail';
-import Notifications from './pages/Notifications';
-import Settings from './pages/Settings';
-import Analytics from './pages/Analytics';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import StoryCreator from './components/features/StoryCreator';
-import Achievements from './pages/Achievements';
-import { AchievementListener } from './components/gamification/AchievementModal';
-import CreatorRevenue from './pages/CreatorRevenue';
-import EmailPreferences from './pages/EmailPreferences';
-import AdminDashboard from './pages/admin/Dashboard';
-import EmailCampaigns from './pages/admin/EmailCampaigns';
-import { ProtectedAdminRoute } from './components/auth/ProtectedAdminRoute';
+import Feed from '@/pages/Feed';
+import Profile from '@/pages/Profile';
+import Upload from '@/pages/Upload';
+import Explore from '@/pages/Explore';
+import PostDetail from '@/pages/PostDetail';
+import Notifications from '@/pages/Notifications';
+import Settings from '@/pages/Settings';
+import Analytics from '@/pages/Analytics';
+import Login from '@/pages/Login';
+import Signup from '@/pages/Signup';
+import StoryCreator from '@/components/features/StoryCreator';
+import Achievements from '@/pages/Achievements';
+import { AchievementListener } from '@/components/gamification/AchievementModal';
+import CreatorRevenue from '@/pages/CreatorRevenue';
+import EmailPreferences from '@/pages/EmailPreferences';
+import AdminDashboard from '@/pages/admin/Dashboard';
+import EmailCampaigns from '@/pages/admin/EmailCampaigns';
+import { ProtectedAdminRoute } from '@/components/auth/ProtectedAdminRoute';
 
 // New Phase 2 Pages
-import Artiste from './pages/Artiste';
-import Studio from './pages/Studio';
-import Marketplace from './pages/Marketplace';
-import Premium from './pages/Premium';
-import Challenges from './pages/Challenges';
-import VoiceSettingsPage from './pages/VoiceSettingsPage';
-import GoLive from './pages/GoLive';
-import WatchLive from './pages/WatchLive';
-import LiveDiscover from './pages/LiveDiscover';
+import Artiste from '@/pages/Artiste';
+import Studio from '@/pages/Studio';
+import Marketplace from '@/pages/Marketplace';
+import Premium from '@/pages/Premium';
+import Challenges from '@/pages/Challenges';
+import VoiceSettingsPage from '@/pages/VoiceSettingsPage';
+import GoLive from '@/pages/GoLive';
+import WatchLive from '@/pages/WatchLive';
+import LiveDiscover from '@/pages/LiveDiscover';
 
 // Moderation
-import Moderation from './pages/moderation/Moderation';
+import Moderation from '@/pages/moderation/Moderation';
 
 // Legal Pages
-import CommunityGuidelines from './pages/legal/CommunityGuidelines';
-import TermsOfService from './pages/legal/TermsOfService';
-import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import CommunityGuidelines from '@/pages/legal/CommunityGuidelines';
+import TermsOfService from '@/pages/legal/TermsOfService';
+import PrivacyPolicy from '@/pages/legal/PrivacyPolicy';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {

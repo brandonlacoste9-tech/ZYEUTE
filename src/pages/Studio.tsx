@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import { Header } from '../components/Header';
-import { BottomNav } from '../components/layout/BottomNav';
+import { BottomNav } from '../components/BottomNav';
 import { Button } from '../components/Button';
 import { processVideo, generateCaptions, smartTrim, type VideoProcessResult } from '../services/videoService';
 import { toast } from '../components/Toast';

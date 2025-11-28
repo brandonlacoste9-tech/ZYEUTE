@@ -5,13 +5,13 @@
 
 import React from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Header } from '../components/Header';
-import { BottomNav } from '../components/layout/BottomNav';
-import { Avatar } from '../components/Avatar';
-import { Button } from '../components/Button';
-import { supabase } from '../lib/supabase';
-import { formatNumber } from '../lib/utils';
-import type { User, Post } from '../types';
+import { Header } from '@/components/Header';
+import { BottomNav } from '@/components/BottomNav';
+import { Avatar } from '@/components/Avatar';
+import { Button } from '@/components/Button';
+import { supabase } from '@/lib/supabase';
+import { formatNumber } from '@/lib/utils';
+import type { User, Post } from '@/types';
 
 export const Profile: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();

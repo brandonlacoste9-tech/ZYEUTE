@@ -5,12 +5,12 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Header } from '../components/Header';
-import { BottomNav } from '../components/layout/BottomNav';
-import { supabase } from '../lib/supabase';
-import { QUEBEC_HASHTAGS, QUEBEC_REGIONS } from '../lib/quebecFeatures';
-import { formatNumber } from '../lib/utils';
-import type { Post } from '../types';
+import { Header } from '@/components/Header';
+import { BottomNav } from '@/components/BottomNav';
+import { supabase } from '@/lib/supabase';
+import { QUEBEC_HASHTAGS, QUEBEC_REGIONS } from '@/lib/quebecFeatures';
+import { formatNumber } from '@/lib/utils';
+import type { Post } from '@/types';
 
 export const Explore: React.FC = () => {
   const [posts, setPosts] = React.useState<Post[]>([]);

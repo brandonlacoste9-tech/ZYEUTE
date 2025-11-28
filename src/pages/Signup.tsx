@@ -5,9 +5,9 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '../components/Button';
-import { Logo } from '../components/Logo';
-import { signUp } from '../lib/supabase';
+import { Button } from '@/components/Button';
+import { Logo } from '@/components/Logo';
+import { signUp } from '@/lib/supabase';
 
 export const Signup: React.FC = () => {
   const navigate = useNavigate();

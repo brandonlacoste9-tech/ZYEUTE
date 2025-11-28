@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase, signIn, signInWithGoogle } from '../lib/supabase';
+import { supabase, signIn, signInWithGoogle } from '@/lib/supabase';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();

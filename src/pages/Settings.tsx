@@ -5,15 +5,15 @@
 
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Header } from '../components/Header';
-import { BottomNav } from '../components/layout/BottomNav';
-import { Avatar } from '../components/Avatar';
-import { Button } from '../components/Button';
-import { supabase } from '../lib/supabase';
-import { toast } from '../components/Toast';
-import { generateId } from '../lib/utils';
-import { QUEBEC_REGIONS } from '../lib/quebecFeatures';
-import type { User } from '../types';
+import { Header } from '@/components/Header';
+import { BottomNav } from '@/components/BottomNav';
+import { Avatar } from '@/components/Avatar';
+import { Button } from '@/components/Button';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/components/Toast';
+import { generateId } from '@/lib/utils';
+import { QUEBEC_REGIONS } from '@/lib/quebecFeatures';
+import type { User } from '@/types';
 
 interface SettingItem {
   icon: React.ReactNode;

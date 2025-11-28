@@ -1,5 +1,6 @@
 /**
- * Bottom navigation bar with gold active indicator
+ * Bottom Navigation - Premium Quebec Heritage Design
+ * Leather texture with gold stitching and glowing icons
  */
 
 import React from 'react';
@@ -46,14 +47,18 @@ const navItems: NavItem[] = [
     to: '/upload',
     label: 'Créer',
     icon: (
-      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
-      </svg>
+      <div className="relative">
+        <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
+        </svg>
+      </div>
     ),
     activeIcon: (
-      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
-      </svg>
+      <div className="relative">
+        <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
+        </svg>
+      </div>
     ),
   },
   {
@@ -88,7 +93,17 @@ const navItems: NavItem[] = [
 
 export const BottomNav: React.FC = () => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-white/10 safe-bottom">
+    <nav 
+      className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
+      style={{
+        background: 'linear-gradient(to top, #0d0c0b 0%, #1a1815 100%)',
+        boxShadow: '0 -10px 40px rgba(0,0,0,0.8)',
+      }}
+    >
+      {/* Gold Stitching Line at Top */}
+      <div className="absolute top-0 left-4 right-4 h-[1px] bg-gradient-to-r from-transparent via-gold-500/50 to-transparent" />
+      <div className="absolute top-[3px] left-6 right-6 border-t border-dashed border-gold-500/30" />
+
       <div className="max-w-7xl mx-auto px-2">
         <div className="flex items-center justify-around h-16">
           {navItems.map((item) => (
@@ -98,26 +113,79 @@ export const BottomNav: React.FC = () => {
               end={item.to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 relative',
-                  'hover:bg-white/5',
-                  isActive ? 'text-gold-400' : 'text-white/60'
+                  'flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-300 relative',
+                  item.to === '/upload' ? '-mt-4' : '',
+                  isActive 
+                    ? 'text-gold-400' 
+                    : 'text-neutral-500 hover:text-gold-500/70'
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  {/* Active indicator */}
+                  {/* Active Glow Indicator */}
                   {isActive && (
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-12 h-1 bg-gold-gradient rounded-full" />
+                    <>
+                      {/* Top Bar */}
+                      <div 
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full"
+                        style={{
+                          background: 'linear-gradient(90deg, #B8860B, #FFD700, #B8860B)',
+                          boxShadow: '0 0 10px rgba(255,191,0,0.6)',
+                        }}
+                      />
+                      {/* Background Glow */}
+                      <div 
+                        className="absolute inset-0 rounded-xl opacity-20"
+                        style={{
+                          background: 'radial-gradient(circle, rgba(255,191,0,0.4) 0%, transparent 70%)',
+                        }}
+                      />
+                    </>
                   )}
 
-                  {/* Icon */}
-                  <div className={cn(isActive && 'drop-shadow-gold')}>
-                    {isActive ? item.activeIcon : item.icon}
-                  </div>
+                  {/* Upload Button Special Styling */}
+                  {item.to === '/upload' ? (
+                    <div 
+                      className="relative p-1 rounded-full transition-all duration-300"
+                      style={{
+                        background: isActive 
+                          ? 'linear-gradient(135deg, #FFD700 0%, #DAA520 100%)'
+                          : 'linear-gradient(135deg, #3a3530 0%, #252320 100%)',
+                        boxShadow: isActive 
+                          ? '0 0 20px rgba(255,191,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3)'
+                          : '0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
+                        border: `2px solid ${isActive ? 'rgba(255,191,0,0.8)' : 'rgba(255,191,0,0.3)'}`,
+                      }}
+                    >
+                      <div className={isActive ? 'text-black' : 'text-gold-400'}>
+                        {isActive ? item.activeIcon : item.icon}
+                      </div>
+                    </div>
+                  ) : (
+                    /* Icon with Glow Effect */
+                    <div 
+                      className="relative z-10 transition-all duration-300"
+                      style={{
+                        filter: isActive 
+                          ? 'drop-shadow(0 0 8px rgba(255,191,0,0.6))'
+                          : 'none',
+                      }}
+                    >
+                      {isActive ? item.activeIcon : item.icon}
+                    </div>
+                  )}
 
                   {/* Label */}
-                  <span className={cn('text-xs font-medium', item.to === '/upload' && 'sr-only')}>
+                  <span 
+                    className={cn(
+                      'text-[10px] font-semibold tracking-wide relative z-10 transition-all duration-300',
+                      item.to === '/upload' && 'sr-only'
+                    )}
+                    style={{
+                      textShadow: isActive ? '0 0 10px rgba(255,191,0,0.5)' : 'none',
+                    }}
+                  >
                     {item.label}
                   </span>
                 </>
@@ -126,6 +194,12 @@ export const BottomNav: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Bottom Safe Area Fill */}
+      <div 
+        className="h-[env(safe-area-inset-bottom)]"
+        style={{ background: '#0d0c0b' }}
+      />
     </nav>
   );
 };

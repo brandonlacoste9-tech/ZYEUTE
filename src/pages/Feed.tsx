@@ -4,13 +4,13 @@
  */
 
 import React from 'react';
-import { Header } from '../components/Header';
-import { BottomNav } from '../components/layout/BottomNav';
-import { StoryCarousel } from '../components/features/StoryCircle';
-import { VideoCard } from '../components/features/VideoCard';
-import { supabase } from '../lib/supabase';
-import type { Post, User, Story } from '../types';
 import { Link } from 'react-router-dom';
+import { Header } from '@/components/Header';
+import { BottomNav } from '@/components/BottomNav';
+import { StoryCarousel } from '@/components/features/StoryCircle';
+import { VideoCard } from '@/components/features/VideoCard';
+import { supabase } from '@/lib/supabase';
+import type { Post, User, Story } from '@/types';
 
 export const Feed: React.FC = () => {
   const [posts, setPosts] = React.useState<Post[]>([]);
