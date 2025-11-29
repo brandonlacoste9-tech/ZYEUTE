@@ -1,6 +1,6 @@
 # 🔥⚜️ Zyeuté - AI Assistant Guide ⚜️🔥
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 
 **Last Updated**: 2025-11-28
 
@@ -9,6 +9,32 @@
 > **Fait au Québec, pour le Québec** 🇨🇦
 
 This document provides comprehensive guidance for AI assistants working on the Zyeuté codebase. Zyeuté is Quebec's first social media platform built specifically for Quebecers, celebrating Quebec culture, language (Joual), and community.
+
+---
+
+## 📝 Changelog
+
+### Version 1.1.0 (2025-11-28)
+
+**New Sections Added**:
+- ⚙️ Environment Setup - Comprehensive .env configuration guide
+- 🧪 Testing - Unit, integration, and E2E testing examples
+- 🎣 Custom Hooks Patterns - 5+ reusable hook examples
+- 🔄 State Management Patterns - React Context best practices
+- ⚡ Performance Optimization - Code splitting, memoization, caching
+- 🚀 Deployment - Vercel and Netlify deployment guides
+- 🔧 Troubleshooting & Debugging - Common issues and solutions
+
+**Enhanced Sections**:
+- 📚 Joual Dictionary - Expanded with 100+ terms and phrases
+- ✅ Best Practices - More detailed checklists
+- 🎯 Quick Reference - Updated commands
+
+**Improvements**:
+- Added more code examples throughout
+- Improved TypeScript examples
+- Enhanced error handling patterns
+- Better Quebec culture integration
 
 ---
 
@@ -76,6 +102,105 @@ Payments:  Stripe
 AI:        OpenAI (GPT-4, DALL-E 3)
 Deploy:    Vercel / Netlify
 ```
+
+---
+
+## ⚙️ Environment Setup
+
+### Required Environment Variables
+
+Create a `.env.local` file in the project root:
+
+```bash
+# Supabase (Required for all features)
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+
+# OpenAI (Required for Ti-Guy AI features)
+VITE_OPENAI_API_KEY=sk-your-openai-api-key
+
+# Stripe (Required for payments and subscriptions)
+VITE_STRIPE_PUBLIC_KEY=pk_test_your-stripe-publishable-key
+
+# Optional: Google OAuth
+VITE_GOOGLE_CLIENT_ID=your-google-client-id
+```
+
+### Setting Up Supabase
+
+1. **Create a Supabase project** at [supabase.com](https://supabase.com)
+2. **Get your credentials**:
+   - Go to Project Settings → API
+   - Copy `Project URL` → `VITE_SUPABASE_URL`
+   - Copy `anon public` key → `VITE_SUPABASE_ANON_KEY`
+3. **Run migrations**:
+   ```bash
+   # Migrations are in supabase/migrations/
+   # Apply them via Supabase dashboard or CLI
+   ```
+
+### Setting Up OpenAI
+
+1. **Get API key** from [platform.openai.com](https://platform.openai.com/api-keys)
+2. **Add to `.env.local`**: `VITE_OPENAI_API_KEY=sk-...`
+3. **Verify it works**:
+   ```typescript
+   const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+   if (!apiKey) {
+     console.warn('OpenAI API key missing');
+   }
+   ```
+
+### Setting Up Stripe
+
+1. **Create account** at [stripe.com](https://stripe.com)
+2. **Get publishable key** from Dashboard → Developers → API keys
+3. **Add to `.env.local`**: `VITE_STRIPE_PUBLIC_KEY=pk_test_...`
+4. **Note**: Use test keys for development, production keys for production
+
+### Environment Verification
+
+Create a simple check in your app:
+
+```typescript
+// src/lib/envCheck.ts
+export function checkEnvironment() {
+  const required = {
+    supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+    supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+  };
+
+  const optional = {
+    openaiKey: import.meta.env.VITE_OPENAI_API_KEY,
+    stripeKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY,
+  };
+
+  const missing = Object.entries(required)
+    .filter(([_, value]) => !value)
+    .map(([key]) => key);
+
+  if (missing.length > 0) {
+    console.error('Missing required env vars:', missing);
+    return false;
+  }
+
+  console.log('✅ Required env vars present');
+  console.log('Optional:', {
+    openai: !!optional.openaiKey,
+    stripe: !!optional.stripeKey,
+  });
+
+  return true;
+}
+```
+
+### Security Best Practices
+
+1. **Never commit `.env.local`** - it's in `.gitignore`
+2. **Use different keys** for development and production
+3. **Rotate keys** if exposed
+4. **Use RLS policies** in Supabase for data protection
+5. **Validate env vars** at app startup
 
 ---
 
@@ -150,23 +275,171 @@ Zyeuté's identity is **Joual** (Quebec French dialect). This is non-negotiable.
 
 Reference: `src/lib/quebecFeatures.ts`
 
+**Comprehensive Joual vocabulary for UI text and interactions:**
+
 ```typescript
-// Social Actions
+// ==================== SOCIAL ACTIONS & UI ELEMENTS ====================
 like: 'Donner du feu 🔥'
 comment: 'Jasette 💬'
 share: 'Partager ça'
+follow: 'Suivre'
+unfollow: 'Unfollow'
+post: 'Poster'
+upload: 'Uploader'
+save: 'Sauvegarder'
+delete: 'Effacer'
+edit: 'Modifier'
+cancel: 'Annuler'
+confirm: 'Confirmer'
+search: 'Chercher'
+filter: 'Filtrer'
+sort: 'Trier'
+loadMore: 'Voir plus'
+refresh: 'Rafraîchir'
 
-// Reactions
+// Feed & Navigation
+feed: 'Mon feed'
+explore: 'Découvrir'
+profile: 'Mon profil'
+notifications: 'Mes notifs'
+messages: 'Mes messages'
+settings: 'Paramètres'
+logout: 'Déconnecter'
+login: 'Se connecter'
+signup: "S'inscrire"
+
+// ==================== REACTIONS & EMOTIONS ====================
 cool: 'Tiguidou'
 nice: 'Nice en criss'
 awesome: 'Malade!'
+amazing: 'Malade en esti!'
 lol: 'Haha tabarnak'
+funny: 'Drôle en criss'
+beautiful: 'Beau en tabarnak'
+impressive: 'Impressionnant!'
+love: "J'adore ça!"
+hate: "J'aime pas ça"
+confused: 'Je comprends rien'
+excited: 'Je suis hype!'
+proud: 'Fier en esti'
 
-// Weather (very Quebec!)
+// ==================== WEATHER & SEASONS (VERY QUEBEC!) ====================
 cold: 'Frette en esti'
 hot: 'Chaud en tabarnak'
 snow: 'Y neige!'
+rain: 'Y mouille!'
+sunny: 'Y fait beau!'
+windy: 'Y vente!'
 construction: 'Saison de construction 🚧'
+winter: "L'hiver québécois"
+summer: "L'été"
+spring: "Le printemps"
+fall: "L'automne"
+
+// ==================== QUEBEC-SPECIFIC TERMS ====================
+// Food & Drinks
+poutine: 'Une pout'
+poutine: 'Une poutine'
+tourtiere: 'Une tourtière'
+caribou: "Un p'tit caribou"
+beer: 'Une frette'
+mapleSyrup: 'Du sirop'
+bagel: 'Un bagel'
+smokedMeat: 'Du smoked meat'
+
+// Places & Locations
+montreal: 'MTL'
+quebec: 'QC'
+plateau: 'Le Plateau'
+mileEnd: 'Mile End'
+vieuxMontreal: 'Vieux-MTL'
+hochelaga: 'Hochelaga'
+verdun: 'Verdun'
+
+// Events & Culture
+saintJean: 'La Saint-Jean'
+carnaval: 'Le Carnaval'
+osheaga: 'Osheaga'
+justePourRire: 'JPR'
+francoFolies: 'Les Francos'
+
+// ==================== COMMON PHRASES ====================
+greeting: 'Salut!'
+hello: 'Allo!'
+hey: 'Heille!'
+whatsUp: 'Ça va?'
+howAreYou: 'Comment ça va?'
+good: 'Ça va bien'
+bad: 'Ça va mal'
+yes: 'Ouin'
+no: 'Non'
+maybe: 'Peut-être'
+sure: 'Sûr!'
+ofCourse: 'Ben oui!'
+really: 'Vraiment?'
+seriously: 'Sérieux?'
+noWay: 'Pas moyen!'
+forReal: 'Pour vrai?'
+awesome: 'Tiguidou!'
+thanks: 'Merci!'
+welcome: 'Bienvenue!'
+sorry: 'Désolé'
+excuseMe: 'Excuse-moi'
+please: 'S\'il te plaît'
+
+// ==================== ERROR MESSAGES & FEEDBACK ====================
+error: 'Erreur'
+somethingWentWrong: 'Quelque chose a mal tourné'
+tryAgain: 'Réessaie!'
+loading: 'En chargement...'
+saving: 'En sauvegarde...'
+uploading: 'En upload...'
+success: 'Succès!'
+saved: 'Sauvegardé!'
+deleted: 'Effacé!'
+updated: 'Mis à jour!'
+created: 'Créé!'
+failed: 'Échoué'
+networkError: 'Erreur de réseau'
+notFound: 'Pas trouvé'
+unauthorized: 'Pas autorisé'
+forbidden: 'Interdit'
+serverError: 'Erreur du serveur'
+validationError: 'Erreur de validation'
+required: 'Requis'
+invalid: 'Invalide'
+tooShort: 'Trop court'
+tooLong: 'Trop long'
+invalidEmail: 'Email invalide'
+passwordTooWeak: 'Mot de passe trop faible'
+passwordsDontMatch: 'Les mots de passe ne correspondent pas'
+
+// ==================== TI-GUY SPECIFIC ====================
+tiGuyGreeting: 'Salut! C\'est Ti-Guy!'
+tiGuyReady: 'Je suis prêt à t\'aider!'
+tiGuyThinking: 'Laisse-moi réfléchir...'
+tiGuyGenerating: 'Je génère ça pour toi...'
+tiGuyDone: 'Voilà! C\'est fait!'
+tiGuyError: 'Oups! Y\'a eu un problème...'
+tiGuyHelp: 'Comment je peux t\'aider?'
+tiGuyCaption: 'Je peux créer une caption pour toi!'
+tiGuyHashtags: 'Je peux suggérer des hashtags!'
+tiGuyImage: 'Je peux générer une image!'
+
+// ==================== PREMIUM/VIP TIERS ====================
+bronze: 'Bronze'
+silver: 'Argent'
+gold: 'Or'
+premium: 'Premium'
+vip: 'VIP'
+subscribe: "S'abonner"
+subscription: 'Abonnement'
+unsubscribe: "Se désabonner"
+trial: 'Essai gratuit'
+features: 'Fonctionnalités'
+exclusive: 'Exclusif'
+adFree: 'Sans pub'
+earlyAccess: 'Accès anticipé'
 ```
 
 ### Quebec Cultural Elements
@@ -252,6 +525,314 @@ const VideoCard: React.FC<Props> = (props) => { /* ... */ }
 - Destructure props in parameters
 - Proper dependency arrays in `useEffect`, `useMemo`, `useCallback`
 
+### Custom Hooks Patterns
+
+Custom hooks encapsulate reusable logic. Follow these patterns:
+
+#### Data Fetching Hook
+
+```typescript
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { Post } from '../types';
+
+interface UsePostsOptions {
+  limit?: number;
+  userId?: string;
+}
+
+export function usePosts({ limit = 20, userId }: UsePostsOptions = {}) {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        setLoading(true);
+        let query = supabase
+          .from('posts')
+          .select('*, users(*)')
+          .order('created_at', { ascending: false })
+          .limit(limit);
+
+        if (userId) {
+          query = query.eq('user_id', userId);
+        }
+
+        const { data, error: fetchError } = await query;
+
+        if (fetchError) throw fetchError;
+        setPosts(data || []);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to fetch posts'));
+        console.error('Error fetching posts:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPosts();
+  }, [limit, userId]);
+
+  return { posts, loading, error };
+}
+```
+
+#### Authentication Hook
+
+```typescript
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { User } from '@supabase/supabase-js';
+
+export function useAuth() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  return { user, loading };
+}
+```
+
+#### Local Storage Hook
+
+```typescript
+import { useState, useEffect } from 'react';
+
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(`Error reading localStorage key "${key}":`, error);
+      return initialValue;
+    }
+  });
+
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      console.error(`Error setting localStorage key "${key}":`, error);
+    }
+  };
+
+  return [storedValue, setValue] as const;
+}
+```
+
+#### Debounce Hook
+
+```typescript
+import { useState, useEffect } from 'react';
+
+export function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Usage: Search input
+function SearchInput() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 500);
+
+  useEffect(() => {
+    if (debouncedSearch) {
+      // Perform search
+      console.log('Searching for:', debouncedSearch);
+    }
+  }, [debouncedSearch]);
+}
+```
+
+#### Media Query Hook
+
+```typescript
+import { useState, useEffect } from 'react';
+
+export function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+
+    const listener = () => setMatches(media.matches);
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, [matches, query]);
+
+  return matches;
+}
+
+// Usage
+function ResponsiveComponent() {
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  return <div>{isMobile ? 'Mobile' : 'Desktop'}</div>;
+}
+```
+
+**Hook Best Practices**:
+- Start hook names with `use`
+- Return consistent data structures
+- Handle loading and error states
+- Clean up subscriptions/effects
+- Document hook dependencies
+
+### State Management Patterns
+
+Zyeuté uses React Context API for global state. Follow these patterns:
+
+#### Creating a Context
+
+```typescript
+// src/contexts/NotificationContext.tsx
+import { createContext, useContext, useState, ReactNode } from 'react';
+
+interface Notification {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
+
+interface NotificationContextType {
+  notifications: Notification[];
+  addNotification: (notification: Omit<Notification, 'id'>) => void;
+  removeNotification: (id: string) => void;
+}
+
+const NotificationContext = createContext<NotificationContextType | undefined>(
+  undefined
+);
+
+export function NotificationProvider({ children }: { children: ReactNode }) {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const addNotification = (notification: Omit<Notification, 'id'>) => {
+    const id = Math.random().toString(36).substr(2, 9);
+    setNotifications((prev) => [...prev, { ...notification, id }]);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      removeNotification(id);
+    }, 5000);
+  };
+
+  const removeNotification = (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  return (
+    <NotificationContext.Provider
+      value={{ notifications, addNotification, removeNotification }}
+    >
+      {children}
+    </NotificationContext.Provider>
+  );
+}
+
+export function useNotifications() {
+  const context = useContext(NotificationContext);
+  if (context === undefined) {
+    throw new Error('useNotifications must be used within NotificationProvider');
+  }
+  return context;
+}
+```
+
+#### Using Context
+
+```typescript
+// In your component
+import { useNotifications } from '../contexts/NotificationContext';
+
+function MyComponent() {
+  const { addNotification } = useNotifications();
+
+  const handleSuccess = () => {
+    addNotification({
+      message: 'Post créé avec succès!',
+      type: 'success',
+    });
+  };
+
+  return <button onClick={handleSuccess}>Create Post</button>;
+}
+```
+
+#### Performance Optimization for Context
+
+Split contexts to avoid unnecessary re-renders:
+
+```typescript
+// ❌ Bad: Single large context
+const AppContext = createContext({
+  user: null,
+  theme: 'dark',
+  notifications: [],
+  // ... many other values
+});
+
+// ✅ Good: Split into focused contexts
+const UserContext = createContext({ user: null });
+const ThemeContext = createContext({ theme: 'dark' });
+const NotificationContext = createContext({ notifications: [] });
+```
+
+Use `useMemo` for context values:
+
+```typescript
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState('dark');
+
+  const value = useMemo(
+    () => ({ theme, setTheme }),
+    [theme]
+  );
+
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+```
+
 ### File Naming
 
 ```
@@ -300,6 +881,119 @@ try {
 - Toast notifications for user-facing errors
 - Console logs for debugging
 - Provide fallbacks/demo modes when services unavailable
+
+### Testing
+
+#### Component Testing
+
+Use React Testing Library for component tests:
+
+```typescript
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Button } from '../components/Button';
+
+describe('Button', () => {
+  it('should render with correct text', () => {
+    render(<Button>Donner du feu</Button>);
+    expect(screen.getByText('Donner du feu')).toBeInTheDocument();
+  });
+
+  it('should call onClick when clicked', () => {
+    const handleClick = jest.fn();
+    render(<Button onClick={handleClick}>Click me</Button>);
+    
+    fireEvent.click(screen.getByText('Click me'));
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+});
+```
+
+#### Service Testing
+
+Test services with mocked dependencies:
+
+```typescript
+import { generateImage } from '../services/openaiService';
+import { openai } from 'openai';
+
+jest.mock('openai');
+
+describe('openaiService', () => {
+  it('should generate image with correct prompt', async () => {
+    const mockImageUrl = 'https://example.com/image.png';
+    (openai.images.generate as jest.Mock).mockResolvedValue({
+      data: [{ url: mockImageUrl }],
+    });
+
+    const result = await generateImage('Une poutine', 'realistic');
+    expect(result).toBe(mockImageUrl);
+  });
+
+  it('should return null on error', async () => {
+    (openai.images.generate as jest.Mock).mockRejectedValue(
+      new Error('API Error')
+    );
+
+    const result = await generateImage('test', 'realistic');
+    expect(result).toBeNull();
+  });
+});
+```
+
+#### Integration Testing
+
+Test complete user flows:
+
+```typescript
+import { render, screen, waitFor } from '@testing-library/react';
+import { Feed } from '../pages/Feed';
+import { supabase } from '../lib/supabase';
+
+jest.mock('../lib/supabase');
+
+describe('Feed Integration', () => {
+  it('should load and display posts', async () => {
+    const mockPosts = [
+      { id: 1, caption: 'Test post', user: { username: 'testuser' } },
+    ];
+
+    (supabase.from as jest.Mock).mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockResolvedValue({ data: mockPosts, error: null }),
+    });
+
+    render(<Feed />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Test post')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+#### Running Tests
+
+```bash
+# Install testing dependencies (if not already installed)
+npm install -D @testing-library/react @testing-library/jest-dom vitest
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm test -- --watch
+
+# Run tests with coverage
+npm test -- --coverage
+```
+
+**Testing Best Practices**:
+- Test user behavior, not implementation details
+- Use `screen.getByRole` for accessible queries
+- Mock external dependencies (Supabase, OpenAI, Stripe)
+- Test error states and edge cases
+- Keep tests simple and focused
 
 ---
 
@@ -531,6 +1225,229 @@ const { error } = await supabase
 
 ---
 
+## ⚡ Performance Optimization
+
+### Code Splitting & Lazy Loading
+
+Split code by route for faster initial load:
+
+```typescript
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Lazy load route components
+const Feed = lazy(() => import('./pages/Feed'));
+const Profile = lazy(() => import('./pages/Profile'));
+const TiGuyArtiste = lazy(() => import('./pages/Artiste'));
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/" element={<Feed />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/artiste" element={<TiGuyArtiste />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
+}
+```
+
+### Image Optimization
+
+```typescript
+// Optimize images before upload
+function optimizeImage(file: File, maxWidth = 1920, quality = 0.8): Promise<Blob> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(resolve, 'image/jpeg', quality);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+```
+
+### Memoization
+
+Use `memo`, `useMemo`, and `useCallback` strategically:
+
+```typescript
+import { memo, useMemo, useCallback } from 'react';
+
+// Memoize expensive components
+const PostCard = memo(function PostCard({ post, onLike }: PostCardProps) {
+  return (
+    <div>
+      <p>{post.caption}</p>
+      <button onClick={() => onLike(post.id)}>Like</button>
+    </div>
+  );
+});
+
+// Memoize expensive calculations
+function Feed({ posts }: { posts: Post[] }) {
+  const sortedPosts = useMemo(() => {
+    return [...posts].sort((a, b) => 
+      b.created_at.localeCompare(a.created_at)
+    );
+  }, [posts]);
+
+  // Memoize callbacks passed to children
+  const handleLike = useCallback((postId: string) => {
+    // Like logic
+  }, []);
+
+  return (
+    <div>
+      {sortedPosts.map((post) => (
+        <PostCard key={post.id} post={post} onLike={handleLike} />
+      ))}
+    </div>
+  );
+}
+```
+
+### Database Query Optimization
+
+```typescript
+// ❌ Bad: Fetching all columns
+const { data } = await supabase.from('posts').select('*');
+
+// ✅ Good: Select only needed columns
+const { data } = await supabase
+  .from('posts')
+  .select('id, caption, media_url, created_at, users(username, avatar)');
+
+// Use pagination
+const { data } = await supabase
+  .from('posts')
+  .select('*')
+  .range(0, 19) // First 20 posts
+  .order('created_at', { ascending: false });
+```
+
+### Infinite Scroll Pattern
+
+```typescript
+import { useState, useEffect, useCallback } from 'react';
+
+function useInfiniteScroll<T>(
+  fetchFn: (page: number) => Promise<T[]>,
+  pageSize = 20
+) {
+  const [items, setItems] = useState<T[]>([]);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  const loadMore = useCallback(async () => {
+    if (loading || !hasMore) return;
+
+    setLoading(true);
+    try {
+      const newItems = await fetchFn(page);
+      if (newItems.length < pageSize) {
+        setHasMore(false);
+      }
+      setItems((prev) => [...prev, ...newItems]);
+      setPage((prev) => prev + 1);
+    } catch (error) {
+      console.error('Error loading more:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, loading, hasMore, fetchFn, pageSize]);
+
+  return { items, loadMore, loading, hasMore };
+}
+```
+
+### Bundle Size Optimization
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'supabase': ['@supabase/supabase-js'],
+          'openai': ['openai'],
+        },
+      },
+    },
+  },
+});
+```
+
+### Caching Strategies
+
+```typescript
+// Cache API responses
+const cache = new Map<string, { data: unknown; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function fetchWithCache<T>(
+  key: string,
+  fetchFn: () => Promise<T>
+): Promise<T> {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data as T;
+  }
+
+  const data = await fetchFn();
+  cache.set(key, { data, timestamp: Date.now() });
+  return data;
+}
+```
+
+### Performance Monitoring
+
+```typescript
+// Monitor component render times
+import { useEffect, useRef } from 'react';
+
+function useRenderTime(componentName: string) {
+  const renderStart = useRef(performance.now());
+
+  useEffect(() => {
+    const renderTime = performance.now() - renderStart.current;
+    if (renderTime > 16) { // > 1 frame at 60fps
+      console.warn(`${componentName} took ${renderTime.toFixed(2)}ms to render`);
+    }
+  });
+}
+```
+
+---
+
 ## 🔄 Development Workflow
 
 ### Before Starting
@@ -607,6 +1524,116 @@ git status
 # - Test plan (how to verify changes)
 # - Screenshots if UI changes
 ```
+
+---
+
+## 🚀 Deployment
+
+### Deploying to Vercel
+
+**Recommended** for Zyeuté - zero config, automatic deployments.
+
+#### 1. Install Vercel CLI
+
+```bash
+npm i -g vercel
+```
+
+#### 2. Login to Vercel
+
+```bash
+vercel login
+```
+
+#### 3. Deploy
+
+```bash
+# Deploy to preview
+vercel
+
+# Deploy to production
+vercel --prod
+```
+
+#### 4. Configure Environment Variables
+
+In Vercel Dashboard:
+1. Go to Project Settings → Environment Variables
+2. Add all variables from `.env.local`:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_OPENAI_API_KEY`
+   - `VITE_STRIPE_PUBLIC_KEY`
+
+#### 5. Automatic Deployments
+
+Vercel automatically deploys on:
+- Push to `main` branch → Production
+- Push to other branches → Preview
+- Pull requests → Preview
+
+### Deploying to Netlify
+
+#### 1. Install Netlify CLI
+
+```bash
+npm i -g netlify-cli
+```
+
+#### 2. Login
+
+```bash
+netlify login
+```
+
+#### 3. Deploy
+
+```bash
+# Build first
+npm run build
+
+# Deploy
+netlify deploy --prod --dir=dist
+```
+
+#### 4. Configure Environment Variables
+
+In Netlify Dashboard:
+1. Site Settings → Environment Variables
+2. Add all required variables
+
+### Pre-Deployment Checklist
+
+- [ ] All environment variables configured
+- [ ] Build succeeds locally (`npm run build`)
+- [ ] Type checking passes (`npm run type-check`)
+- [ ] No console errors in production build
+- [ ] API keys are production keys (not test keys)
+- [ ] Supabase RLS policies are configured
+- [ ] Stripe webhooks configured (if using)
+- [ ] Custom domain configured (if applicable)
+- [ ] Analytics/monitoring set up
+
+### Post-Deployment
+
+1. **Verify deployment**:
+   - Check all pages load
+   - Test authentication
+   - Test key features (posts, payments, etc.)
+
+2. **Monitor**:
+   - Check Vercel/Netlify logs
+   - Monitor error tracking (Sentry, etc.)
+   - Check API usage (OpenAI, Stripe)
+
+3. **Set up custom domain** (optional):
+   ```bash
+   # Vercel
+   vercel domains add zyeute.com
+
+   # Netlify
+   netlify domains:add zyeute.com
+   ```
 
 ---
 
@@ -735,6 +1762,169 @@ const createUserHelper = (data) => { /* complex abstraction */ }
 // Just do it directly if it's one-time
 const { data, error } = await supabase.from('users').insert(userData);
 ```
+
+---
+
+## 🔧 Troubleshooting & Debugging
+
+### Common Issues
+
+#### 1. "Cannot find module" errors
+
+**Problem**: Import errors after adding new files
+
+```bash
+Error: Cannot find module '../components/NewComponent'
+```
+
+**Solutions**:
+```bash
+# Restart dev server
+Ctrl+C
+npm run dev
+
+# Clear Vite cache
+rm -rf node_modules/.vite
+npm run dev
+
+# Check file path and extension (.tsx vs .ts)
+```
+
+#### 2. TypeScript errors in node_modules
+
+**Problem**: Type errors from dependencies
+
+**Solution**: Add to `tsconfig.json`:
+```json
+{
+  "compilerOptions": {
+    "skipLibCheck": true
+  }
+}
+```
+
+#### 3. Environment variables not working
+
+**Problem**: `import.meta.env.VITE_*` returns `undefined`
+
+**Solutions**:
+- Ensure variables start with `VITE_`
+- Restart dev server after adding variables
+- Check `.env.local` is in project root
+- Verify no typos in variable names
+
+#### 4. Supabase connection errors
+
+**Problem**: "Failed to fetch" or connection timeouts
+
+**Solutions**:
+```typescript
+// Check Supabase URL and key
+console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+console.log('Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY?.substring(0, 20));
+
+// Verify RLS policies allow access
+// Check Supabase dashboard → Authentication → Policies
+```
+
+#### 5. CORS errors
+
+**Problem**: CORS errors when calling APIs
+
+**Solution**: Configure CORS in Supabase:
+- Go to Supabase Dashboard → Settings → API
+- Add your domain to allowed origins
+
+#### 6. Build fails in production
+
+**Problem**: Build works locally but fails on Vercel/Netlify
+
+**Solutions**:
+- Check Node.js version matches (use `.nvmrc`)
+- Verify all environment variables are set
+- Check build logs for specific errors
+- Test production build locally: `npm run build`
+
+#### 7. Images not loading
+
+**Problem**: Images return 404 or don't display
+
+**Solutions**:
+```typescript
+// Check image URLs are correct
+console.log('Image URL:', imageUrl);
+
+// Verify Supabase storage bucket permissions
+// Check if image exists in storage bucket
+// Ensure public URL is used for public images
+```
+
+#### 8. State not updating
+
+**Problem**: Component doesn't re-render when state changes
+
+**Solutions**:
+- Check if state setter is being called
+- Verify dependencies in `useEffect`/`useMemo`/`useCallback`
+- Use React DevTools to inspect state
+- Check for stale closures
+
+### Debugging Tools
+
+#### Browser DevTools
+
+```typescript
+// Console logging
+console.log('Debug:', variable);
+console.table(arrayOfObjects);
+console.group('Group Name');
+console.log('Item 1');
+console.log('Item 2');
+console.groupEnd();
+
+// Breakpoints
+debugger; // Pauses execution
+```
+
+#### React DevTools
+
+1. Install [React DevTools](https://react.dev/learn/react-developer-tools)
+2. Inspect component props and state
+3. Profile component renders
+4. Check component tree
+
+#### Vite DevTools
+
+```bash
+# Enable detailed logging
+npm run dev -- --debug
+
+# Check build analysis
+npm run build -- --mode analyze
+```
+
+### Performance Debugging
+
+```typescript
+// Measure function execution time
+const start = performance.now();
+// ... your code ...
+const end = performance.now();
+console.log(`Function took ${end - start}ms`);
+
+// Monitor re-renders
+useEffect(() => {
+  console.log('Component rendered');
+});
+```
+
+### Getting Help
+
+1. **Check documentation**: README, DESIGN_SYSTEM, this file
+2. **Search codebase**: Look for similar implementations
+3. **Check console**: Browser console and terminal logs
+4. **Verify environment**: Are API keys set? Is dev server running?
+5. **Ask for help**: Provide error messages, steps to reproduce, and what you've tried
 
 ---
 
