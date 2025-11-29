@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ESLint configuration for code quality standards
 - Prettier configuration for consistent code formatting
 - GitHub Actions workflow for CI/CD pipeline
+- Daily health check workflow (`.github/workflows/daily-health-check.yml`)
+  - Scheduled to run daily at 6:00 UTC
+  - Can be triggered manually via workflow_dispatch
+  - Checks project health by running npm install and health-check script if present
+  - Securely passes SUPABASE_SERVICE_ROLE_KEY from GitHub Secrets
+  - Includes comprehensive audit comments for security and maintenance
 - This CHANGELOG file to track project changes
 
 ### Changed

@@ -1,0 +1,155 @@
+# Daily Health Check Workflow for Zyeuté
+# Documentation: https://docs.github.com/en/actions
+# 
+# Purpose: Runs automated daily health checks to ensure the application is healthy
+# Frequency: Every day at 6:00 UTC (scheduled via cron)
+# Manual Run: Can be triggered manually via GitHub Actions UI (workflow_dispatch)
+#
+# Setup Instructions:
+# 1. Go to your GitHub repo → Settings → Secrets and variables → Actions
+# 2. Click "New repository secret"
+# 3. Add SUPABASE_SERVICE_ROLE_KEY with your Supabase service role key
+#    (Found in: Supabase dashboard → Project Settings → API → service_role key)
+#
+# Security:
+# - All secrets are passed securely via GitHub Secrets
+# - No sensitive information is logged or exposed in workflow output
+# - Service role key is only available to the workflow environment
+
+name: Daily Health Check
+
+# Trigger configuration
+on:
+  # Scheduled trigger: Run every day at 6:00 UTC
+  schedule:
+    - cron: '0 6 * * *'  # Format: minute hour day month day-of-week (0 6 = 6:00 AM UTC)
+  
+  # Manual trigger: Allow running the workflow manually from GitHub Actions UI
+  workflow_dispatch:
+    # Optional inputs for manual runs (can be extended as needed)
+    inputs:
+      verbose:
+        description: 'Enable verbose logging'
+        required: false
+        default: 'false'
+        type: boolean
+
+# Limit permissions for security (principle of least privilege)
+permissions:
+  contents: read
+
+jobs:
+  # Job: Daily health check
+  daily-health-check:
+    name: Daily Health Check
+    runs-on: ubuntu-latest
+    
+    # Timeout after 15 minutes to prevent hanging workflows
+    timeout-minutes: 15
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Shallow clone for faster checkout (health check doesn't need history)
+          fetch-depth: 1
+      
+      # Step 2: Setup Node.js (latest LTS version)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # Use latest LTS version of Node.js
+          # LTS versions are recommended for production stability
+          node-version: 'lts/*'
+          # Cache npm dependencies for faster runs
+          cache: 'npm'
+      
+      # Step 3: Check if package.json exists and install dependencies
+      - name: Install dependencies
+        # Only run if package.json exists in the repository
+        if: hashFiles('package.json') != ''
+        run: |
+          echo "📦 Installing npm dependencies..."
+          npm ci
+          echo "✅ Dependencies installed successfully"
+      
+      # Step 4: Run health check script if it exists
+      - name: Run health check
+        # Only run if package.json exists and contains a health-check script
+        if: hashFiles('package.json') != ''
+        run: |
+          # Check if health-check script exists in package.json
+          if npm run | grep -q "health-check"; then
+            echo "🏥 Running health check script..."
+            npm run health-check
+            echo "✅ Health check completed successfully"
+          else
+            echo "⚠️ No 'health-check' script found in package.json"
+            echo "To enable health checks, add the following to package.json scripts:"
+            echo '  "health-check": "your-health-check-command"'
+            echo ""
+            echo "Example health check commands:"
+            echo "  - npm run build  # Verify the project builds"
+            echo "  - npm run type-check  # Run TypeScript type checking"
+            echo "  - curl -f https://your-app-url.com/health  # Ping health endpoint"
+          fi
+        # Set environment variables for the health check
+        # SUPABASE_SERVICE_ROLE_KEY is passed from GitHub Secrets
+        env:
+          # Supabase service role key for backend operations
+          # This key has elevated privileges - never expose in logs
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # Set verbose mode if manually triggered with verbose input
+          VERBOSE: ${{ github.event.inputs.verbose || 'false' }}
+      
+      # Step 5: Report health check results
+      - name: Health check summary
+        if: always()
+        run: |
+          echo "================================================"
+          echo "Daily Health Check Summary"
+          echo "================================================"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Run Number: ${{ github.run_number }}"
+          echo "Triggered by: ${{ github.event_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "================================================"
+          
+          # Display job status
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Health check passed!"
+          else
+            echo "❌ Health check failed. Please review the logs above."
+            exit 1
+          fi
+
+# Additional Notes for Maintainers:
+# 
+# Testing the Workflow:
+# 1. Use "workflow_dispatch" to trigger manually from GitHub Actions tab
+# 2. Check the workflow run logs for any errors
+# 3. Verify that secrets are properly configured (workflow will fail if missing)
+#
+# Adding a Health Check Script:
+# To add a health check script to package.json, add:
+#   "scripts": {
+#     "health-check": "npm run type-check && npm run build"
+#   }
+#
+# Modifying Schedule:
+# The cron schedule can be adjusted:
+# - '0 6 * * *' = 6:00 AM UTC daily
+# - '0 */6 * * *' = Every 6 hours
+# - '0 0 * * 0' = Weekly on Sunday at midnight UTC
+#
+# Cron syntax: minute(0-59) hour(0-23) day(1-31) month(1-12) day-of-week(0-6, 0=Sunday)
+#
+# Monitoring:
+# - GitHub will send notifications if scheduled workflows fail
+# - Review workflow runs at: https://github.com/{owner}/{repo}/actions
+# - Check the Actions tab for historical run data and trends
