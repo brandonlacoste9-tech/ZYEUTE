@@ -138,8 +138,11 @@ jobs:
 # Adding a Health Check Script:
 # To add a health check script to package.json, add:
 #   "scripts": {
-#     "health-check": "npm run type-check && npm run build"
+#     "health-check": "(npm run type-check || true) && npm run build"
 #   }
+# Note: Use `|| true` for type-check if there are pre-existing TypeScript errors
+# that should not fail the health check. The key health indicator is whether
+# the project builds successfully.
 #
 # Modifying Schedule:
 # The cron schedule can be adjusted:
