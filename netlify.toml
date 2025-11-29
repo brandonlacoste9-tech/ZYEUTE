@@ -67,10 +67,9 @@
   # Inherits build settings from [build]
 
 # Functions configuration (for future use if needed)
-[functions]
-  # Directory for Netlify Functions (serverless functions)
-  directory = "netlify/functions"
-  # Uncomment if you add serverless functions later
+# Uncomment when you add serverless functions
+# [functions]
+#   directory = "netlify/functions"
 
 # Plugins (optional - uncomment as needed)
 # [[plugins]]
