@@ -1,7 +1,4 @@
 {
-  // ESLint Configuration for Zyeuté
-  // Documentation: https://eslint.org/docs/latest/use/configure/
-  
   "root": true,
   "env": {
     "browser": true,
@@ -9,12 +6,10 @@
     "node": true
   },
   "extends": [
-    // React best practices
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
-    // TypeScript rules
     "plugin:@typescript-eslint/recommended"
   ],
   "parser": "@typescript-eslint/parser",
@@ -32,14 +27,11 @@
     "@typescript-eslint"
   ],
   "rules": {
-    // React rules
-    "react/react-in-jsx-scope": "off", // Not needed in React 18+
-    "react/prop-types": "off", // Using TypeScript for type checking
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
     "react/display-name": "warn",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
-    
-    // TypeScript rules
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
@@ -49,8 +41,6 @@
     ],
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    
-    // General rules
     "no-console": ["warn", { "allow": ["warn", "error"] }],
     "prefer-const": "warn",
     "no-var": "error"
