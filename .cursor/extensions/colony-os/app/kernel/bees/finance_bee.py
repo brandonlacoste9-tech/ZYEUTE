@@ -219,7 +219,7 @@ class FinanceBee(BaseBee):
                     "plan": "free",
                     "is_premium": False,
                     "stripe_customer_id": None  # Clear customer ID
-                }).eq("id", user_id).execute()
+                }).eq("id", user_id).select().execute()
                 
                 # Verify that the update actually affected a row
                 if not update_response.data or len(update_response.data) == 0:
@@ -293,7 +293,7 @@ class FinanceBee(BaseBee):
                 if update_data:
                     update_response = self.supabase.table("user_profiles").update(update_data).eq(
                         "id", user_id
-                    ).execute()
+                    ).select().execute()
                     
                     # Verify that the update actually affected a row
                     if not update_response.data or len(update_response.data) == 0:
