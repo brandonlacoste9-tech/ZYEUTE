@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import { VideoCard, VideoCardSkeleton } from '../features/VideoCard';
-import type { Post } from '../../types';
+import { VideoCard } from './features/VideoCard';
+import type { Post } from '../types';
 import { cn } from '../lib/utils';
 
 export interface FeedGridProps {
@@ -73,14 +73,17 @@ export const FeedGrid: React.FC<FeedGridProps> = ({
     <div className={cn('w-full', className)}>
       {/* Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {posts.map((post) => (
-          <VideoCard key={post.id} post={post} />
+        {posts.map((post) => post.user && (
+          <VideoCard key={post.id} post={post} user={post.user} />
         ))}
 
         {/* Loading skeletons */}
         {isLoading &&
           Array.from({ length: 8 }).map((_, i) => (
-            <VideoCardSkeleton key={`skeleton-${i}`} />
+            <div 
+              key={`skeleton-${i}`} 
+              className="leather-card rounded-2xl overflow-hidden aspect-[9/16] animate-pulse bg-leather-700/50"
+            />
           ))}
       </div>
 

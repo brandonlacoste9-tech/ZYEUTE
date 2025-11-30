@@ -53,6 +53,9 @@ export interface Comment {
   post_id: string;
   user_id: string;
   text: string;
+  content: string; // Alias for text field
+  parent_id?: string | null;
+  likes?: number;
   created_at: string;
 
   // Relations
