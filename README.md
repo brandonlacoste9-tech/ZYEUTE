@@ -101,6 +101,8 @@ VITE_GOOGLE_CLIENT_ID=your-google-client-id
 
 See `SETUP_GUIDE.md` for detailed setup instructions.
 
+**Stripe Webhooks**: See `STRIPE_WEBHOOK_SETUP.md` for webhook configuration and testing.
+
 **Preview Environments**: For isolated database testing, see `SUPABASE_PREVIEW_SETUP.md` to learn about Supabase branching.
 
 ---
@@ -139,18 +141,20 @@ zyeute/
 
 ## 🗄️ Database Setup
 
-Run migrations in order:
+Run migrations in order using the setup script:
 
 ```bash
-# In Supabase SQL Editor, run each migration:
-001_moderation_system.sql
-002_achievements.sql
-003_creator_subscriptions.sql
-004_live_streaming.sql
-005_daily_challenges.sql
-006_marketplace.sql
-007_email_system.sql
+# Get migration instructions
+npm run db:migrate
 ```
+
+This will list all migration files in the correct order. Then:
+
+1. Open your **Supabase Dashboard** → **SQL Editor**
+2. Run each migration file in the order shown by the script
+3. Start with `001_moderation_system.sql` and proceed sequentially
+
+**Critical**: Don't skip `007_fix_rls_001_critical.sql` - it enables Row Level Security for production.
 
 See `SETUP_GUIDE.md` for detailed instructions.
 
@@ -196,9 +200,16 @@ npm run type-check
 
 Zyeuté is built for the Quebec community. Contributions are welcome!
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- Code standards and conventions
+- Commit message guidelines
+- Pull request process
+- Areas where help is needed
+
+Quick start:
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 

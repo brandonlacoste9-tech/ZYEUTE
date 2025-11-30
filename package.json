@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "health-check": "npm run type-check || true && npm run build",
-    "setup:preview-branch": "bash scripts/setup-preview-branch.sh"
+    "setup:preview-branch": "bash scripts/setup-preview-branch.sh",
+    "db:migrate": "node scripts/setup-database.js"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.74",
