@@ -8,6 +8,8 @@ The Stripe webhook handler is located at `app/api/webhooks/stripe/route.ts` and 
 
 - `checkout.session.completed` - When a user successfully completes a checkout session
 
+**Note:** This project uses a hybrid architecture with Vite for the frontend and Next.js-style API routes for backend functionality. When deployed on Vercel, the API routes are automatically detected and deployed as serverless functions.
+
 ## Environment Variables
 
 Add the following environment variables to your `.env.local` file:
@@ -53,12 +55,15 @@ brew install stripe/stripe-cli/stripe
 # Other platforms: https://stripe.com/docs/stripe-cli#install
 ```
 
-Forward webhooks to your local server:
+For local development, you'll need to run the API routes separately from the Vite dev server. The easiest way is to:
+
+1. Deploy to Vercel preview (push to a branch)
+2. Use the preview URL with Stripe CLI:
 ```bash
-stripe listen --forward-to http://localhost:5173/api/webhooks/stripe
+stripe listen --forward-to https://your-preview.vercel.app/api/webhooks/stripe
 ```
 
-This will output a webhook signing secret like `whsec_...` - use this as your `STRIPE_WEBHOOK_SECRET` for local development.
+Alternatively, you can test webhooks after deploying to production/staging, as the API routes are designed to run as serverless functions on Vercel.
 
 ## How It Works
 
