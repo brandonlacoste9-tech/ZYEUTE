@@ -138,6 +138,8 @@ export interface Database {
           post_id: string
           user_id: string
           text: string
+          content: string
+          parent_id: string | null
           created_at: string
         }
         Insert: {
@@ -145,6 +147,8 @@ export interface Database {
           post_id: string
           user_id: string
           text: string
+          content?: string
+          parent_id?: string | null
           created_at?: string
         }
         Update: {
@@ -152,6 +156,25 @@ export interface Database {
           post_id?: string
           user_id?: string
           text?: string
+          content?: string
+          parent_id?: string | null
+          created_at?: string
+        }
+      }
+      comment_likes: {
+        Row: {
+          comment_id: string
+          user_id: string
+          created_at: string
+        }
+        Insert: {
+          comment_id: string
+          user_id: string
+          created_at?: string
+        }
+        Update: {
+          comment_id?: string
+          user_id?: string
           created_at?: string
         }
       }

@@ -108,11 +108,11 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         .insert({
           post_id: postId,
           user_id: currentUser.id,
-          content: replyText.trim(),
+          text: replyText.trim(),
           parent_id: comment.id,
-        })
+        } as any)
         .select('*, user:users(*)')
-        .single();
+        .single() as { data: CommentType | null; error: any };
 
       if (error) throw error;
 
@@ -125,7 +125,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           data.id
         );
 
-        setReplies([...replies, data]);
+        setReplies([...replies, data as CommentType]);
         setReplyCount(replyCount + 1);
         setReplyText('');
         setIsReplying(false);
@@ -163,7 +163,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           .insert({
             comment_id: comment.id,
             user_id: currentUser.id,
-          });
+          } as any);
       }
     } catch (error) {
       console.error('Error liking comment:', error);
@@ -200,7 +200,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         </div>
 
         {/* Comment text */}
-        <p className="text-white text-sm mb-2 break-words">{comment.content}</p>
+        <p className="text-white text-sm mb-2 break-words">{comment.content || comment.text}</p>
 
         {/* Actions */}
         <div className="flex items-center gap-4 text-xs">

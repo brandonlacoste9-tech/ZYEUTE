@@ -27,7 +27,6 @@ import StoryCreator from '@/components/features/StoryCreator';
 import Achievements from '@/pages/Achievements';
 import { AchievementListener } from '@/components/gamification/AchievementModal';
 import CreatorRevenue from '@/pages/CreatorRevenue';
-import EmailPreferences from '@/pages/EmailPreferences';
 import AdminDashboard from '@/pages/admin/Dashboard';
 import EmailCampaigns from '@/pages/admin/EmailCampaigns';
 import { ProtectedAdminRoute } from '@/components/auth/ProtectedAdminRoute';
@@ -64,7 +63,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
     });
 
