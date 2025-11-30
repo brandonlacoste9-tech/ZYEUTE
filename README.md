@@ -17,6 +17,7 @@ Zyeuté is Quebec's first social media platform built specifically for Quebecers
 - **Zyeuté Commerce** - Buy/sell tickets, crafts, services, and merch
 - **Secure Payments** - Stripe integration for safe transactions
 - **Seller Dashboards** - Track sales and manage inventory
+- **Webhook Setup** - See [STRIPE_WEBHOOK_SETUP.md](STRIPE_WEBHOOK_SETUP.md) for payment webhook configuration
 
 ### 📍 Location Features
 - **Quebec Regions** - Tag posts by region (Montréal, Québec City, Gaspésie, etc.)
@@ -219,7 +220,16 @@ Quick start:
 
 This project is proprietary. All rights reserved.
 
-**Note**: While this repository is publicly accessible for transparency and community collaboration, the codebase remains proprietary. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+### Why is this repository public?
+
+While the codebase remains proprietary, this repository is publicly accessible for:
+
+- **Transparency**: Building trust with the Quebec community by showing our development process
+- **Community Feedback**: Enabling developers to report issues, suggest improvements, and contribute
+- **Hiring & Collaboration**: Showcasing our technical stack and code quality to potential team members
+- **Open Development**: Allowing the community to track progress and understand how Zyeuté is built
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and how to get involved.
 
 ---
 

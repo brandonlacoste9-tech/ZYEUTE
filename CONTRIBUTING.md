@@ -136,11 +136,29 @@ Before submitting a PR:
 - **Accessibility**: Improve a11y compliance
 - **Localization**: Add Quebec French translations
 
-## ❓ Questions?
+## ❓ Getting Help
 
-- Open a GitHub Issue for questions
-- Check existing documentation in `/docs`
-- Review closed PRs for examples
+Need help getting started or have questions?
+
+1. **GitHub Issues**: [Open an issue](https://github.com/brandonlacoste9-tech/Zyeute/issues) for:
+   - Questions about setup or configuration
+   - Bug reports
+   - Feature requests
+   - General questions about contributing
+
+2. **Documentation**:
+   - Check `SETUP_GUIDE.md` for setup instructions
+   - Review `STRIPE_WEBHOOK_SETUP.md` for payment integration
+   - Browse existing documentation in the repository
+
+3. **Examples**:
+   - Review closed Pull Requests to see examples of contributions
+   - Check existing code for patterns and conventions
+
+4. **Before asking**:
+   - Search existing Issues to see if your question was already answered
+   - Check the documentation files
+   - Review the codebase for similar implementations
 
 ## 🙏 Thank You!
 
