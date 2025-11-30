@@ -1,12 +1,13 @@
 /**
- * Signup Page - User registration
+ * Signup Page - Premium Quebec Heritage Design
+ * Matching the luxury login aesthetic
  */
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '../components/ui/Button';
-import { Logo } from '../components/ui/Logo';
-import { signUp } from '../lib/supabase';
+import { Button } from '@/components/Button';
+import { Logo } from '@/components/Logo';
+import { signUp } from '@/lib/supabase';
 
 export const Signup: React.FC = () => {
   const navigate = useNavigate();
@@ -49,21 +50,20 @@ export const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative leather-bg fur-overlay">
+      <div className="w-full max-w-md z-10">
         {/* Logo */}
-        <div className="text-center mb-8 flex flex-col items-center">
-          <Logo size="xl" showText={false} linkTo={null} className="mb-4" />
-          <h1 className="text-4xl font-bold text-white mb-2">Zyeuté</h1>
-          <p className="text-gold-400 text-sm font-semibold tracking-wider mb-1">
+        <div className="text-center mb-8 flex flex-col items-center animate-fade-in">
+          <Logo size="xl" showText={true} linkTo={null} className="mb-4" />
+          <p className="text-gold-400 text-sm font-semibold tracking-wider mb-1 embossed">
             REJOINS LA COMMUNAUTÉ QUÉBÉCOISE
           </p>
-          <p className="text-white/60 text-sm">Fait au Québec, pour le Québec 🇨🇦⚜️</p>
+          <p className="text-white/80 text-sm embossed">Fait au Québec, pour le Québec 🇨🇦⚜️</p>
         </div>
 
         {/* Signup Form */}
-        <div className="glass-card rounded-2xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
+        <div className="leather-card rounded-2xl p-8 stitched animate-fade-in">
+          <h2 className="text-2xl font-bold text-gold-400 mb-6 embossed">
             Inscription
           </h2>
 
@@ -75,7 +75,7 @@ export const Signup: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-white font-semibold mb-2 text-sm">
+              <label className="block text-gold-400 font-semibold mb-2 text-sm embossed">
                 Nom d'utilisateur
               </label>
               <input
@@ -84,15 +84,15 @@ export const Signup: React.FC = () => {
                 onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                 required
                 placeholder="tonusername"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-gold-400"
+                className="input-premium"
               />
-              <p className="text-white/40 text-xs mt-1">
+              <p className="text-leather-400 text-xs mt-1">
                 Lettres minuscules, chiffres et _ seulement
               </p>
             </div>
 
             <div>
-              <label className="block text-white font-semibold mb-2 text-sm">
+              <label className="block text-gold-400 font-semibold mb-2 text-sm embossed">
                 Courriel
               </label>
               <input
@@ -101,12 +101,12 @@ export const Signup: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="ton@email.com"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-gold-400"
+                className="input-premium"
               />
             </div>
 
             <div>
-              <label className="block text-white font-semibold mb-2 text-sm">
+              <label className="block text-gold-400 font-semibold mb-2 text-sm embossed">
                 Mot de passe
               </label>
               <input
@@ -115,9 +115,9 @@ export const Signup: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-gold-400"
+                className="input-premium"
               />
-              <p className="text-white/40 text-xs mt-1">
+              <p className="text-leather-400 text-xs mt-1">
                 Minimum 6 caractères
               </p>
             </div>
@@ -126,7 +126,7 @@ export const Signup: React.FC = () => {
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full"
+              className="w-full btn-gold"
               isLoading={isLoading}
             >
               Créer mon compte
@@ -134,19 +134,32 @@ export const Signup: React.FC = () => {
           </form>
 
           {/* Terms */}
-          <p className="text-center text-white/40 text-xs mt-4">
+          <p className="text-center text-leather-400 text-xs mt-6">
             En t'inscrivant, tu acceptes nos{' '}
-            <a href="/terms" className="text-gold-400 hover:underline">
-              conditions d'utilisation
-            </a>
+            <Link to="/legal/terms" className="text-gold-400 hover:underline">
+              Conditions d'utilisation
+            </Link>
+            {' '}et notre{' '}
+            <Link to="/legal/privacy" className="text-gold-400 hover:underline">
+              Politique de confidentialité
+            </Link>
           </p>
 
           {/* Login link */}
-          <p className="text-center text-white/60 text-sm mt-6">
+          <p className="text-center text-white/80 text-sm mt-6 embossed">
             Déjà un compte?{' '}
             <Link to="/login" className="text-gold-400 hover:underline font-semibold">
               Connecte-toi
             </Link>
+          </p>
+        </div>
+
+        {/* Quebec Pride */}
+        <div className="text-center mt-6 text-leather-400 text-sm">
+          <p className="flex items-center justify-center gap-2 embossed">
+            <span className="text-gold-500">⚜️</span>
+            <span>Bienvenue dans la famille québécoise</span>
+            <span className="text-gold-500">🦫</span>
           </p>
         </div>
       </div>

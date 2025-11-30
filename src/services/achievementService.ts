@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '../lib/supabase';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 
 export type AchievementCategory = 'cultural' | 'regional' | 'engagement' | 'tiguy' | 'elite' | 'seasonal';
 export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';

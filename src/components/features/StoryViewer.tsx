@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar } from '../ui/Avatar';
+import { Avatar } from '../Avatar';
 import { VideoPlayer } from './VideoPlayer';
 import { supabase } from '../../lib/supabase';
 import { getTimeAgo } from '../../lib/utils';

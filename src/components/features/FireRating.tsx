@@ -17,7 +17,7 @@ export interface FireRatingProps {
 }
 
 export const FireRating: React.FC<FireRatingProps> = ({
-  postId,
+  postId: _postId,
   currentRating = 0,
   averageRating,
   totalRatings = 0,

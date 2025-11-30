@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header } from '../../components/layout/Header';
-import { BottomNav } from '../../components/layout/BottomNav';
+import { Header } from '../../components/Header';
+import { BottomNav } from '../../components/BottomNav';
 import { supabase } from '../../lib/supabase';
-import { Button } from '../../components/ui/Button';
+import { Button } from '../../components/Button';
 
 export const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<any>(null);

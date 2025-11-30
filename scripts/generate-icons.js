@@ -35,5 +35,8 @@ sizes.forEach(size => {
 });
 
 console.log('\n⚠️  Note: These are placeholder icons. Replace with proper designs before production.');
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 58462010c80def7a8d0cf4ce1fb8a21d02a32142

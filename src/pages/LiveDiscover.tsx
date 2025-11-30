@@ -5,9 +5,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header } from '../components/layout/Header';
-import { BottomNav } from '../components/layout/BottomNav';
-import { Button } from '../components/ui/Button';
+import { Header } from '../components/Header';
+import { BottomNav } from '../components/BottomNav';
+import { Button } from '../components/Button';
 
 /**
  * Interface for a live stream

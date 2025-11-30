@@ -4,7 +4,7 @@
  * This module contains all Quebec-specific features, translations,
  * and cultural elements that make Zyeuté uniquely Québécois.
  *
- * Propulsé par Nano Banana 🍌 | Fait avec fierté québécoise ⚜️
+ * Zyeuté - L'app sociale du Québec 🦫⚜️
  */
 
 // ==================== QUEBEC REGIONS ====================

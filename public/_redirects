@@ -1,0 +1,17 @@
+# Netlify Redirects for SPA (Single Page Application)
+# Documentation: https://docs.netlify.com/routing/redirects/
+
+# Redirect all requests to index.html for client-side routing (React Router)
+# This allows React Router to handle all routes instead of Netlify returning 404s
+# The 200 status code is a "rewrite" - it serves index.html but keeps the original URL
+/*    /index.html    200
+
+# Note: This is also configured in netlify.toml as a backup.
+# Having it in both places ensures SPA routing works correctly.
+
+# Future: Add specific redirects here if needed
+# Example: Redirect old URLs to new ones
+# /old-path    /new-path    301
+
+# Example: Proxy API requests to an external service
+# /api/*    https://api.example.com/:splat    200

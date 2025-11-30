@@ -1,0 +1,137 @@
+# Supabase Configuration File
+# Documentation: https://supabase.com/docs/guides/cli/config
+
+# Project ID - Replace with your actual project ID
+# Get this from your Supabase dashboard: Settings > General > Reference ID
+project_id = "your-project-id"
+
+[api]
+enabled = true
+# Port to use for the API URL (localhost:54321)
+port = 54321
+# Schemas to expose in your API. Tables, views and stored procedures in these schemas will get API endpoints
+schemas = ["public", "storage", "graphql_public"]
+# Extra schemas to add to the search_path of every request
+extra_search_path = ["public", "extensions"]
+# Maximum number of rows returned from a request. Limits payload size for accidental or malicious requests
+max_rows = 1000
+
+[db]
+# Port to use for the local database (localhost:54322)
+port = 54322
+# The database major version to use
+major_version = 15
+
+[studio]
+enabled = true
+# Port to use for Supabase Studio (localhost:54323)
+port = 54323
+
+[inbucket]
+enabled = true
+# Port to use for Inbucket email testing (localhost:54324)
+port = 54324
+
+[storage]
+enabled = true
+# Port to use for the Storage API (localhost:54325)
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+# Port to use for the Auth API (localhost:54326)
+site_url = "http://localhost:5173"
+# Additional redirect URLs - Add your preview environment URLs here
+additional_redirect_urls = ["http://localhost:5173/**"]
+# JWT expiry in seconds
+jwt_expiry = 3600
+# Allow anonymous sign-ins
+enable_signup = true
+
+[auth.email]
+# Allow email sign-up
+enable_signup = true
+# Allow email login
+enable_confirmations = true
+
+# Supabase Branching Configuration
+# This section defines how Git branches map to Supabase database branches
+# for isolated preview environments
+
+[branching]
+# Enable Supabase branching for preview environments
+enabled = true
+
+# Default branch configuration
+# This is the production branch that other branches will fork from
+[branching.production]
+git_branch = "main"
+# Production Supabase project reference (set via environment variable)
+# SUPABASE_PROJECT_REF should be set to your production project ID
+
+# Preview branch configuration for main branch
+# Creates an isolated database branch for testing changes to main
+[branching.preview]
+git_branch = "main"
+# Supabase branch name for main branch previews
+supabase_branch = "dev-preview-main"
+# Description of this preview branch
+description = "Isolated Supabase branch for main branch preview deployments"
+# Automatically create this branch if it doesn't exist
+auto_create = true
+# Reset the branch to match production schema on each deployment
+reset_on_deploy = false
+# Preserve data between deployments
+preserve_data = true
+
+# Environment-specific connection strings
+# These will be used by preview deployments via environment variables
+# Format: VITE_SUPABASE_URL_PREVIEW and VITE_SUPABASE_ANON_KEY_PREVIEW
+
+# Example additional preview branches (uncomment and configure as needed):
+# [branching.feature]
+# git_branch = "develop"
+# supabase_branch = "dev-preview-develop"
+# description = "Preview branch for develop"
+# auto_create = true
+
+# [branching.staging]
+# git_branch = "staging"
+# supabase_branch = "dev-preview-staging"
+# description = "Preview branch for staging"
+# auto_create = true
+
+# Instructions for setting up preview branches:
+# 
+# Quick Setup (Recommended):
+#   npm run setup:preview-branch
+#   (Follow the interactive prompts)
+#
+# Manual Setup:
+# 1. Install Supabase CLI:
+#    npm install -g supabase
+#    supabase login
+#
+# 2. Link your local project to Supabase:
+#    supabase link --project-ref your-project-id
+#
+# 3. Create the preview branch:
+#    supabase branches create dev-preview-main
+#
+# 4. Get the preview branch connection details:
+#    supabase branches get dev-preview-main
+#
+# 5. Add preview branch environment variables to your CI/CD:
+#    VITE_SUPABASE_URL_PREVIEW=https://your-preview-project.supabase.co
+#    VITE_SUPABASE_ANON_KEY_PREVIEW=your-preview-anon-key
+#
+# 6. Configure your deployment platform (Vercel/Netlify) to use preview env vars
+#    for preview deployments and production env vars for production deployments
+#
+# Detailed Documentation:
+#   - See SUPABASE_PREVIEW_SETUP.md for comprehensive guide
+#   - See PREVIEW_BRANCH_CHECKLIST.md for setup checklist
+#   - See .env.example for required environment variables
+#
+# For more information on Supabase branching:
+# https://supabase.com/docs/guides/platform/branching

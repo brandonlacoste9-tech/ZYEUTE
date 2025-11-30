@@ -1,0 +1,94 @@
+# Netlify Configuration for Vite + React SPA
+# Documentation: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+# Build settings
+[build]
+  # Command to build your Vite project for production
+  # This runs 'vite build' which outputs to the 'dist' directory by default
+  command = "npm run build"
+  
+  # Directory containing the built static files
+  # Vite outputs to 'dist' by default (configured in vite.config.ts)
+  publish = "dist"
+  
+  # Set Node.js version for the build environment
+  # Using Node 20.19.0+ as required by Vite 7.2.4 and other dependencies
+  [build.environment]
+    NODE_VERSION = "20.19.0"
+
+# SPA routing: Redirect all requests to index.html for client-side routing
+# This is also configured in public/_redirects as a backup
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for optimized caching of static assets
+[[headers]]
+  # Apply these headers to all asset files in the /assets directory
+  for = "/assets/*"
+  [headers.values]
+    # Cache static assets for 1 year (they are hashed, so this is safe)
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  # Security headers for all pages
+  for = "/*"
+  [headers.values]
+    # Prevent clickjacking attacks
+    X-Frame-Options = "DENY"
+    # Prevent MIME type sniffing
+    X-Content-Type-Options = "nosniff"
+    # Enable XSS protection
+    X-XSS-Protection = "1; mode=block"
+    # Enforce HTTPS
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# Development settings
+[dev]
+  # Command to run local dev server
+  command = "npm run dev"
+  # Port for local development (matches vite.config.ts)
+  port = 5173
+  # Auto-open browser on dev server start
+  autoLaunch = false
+
+# Deploy contexts for different environments
+[context.production]
+  # Production-specific settings
+  # Uses production Supabase project
+  # Environment variables should be set in Netlify UI for security:
+  #   VITE_SUPABASE_URL (production project URL)
+  #   VITE_SUPABASE_ANON_KEY (production anon key)
+
+[context.deploy-preview]
+  # Preview deployments (for PRs)
+  # Uses 'dev-preview-main' Supabase branch for isolated testing
+  # Environment variables required in Netlify UI with scope "Deploy previews":
+  #   VITE_SUPABASE_URL_PREVIEW (preview branch URL)
+  #   VITE_SUPABASE_ANON_KEY_PREVIEW (preview branch anon key)
+  # 
+  # To set up:
+  # 1. Create Supabase preview branch: supabase branches create dev-preview-main
+  # 2. Get credentials: supabase branches get dev-preview-main
+  # 3. Add credentials in Netlify: Site settings > Environment variables
+  # 4. Scope: "Deploy previews" only
+  #
+  # See SUPABASE_PREVIEW_SETUP.md for detailed instructions
+
+[context.branch-deploy]
+  # Branch deployments
+  # Uses same configuration as deploy-preview
+  # Inherits preview Supabase branch settings
+
+# Functions configuration (for future use if needed)
+# Uncomment when you add serverless functions
+# [functions]
+#   directory = "netlify/functions"
+
+# Plugins (optional - uncomment as needed)
+# [[plugins]]
+#   package = "@netlify/plugin-lighthouse"
+#
+# [[plugins]]
+#   package = "netlify-plugin-cache"

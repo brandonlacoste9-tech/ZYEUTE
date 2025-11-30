@@ -5,7 +5,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { Avatar } from '../ui/Avatar';
+import { Avatar } from '../Avatar';
 import type { Post, User } from '../../types';
 
 interface SearchBarProps {

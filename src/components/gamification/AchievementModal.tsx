@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Button } from '../ui/Button';
+import { Button } from '../Button';
 import { cn } from '../../lib/utils';
 import type { Achievement } from '../../services/achievementService';
 

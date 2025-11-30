@@ -4,9 +4,9 @@
 
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../ui/Button';
+import { Button } from '../Button';
 import { supabase } from '../../lib/supabase';
-import { toast } from '../ui/Toast';
+import { toast } from '../Toast';
 import { generateId } from '../../lib/utils';
 
 export const StoryCreator: React.FC = () => {

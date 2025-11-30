@@ -4,9 +4,9 @@
  */
 
 import React, { useState } from 'react';
-import { Button } from '../ui/Button';
+import { Button } from '../Button';
 import { supabase } from '../../lib/supabase';
-import { toast } from '../ui/Toast';
+import { toast } from '../Toast';
 import { cn } from '../../lib/utils';
 import type { User } from '../../types';
 

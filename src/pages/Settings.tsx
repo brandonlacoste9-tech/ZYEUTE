@@ -1,33 +1,33 @@
 /**
- * Settings Page - User settings and profile edit
+ * Settings Page - Premium Quebec Heritage Design
+ * Instagram-style layout with beaver leather & gold aesthetic
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Header } from '../components/layout/Header';
-import { BottomNav } from '../components/layout/BottomNav';
-import { Avatar } from '../components/ui/Avatar';
-import { Button } from '../components/ui/Button';
-import { supabase } from '../lib/supabase';
-import { toast } from '../components/ui/Toast';
-import { generateId } from '../lib/utils';
-import { QUEBEC_REGIONS } from '../lib/quebecFeatures';
-import { useTheme, PRESET_THEMES } from '../contexts/ThemeContext';
-import type { User } from '../types';
+import { useNavigate, Link } from 'react-router-dom';
+import { Header } from '@/components/Header';
+import { BottomNav } from '@/components/BottomNav';
+import { Avatar } from '@/components/Avatar';
+import { Button } from '@/components/Button';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/components/Toast';
+import { generateId } from '@/lib/utils';
+import { QUEBEC_REGIONS } from '@/lib/quebecFeatures';
+import type { User } from '@/types';
+
+interface SettingItem {
+  icon: React.ReactNode;
+  label: string;
+  path?: string;
+  badge?: string;
+  onClick?: () => void;
+}
 
 export const Settings: React.FC = () => {
   const navigate = useNavigate();
-  const { edgeLighting, setEdgeLighting, currentTheme, setTheme, isAnimated, setIsAnimated, glowIntensity, setGlowIntensity } = useTheme();
-
   const [user, setUser] = React.useState<User | null>(null);
-  const [displayName, setDisplayName] = React.useState('');
-  const [bio, setBio] = React.useState('');
-  const [city, setCity] = React.useState('');
-  const [region, setRegion] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
-  const [isSaving, setIsSaving] = React.useState(false);
-  const [isUploadingAvatar, setIsUploadingAvatar] = React.useState(false);
-  const avatarInputRef = React.useRef<HTMLInputElement>(null);
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   // Fetch current user
   React.useEffect(() => {
@@ -49,10 +49,6 @@ export const Settings: React.FC = () => {
 
         if (data) {
           setUser(data);
-          setDisplayName(data.display_name || '');
-          setBio(data.bio || '');
-          setCity(data.city || '');
-          setRegion(data.region || '');
         }
       } catch (error) {
         console.error('Error fetching user:', error);
@@ -63,111 +59,6 @@ export const Settings: React.FC = () => {
 
     fetchUser();
   }, [navigate]);
-
-  // Upload avatar
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-
-    // Validate file
-    if (!file.type.startsWith('image/')) {
-      toast.error('Sélectionne une image!');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('L\'image est trop grosse (max 5MB)');
-      return;
-    }
-
-    setIsUploadingAvatar(true);
-    toast.info('Upload de l\'avatar... 📸');
-
-    try {
-      // Upload to storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}_${generateId()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        if (uploadError.message.includes('not found')) {
-          throw new Error('Le bucket "avatars" n\'existe pas. Crée-le dans Supabase Storage!');
-        }
-        throw uploadError;
-      }
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      // Update user profile
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-
-      // Update local state
-      setUser({ ...user, avatar_url: publicUrl });
-      toast.success('Avatar mis à jour! 🎉');
-    } catch (error: any) {
-      console.error('Error uploading avatar:', error);
-      toast.error(error.message || 'Erreur lors de l\'upload');
-    } finally {
-      setIsUploadingAvatar(false);
-    }
-  };
-
-  // Save profile
-  const handleSave = async () => {
-    if (!user) return;
-
-    // Validation
-    if (!displayName.trim()) {
-      toast.warning('Entre un nom d\'affichage!');
-      return;
-    }
-
-    setIsSaving(true);
-    toast.info('Sauvegarde en cours...');
-
-    try {
-      const { error } = await supabase
-        .from('users')
-        .update({
-          display_name: displayName,
-          bio,
-          city,
-          region,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      toast.success('Profil mis à jour! ⚜️');
-      
-      // Update local state
-      setUser({
-        ...user,
-        display_name: displayName,
-        bio,
-        city,
-        region,
-      });
-    } catch (error: any) {
-      console.error('Error updating profile:', error);
-      toast.error(error.message || 'Erreur lors de la mise à jour');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   // Sign out
   const handleSignOut = async () => {
@@ -180,354 +71,301 @@ export const Settings: React.FC = () => {
     setTimeout(() => navigate('/login'), 500);
   };
 
-  // Delete account
-  const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(
-      '⚠️ ATTENTION: Cette action est irréversible!\n\nVeux-tu vraiment supprimer ton compte?'
-    );
-    if (!confirmed) return;
+  // Settings sections
+  const yourActivitySettings: SettingItem[] = [
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+      ),
+      label: 'Tags et mentions',
+      path: '/settings/tags',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      ),
+      label: 'Commentaires',
+      path: '/settings/comments',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+        </svg>
+      ),
+      label: 'Partage et remixes',
+      path: '/settings/sharing',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+        </svg>
+      ),
+      label: 'Comptes restreints',
+      path: '/settings/restricted',
+    },
+  ];
 
-    const doubleConfirm = window.confirm(
-      'Es-tu VRAIMENT sûr? Toutes tes données seront perdues!'
-    );
-    if (!doubleConfirm) return;
+  const whatYouSeeSettings: SettingItem[] = [
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+        </svg>
+      ),
+      label: 'Favoris',
+      path: '/settings/favorites',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+        </svg>
+      ),
+      label: 'Comptes masqués',
+      path: '/settings/muted',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>
+      ),
+      label: 'Préférences de contenu',
+      path: '/settings/content',
+    },
+  ];
 
-    toast.warning('Suppression du compte...');
-    
-    try {
-      // TODO: Implement account deletion
-      // This should delete user data, posts, etc.
-      toast.error('Fonctionnalité pas encore disponible. Contacte le support.');
-    } catch (error) {
-      console.error('Error deleting account:', error);
-      toast.error('Erreur lors de la suppression');
-    }
+  const quebecSettings: SettingItem[] = [
+    {
+      icon: <span className="text-2xl">⚜️</span>,
+      label: 'Région du Québec',
+      path: '/settings/region',
+      badge: user?.region ? QUEBEC_REGIONS.find(r => r.id === user.region)?.emoji : undefined,
+    },
+    {
+      icon: <span className="text-2xl">🇨🇦</span>,
+      label: 'Langue',
+      path: '/settings/language',
+      badge: 'FR',
+    },
+    {
+      icon: <span className="text-2xl">🦫</span>,
+      label: 'Ti-Guy Assistant',
+      path: '/settings/voice',
+    },
+  ];
+
+  const accountSettings: SettingItem[] = [
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+      label: 'Modifier le profil',
+      path: '/settings/profile',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      ),
+      label: 'Confidentialité et sécurité',
+      path: '/settings/privacy',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+      ),
+      label: 'Notifications',
+      path: '/settings/notifications',
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      label: 'Abonnement Premium',
+      path: '/premium',
+      badge: user?.subscription_tier ? '⭐' : undefined,
+    },
+  ];
+
+  // Filter settings based on search
+  const filterSettings = (items: SettingItem[]) => {
+    if (!searchQuery) return items;
+    return items.filter(item =>
+      item.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   };
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-gold-400 animate-pulse">Chargement...</div>
+      <div className="min-h-screen bg-black leather-overlay flex items-center justify-center">
+        <div className="text-gold-400 animate-pulse-gold">Chargement...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black pb-20">
-      <Header title="Paramètres" showBack={true} showSearch={false} />
-
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        {/* Hidden file input for avatar */}
-        <input
-          ref={avatarInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleAvatarUpload}
-          className="hidden"
-        />
-
-        {/* Profile Picture */}
-        <div className="glass-card rounded-2xl p-6 mb-4">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Avatar
-                src={user.avatar_url}
-                size="xl"
-                isVerified={user.is_verified}
-              />
-              {isUploadingAvatar && (
-                <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
-                  <svg className="animate-spin h-8 w-8 text-gold-400" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                </div>
-              )}
-            </div>
-            <div className="flex-1">
-              <h3 className="text-white font-semibold mb-1">Photo de profil</h3>
-              <p className="text-white/60 text-sm">
-                @{user.username}
-              </p>
-              {user.is_verified && (
-                <p className="text-gold-400 text-xs mt-1">✓ Compte vérifié</p>
-              )}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => avatarInputRef.current?.click()}
-              disabled={isUploadingAvatar}
-            >
-              Changer
-            </Button>
-          </div>
+    <div className="min-h-screen bg-black leather-overlay pb-20">
+      {/* Header */}
+      <div className="sticky top-0 z-30 nav-leather border-b border-leather-700/50">
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-gold-500 hover:text-gold-400 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-xl font-bold text-gold-500 embossed">
+            Paramètres et activité
+          </h1>
         </div>
+      </div>
 
-        {/* Profile Info */}
-        <div className="glass-card rounded-2xl p-6 mb-4 space-y-4">
-          <div>
-            <label className="block text-white font-semibold mb-2 text-sm">
-              Nom d'affichage
-            </label>
+      <div className="max-w-2xl mx-auto px-4 py-4">
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="input-premium flex items-center gap-3">
+            <svg className="w-5 h-5 text-leather-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
             <input
               type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Ton nom"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-gold-400"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher paramètres"
+              className="flex-1 bg-transparent border-none outline-none text-white placeholder-leather-400"
             />
           </div>
-
-          <div>
-            <label className="block text-white font-semibold mb-2 text-sm">
-              Bio
-            </label>
-            <textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="Parle de toi..."
-              rows={3}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-gold-400 resize-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-white font-semibold mb-2 text-sm">
-                Région
-              </label>
-              <select
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold-400"
-              >
-                <option value="">Sélectionne</option>
-                {QUEBEC_REGIONS.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.emoji} {r.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-white font-semibold mb-2 text-sm">
-                Ville
-              </label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Montréal"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-gold-400"
-              />
-            </div>
-          </div>
-
-          <Button
-            variant="primary"
-            className="w-full"
-            onClick={handleSave}
-            isLoading={isSaving}
-          >
-            Sauvegarder
-          </Button>
         </div>
 
-        {/* Edge Lighting Settings */}
-        <div className="glass-card rounded-2xl p-6 mb-4 space-y-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-white font-bold">Éclairage des bords ✨</h3>
-              <p className="text-white/60 text-sm">Personnalise l'aura de ton app</p>
-            </div>
-            <div 
-              className="w-12 h-12 rounded-full border-4 edge-glow"
-              style={{ borderColor: edgeLighting, boxShadow: `0 0 20px ${edgeLighting}` }}
-            />
-          </div>
-
-          {/* Preset Themes */}
-          <div>
-            <label className="block text-white font-semibold mb-3 text-sm">
-              Thèmes prédéfinis
-            </label>
-            <div className="grid grid-cols-4 gap-3">
-              {Object.entries(PRESET_THEMES).map(([key, theme]) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setTheme(key);
-                    toast.success(`Thème ${theme.name} activé! ✨`);
-                  }}
-                  className={`relative p-3 rounded-xl transition-all hover:scale-105 ${
-                    currentTheme === key ? 'ring-2 ring-white' : ''
-                  }`}
-                  style={{ 
-                    backgroundColor: theme.edgeLighting + '20',
-                    border: `2px solid ${theme.edgeLighting}`
-                  }}
-                >
-                  <div 
-                    className="w-full aspect-square rounded-lg"
-                    style={{ backgroundColor: theme.edgeLighting }}
-                  />
-                  <p className="text-white text-xs mt-2 text-center truncate">
-                    {theme.name}
-                  </p>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Custom Color Picker */}
-          <div>
-            <label className="block text-white font-semibold mb-2 text-sm">
-              Couleur personnalisée
-            </label>
-            <div className="flex gap-3 items-center">
-              <input
-                type="color"
-                value={edgeLighting}
-                onChange={(e) => {
-                  setEdgeLighting(e.target.value);
-                  toast.info('Couleur personnalisée appliquée! 🎨');
-                }}
-                className="w-20 h-12 rounded-xl cursor-pointer border-2 border-white/20"
-              />
-              <div className="flex-1">
-                <input
-                  type="text"
-                  value={edgeLighting}
-                  onChange={(e) => setEdgeLighting(e.target.value)}
-                  placeholder="#F5C842"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-gold-400 font-mono"
-                />
+        {/* Your Activity Section */}
+        <div className="mb-6">
+          {filterSettings(yourActivitySettings).map((item, index) => (
+            <Link
+              key={index}
+              to={item.path || '#'}
+              className="flex items-center gap-4 p-4 hover:bg-leather-800/30 transition-colors rounded-xl group"
+            >
+              <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
+                {item.icon}
               </div>
-            </div>
-          </div>
+              <span className="flex-1 text-white font-medium">{item.label}</span>
+              <svg className="w-5 h-5 text-leather-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          ))}
+        </div>
 
-          {/* Animation Toggle */}
-          <div className="flex items-center justify-between">
-            <div>
-              <label className="text-white font-semibold text-sm">
-                Animation pulsante
-              </label>
-              <p className="text-white/60 text-xs">Effet lumineux animé</p>
-            </div>
-            <button
-              onClick={() => {
-                setIsAnimated(!isAnimated);
-                toast.success(isAnimated ? 'Animation désactivée' : 'Animation activée! ✨');
-              }}
-              className={`relative w-14 h-8 rounded-full transition-colors ${
-                isAnimated ? 'bg-gold-gradient' : 'bg-white/20'
-              }`}
+        {/* What You See Section */}
+        <div className="mb-6">
+          <h2 className="text-leather-400 text-xs font-bold uppercase tracking-wider mb-3 px-4">
+            Ce que tu vois
+          </h2>
+          {filterSettings(whatYouSeeSettings).map((item, index) => (
+            <Link
+              key={index}
+              to={item.path || '#'}
+              className="flex items-center gap-4 p-4 hover:bg-leather-800/30 transition-colors rounded-xl group"
             >
-              <div
-                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                  isAnimated ? 'translate-x-6' : ''
-                }`}
-              />
-            </button>
-          </div>
+              <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
+                {item.icon}
+              </div>
+              <span className="flex-1 text-white font-medium">{item.label}</span>
+              <svg className="w-5 h-5 text-leather-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          ))}
+        </div>
 
-          {/* Glow Intensity Slider */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-white font-semibold text-sm">
-                Intensité de la lueur
-              </label>
-              <span className="text-white/60 text-sm">{glowIntensity}%</span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={glowIntensity}
-              onChange={(e) => setGlowIntensity(parseInt(e.target.value))}
-              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, ${edgeLighting} 0%, ${edgeLighting} ${glowIntensity}%, rgba(255,255,255,0.2) ${glowIntensity}%, rgba(255,255,255,0.2) 100%)`
-              }}
-            />
-          </div>
-
-          {/* Preview Card */}
-          <div className="mt-4">
-            <label className="block text-white font-semibold mb-2 text-sm">
-              Aperçu
-            </label>
-            <div 
-              className="card-edge p-6 text-center"
-              style={{ 
-                boxShadow: `0 0 ${glowIntensity/5}px ${edgeLighting}, 0 0 ${glowIntensity/2.5}px ${edgeLighting}`
-              }}
-            >
-              <div className="text-4xl mb-2">⚜️</div>
-              <p className="text-white font-bold">Zyeuté</p>
-              <p className="text-white/60 text-sm">Le réseau social québécois</p>
-            </div>
+        {/* Quebec Heritage Section */}
+        <div className="mb-6">
+          <h2 className="text-gold-500 text-xs font-bold uppercase tracking-wider mb-3 px-4 flex items-center gap-2">
+            <span>🇨🇦</span>
+            <span>Québec</span>
+          </h2>
+          <div className="leather-card rounded-2xl overflow-hidden stitched">
+            {filterSettings(quebecSettings).map((item, index) => (
+              <Link
+                key={index}
+                to={item.path || '#'}
+                className="flex items-center gap-4 p-4 hover:bg-leather-700/30 transition-colors group border-b border-leather-700/30 last:border-b-0"
+              >
+                <div className="text-2xl group-hover:scale-110 transition-transform">
+                  {item.icon}
+                </div>
+                <span className="flex-1 text-white font-medium">{item.label}</span>
+                {item.badge && (
+                  <span className="badge-premium">{item.badge}</span>
+                )}
+                <svg className="w-5 h-5 text-leather-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            ))}
           </div>
         </div>
 
-        {/* Account Settings */}
-        <div className="glass-card rounded-2xl p-6 mb-4 space-y-3">
-          <h3 className="text-white font-bold mb-3">Compte</h3>
+        {/* Account Settings Section */}
+        <div className="mb-6">
+          <h2 className="text-leather-400 text-xs font-bold uppercase tracking-wider mb-3 px-4">
+            Ton compte
+          </h2>
+          {filterSettings(accountSettings).map((item, index) => (
+            <Link
+              key={index}
+              to={item.path || '#'}
+              className="flex items-center gap-4 p-4 hover:bg-leather-800/30 transition-colors rounded-xl group"
+            >
+              <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
+                {item.icon}
+              </div>
+              <span className="flex-1 text-white font-medium">{item.label}</span>
+              {item.badge && (
+                <span className="text-gold-500 text-sm">{item.badge}</span>
+              )}
+              <svg className="w-5 h-5 text-leather-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          ))}
+        </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 p-4 bg-white/5 rounded-xl mb-4">
-            <div className="text-center">
-              <div className="text-gold-400 font-bold text-xl">{user.coins}</div>
-              <div className="text-white/60 text-xs">Cennes</div>
-            </div>
-            <div className="text-center">
-              <div className="text-orange-400 font-bold text-xl">{user.fire_score}</div>
-              <div className="text-white/60 text-xs">Score 🔥</div>
-            </div>
-            <div className="text-center">
-              <div className="text-white font-bold text-xl">{user.posts_count || 0}</div>
-              <div className="text-white/60 text-xs">Posts</div>
-            </div>
-          </div>
-
-          <button className="w-full text-left px-4 py-3 hover:bg-white/5 rounded-xl transition-colors text-white flex items-center justify-between">
-            <span>Confidentialité et sécurité</span>
-            <span className="text-white/40">›</span>
-          </button>
-
-          <button className="w-full text-left px-4 py-3 hover:bg-white/5 rounded-xl transition-colors text-white flex items-center justify-between">
-            <span>Notifications</span>
-            <span className="text-white/40">›</span>
-          </button>
-
-          <button className="w-full text-left px-4 py-3 hover:bg-white/5 rounded-xl transition-colors text-white flex items-center justify-between">
-            <span>Langue</span>
-            <span className="text-white/60 text-sm">Français 🇨🇦</span>
-          </button>
-
-          <div className="border-t border-white/10 my-2" />
-
+        {/* Sign Out Button */}
+        <div className="leather-card rounded-2xl p-4 mb-6 stitched">
           <button
             onClick={handleSignOut}
-            className="w-full text-left px-4 py-3 hover:bg-white/5 rounded-xl transition-colors text-red-400 font-semibold"
+            className="w-full text-center py-3 text-red-400 font-bold hover:text-red-300 transition-colors"
           >
             Se déconnecter
-          </button>
-
-          <button
-            onClick={handleDeleteAccount}
-            className="w-full text-left px-4 py-3 hover:bg-red-500/10 rounded-xl transition-colors text-red-500 text-sm"
-          >
-            Supprimer mon compte
           </button>
         </div>
 
         {/* App Info */}
-        <div className="text-center text-white/40 text-sm">
-          <p>Zyeuté v1.0.0</p>
-          <p className="mt-1">Fait avec fierté québécoise ⚜️</p>
+        <div className="text-center text-leather-400 text-sm space-y-1">
+          <p className="flex items-center justify-center gap-2">
+            <span className="text-gold-500">⚜️</span>
+            <span>Zyeuté v1.0.0</span>
+          </p>
+          <p>Fait avec fierté québécoise 🇨🇦</p>
+          <p className="text-xs text-leather-500">Fait au Québec avec fierté 🦫⚜️</p>
         </div>
       </div>
 

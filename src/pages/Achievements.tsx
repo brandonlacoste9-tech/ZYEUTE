@@ -4,9 +4,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Header } from '../components/layout/Header';
-import { BottomNav } from '../components/layout/BottomNav';
-import { Button } from '../components/ui/Button';
+import { Header } from '../components/Header';
+import { BottomNav } from '../components/BottomNav';
+import { Button } from '../components/Button';
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
 import {

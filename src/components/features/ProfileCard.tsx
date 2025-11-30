@@ -4,8 +4,8 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar } from '../ui/Avatar';
-import { Button } from '../ui/Button';
+import { Avatar } from '../Avatar';
+import { Button } from '../Button';
 import { formatNumber } from '../../lib/utils';
 import type { User } from '../../types';
 import { cn } from '../../lib/utils';

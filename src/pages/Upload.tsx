@@ -1,18 +1,16 @@
 /**
- * Upload Page - Create posts with Ti-Guy AI assistance
+ * Upload Page - Premium Quebec Heritage Design
+ * Luxury content creation with Ti-Guy AI and gold accents
  */
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header } from '../components/layout/Header';
-import { Button } from '../components/ui/Button';
+import { Header } from '../components/Header';
+import { Button } from '../components/Button';
 import { supabase } from '../lib/supabase';
 import { extractHashtags, generateId } from '../lib/utils';
 import { QUEBEC_REGIONS } from '../lib/quebecFeatures';
-import { generateCaption as generateAICaption, generateHashtags as generateAIHashtags, analyzeImage } from '../services/geminiService';
-import { moderateContent, isUserBanned } from '../services/moderationService';
-import { checkAchievements } from '../services/achievementService';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 
 export const Upload: React.FC = () => {
   const navigate = useNavigate();
@@ -21,7 +19,6 @@ export const Upload: React.FC = () => {
   const [caption, setCaption] = React.useState('');
   const [region, setRegion] = React.useState('');
   const [city, setCity] = React.useState('');
-  const [isGenerating, setIsGenerating] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -31,7 +28,6 @@ export const Upload: React.FC = () => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result as string);
@@ -40,321 +36,262 @@ export const Upload: React.FC = () => {
     }
   };
 
-  // Generate caption with Ti-Guy AI (Gemini)
-  const handleGenerateCaption = async () => {
-    if (!file) {
-      toast.warning('Ajoute une image d\'abord!');
-      return;
-    }
-    setIsGenerating(true);
-    toast.info('Ti-Guy est en train de créer ta légende... 🤖');
-    try {
-      const aiCaption = await generateAICaption(file);
-      setCaption(aiCaption);
-      toast.success('Caption générée! 🔥');
-    } catch (error: any) {
-      console.error('Error generating caption:', error);
-      if (error.message?.includes('Configuration')) {
-        toast.error('Configure ton API Gemini dans .env.local');
-      } else {
-        toast.error('Erreur avec Ti-Guy. Réessaye!');
-      }
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  // Generate hashtags with AI
-  const handleGenerateHashtags = async () => {
-    if (!file) {
-      toast.warning('Ajoute une image d\'abord!');
-      return;
-    }
-    toast.info('Génération des hashtags... 🏷️');
-    try {
-      const hashtags = await generateAIHashtags(file);
-      const hashtagString = hashtags.join(' ');
-      // Append hashtags to caption or replace existing ones
-      const captionWithoutHashtags = caption.replace(/#\w+/g, '').trim();
-      setCaption(`${captionWithoutHashtags} ${hashtagString}`.trim());
-      toast.success(`${hashtags.length} hashtags ajoutés!`);
-    } catch (error) {
-      console.error('Error generating hashtags:', error);
-      toast.error('Erreur lors de la génération des hashtags');
-    }
-  };
-
-  // Analyze image
-  const handleAnalyzeImage = async () => {
-    if (!file) return;
-    toast.info('Analyse de l\'image...');
-    try {
-      const description = await analyzeImage(file);
-      toast.info(description);
-    } catch (error) {
-      console.error('Error analyzing image:', error);
-    }
-  };
-
   // Upload post
   const handleUpload = async () => {
     if (!file) {
-      alert('Sélectionne une photo ou vidéo!');
+      toast.warning('Ajoute une image ou vidéo!');
       return;
     }
+
+    if (!caption.trim()) {
+      toast.warning('Ajoute une légende!');
+      return;
+    }
+
     setIsUploading(true);
+    toast.info('Upload en cours... 📤');
+
     try {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert('Tu dois être connecté!');
+        toast.error('Tu dois être connecté!');
         navigate('/login');
         return;
       }
-      // Check if user is banned
-      const banStatus = await isUserBanned(user.id);
-      if (banStatus.isBanned) {
-        toast.error(
-          banStatus.until
-            ? `Tu es suspendu jusqu'au ${new Date(banStatus.until).toLocaleDateString('fr-CA')}`
-            : 'Ton compte est banni définitivement'
-        );
-        setIsUploading(false);
-        return;
-      }
-      // AI Moderation Check
-      toast.info('Analyse du contenu en cours... 🛡️');
-      const moderationResult = await moderateContent(
-        { text: caption },
-        'post',
-        user.id
-      );
-      // Handle moderation result
-      if (moderationResult.action === 'ban' || moderationResult.action === 'remove') {
-        toast.error(`❌ ${moderationResult.reason}`);
-        toast.warning('Ton contenu viole nos directives de la communauté');
-        setIsUploading(false);
-        return;
-      }
-      if (moderationResult.action === 'flag') {
-        toast.warning('⚠️ Ton contenu sera révisé par notre équipe');
-      }
-      // Upload file to storage
+
+      // Upload file to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${generateId()}.${fileExt}`;
-      const filePath = `media/${user.id}/${fileName}`;
-      toast.info('Upload en cours... ⬆️');
+      const filePath = `posts/${user.id}/${fileName}`;
+
       const { error: uploadError } = await supabase.storage
-        .from('posts')
+        .from('media')
         .upload(filePath, file);
-      if (uploadError) {
-        // Check if bucket exists, provide helpful error
-        if (uploadError.message.includes('not found')) {
-          throw new Error('Le bucket "posts" n\'existe pas dans Supabase Storage. Crée-le d\'abord!');
-        }
-        throw uploadError;
-      }
+
+      if (uploadError) throw uploadError;
+
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from('posts')
+        .from('media')
         .getPublicUrl(filePath);
+
       // Extract hashtags
       const hashtags = extractHashtags(caption);
+
       // Create post
-      const { data: newPost, error: insertError } = await supabase
+      const { error: postError } = await supabase
         .from('posts')
         .insert({
           user_id: user.id,
-          type: file.type.startsWith('video/') ? 'video' : 'photo',
+          caption: caption.trim(),
           media_url: publicUrl,
-          caption,
+          media_type: file.type.startsWith('video') ? 'video' : 'image',
           hashtags,
-          region,
-          city,
-        })
-        .select()
-        .single();
-      if (insertError) throw insertError;
-      // Log moderation with content ID
-      if (newPost) {
-        await moderateContent(
-          { text: caption },
-          'post',
-          user.id,
-          newPost.id
-        );
-        // Check achievements! 🏆
-        await checkAchievements(user.id, {
-          type: 'post_created',
-          data: {
-            hashtags,
-            region,
-            city,
-          },
+          region: region || null,
+          city: city || null,
         });
-      }
-      // Success!
-      if (moderationResult.action === 'flag') {
-        toast.success('Post publié! En attente de révision.');
-      } else {
-        toast.success('Post publié avec succès! 🔥');
-      }
-      setTimeout(() => navigate('/'), 1000);
-    } catch (error: any) {
-      console.error('Error uploading post:', error);
-      toast.error(error.message || 'Erreur lors du téléversement');
+
+      if (postError) throw postError;
+
+      toast.success('Post publié! 🔥');
+      navigate('/');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Erreur lors de l\'upload');
     } finally {
       setIsUploading(false);
     }
   };
+
   return (
-    <div className="min-h-screen bg-black pb-20">
-      <Header showBack={true} title="Créer un post" />
+    <div className="min-h-screen bg-black leather-overlay pb-20">
+      <Header title="Créer un post" showBack={true} showSearch={false} />
+
       <div className="max-w-2xl mx-auto px-4 py-6">
-        {/* File input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*,video/*"
-          onChange={handleFileChange}
-          className="hidden"
-        />
-        {/* Preview */}
-        {preview ? (
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-900 mb-6">
-            {file?.type.startsWith('video/') ? (
-              <video
-                src={preview}
-                controls
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <img
-                src={preview}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
-            )}
-            {/* Change file button */}
+        {/* Upload Area */}
+        <div className="leather-card rounded-2xl p-6 mb-4 stitched">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,video/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+
+          {!preview ? (
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="absolute top-4 right-4 px-4 py-2 bg-black/80 rounded-xl text-white text-sm hover:bg-black transition-colors"
+              className="w-full aspect-square border-2 border-dashed border-gold-500/50 rounded-2xl flex flex-col items-center justify-center gap-4 hover:border-gold-500 hover:bg-gold-500/5 transition-all group"
             >
-              Changer
+              <div className="w-20 h-20 rounded-full bg-gold-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg className="w-10 h-10 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+              <div className="text-center">
+                <p className="text-gold-400 font-bold text-lg mb-1 embossed">
+                  Ajoute une photo ou vidéo
+                </p>
+                <p className="text-leather-300 text-sm">
+                  Clique pour sélectionner un fichier
+                </p>
+              </div>
+            </button>
+          ) : (
+            <div className="space-y-4">
+              {/* Preview */}
+              <div className="relative aspect-square rounded-2xl overflow-hidden stitched-subtle">
+                {file?.type.startsWith('video') ? (
+                  <video
+                    src={preview}
+                    controls
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                )}
+                {/* Gold corner accents */}
+                <div className="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-gold-500" />
+                <div className="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-gold-500" />
+                <div className="absolute bottom-2 left-2 w-8 h-8 border-b-2 border-l-2 border-gold-500" />
+                <div className="absolute bottom-2 right-2 w-8 h-8 border-b-2 border-r-2 border-gold-500" />
+              </div>
+
+              {/* Change File Button */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full btn-leather py-3 rounded-xl font-semibold"
+              >
+                Changer le fichier
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Caption & Details */}
+        {preview && (
+          <div className="leather-card rounded-2xl p-6 mb-4 space-y-4 stitched">
+            <div>
+              <label className="block text-gold-400 font-semibold mb-2 text-sm embossed">
+                Légende
+              </label>
+              <textarea
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder="Écris une légende... #Quebec"
+                rows={4}
+                className="input-premium resize-none"
+              />
+              <p className="text-leather-400 text-xs mt-2">
+                {caption.length}/2200 caractères
+              </p>
+            </div>
+
+            {/* Ti-Guy AI Suggestions */}
+            <div className="bg-leather-900/50 rounded-xl p-4 border border-gold-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-full bg-gold-500 flex items-center justify-center">
+                  <span className="text-lg">🦫</span>
+                </div>
+                <div>
+                  <h3 className="text-gold-400 font-bold text-sm embossed">Ti-Guy AI</h3>
+                  <p className="text-leather-300 text-xs">Ton assistant québécois</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button className="btn-leather py-2 rounded-lg text-sm font-medium">
+                  ✨ Générer caption
+                </button>
+                <button className="btn-leather py-2 rounded-lg text-sm font-medium">
+                  🏷️ Ajouter hashtags
+                </button>
+              </div>
+            </div>
+
+            {/* Location */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gold-400 font-semibold mb-2 text-sm embossed">
+                  Région
+                </label>
+                <select
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  className="input-premium"
+                >
+                  <option value="">Sélectionne</option>
+                  {QUEBEC_REGIONS.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.emoji} {r.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-gold-400 font-semibold mb-2 text-sm embossed">
+                  Ville
+                </label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Montréal"
+                  className="input-premium"
+                />
+              </div>
+            </div>
+
+            {/* Publish Button */}
+            <button
+              onClick={handleUpload}
+              disabled={isUploading || !file || !caption.trim()}
+              className="w-full btn-gold py-4 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed glow-gold"
+            >
+              {isUploading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>Publication...</span>
+                </div>
+              ) : (
+                '🔥 Publier'
+              )}
             </button>
           </div>
-        ) : (
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full aspect-square rounded-2xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center gap-4 hover:border-gold-400 hover:bg-white/5 transition-all"
-          >
-            <svg
-              className="w-16 h-16 text-white/40"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            <span className="text-white/60 text-lg">
-              Clique pour ajouter une photo ou vidéo
-            </span>
-          </button>
         )}
-        {/* Caption */}
-        <div className="glass-card rounded-2xl p-6 mb-4">
-          <label className="block text-white font-semibold mb-2">
-            Caption
-          </label>
-          <textarea
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            placeholder="Écris quelque chose de nice..."
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-gold-400 resize-none"
-            rows={4}
-          />
-          {/* AI Actions */}
-          <div className="mt-3 flex gap-2 flex-wrap">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleGenerateCaption}
-              isLoading={isGenerating}
-              disabled={!file}
-              leftIcon={<span>🤖</span>}
-            >
-              {isGenerating ? 'Ti-Guy réfléchit...' : 'Demande à Ti-Guy'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleGenerateHashtags}
-              disabled={!file}
-              leftIcon={<span>🏷️</span>}
-            >
-              Hashtags
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleAnalyzeImage}
-              disabled={!file}
-              leftIcon={<span>👁️</span>}
-            >
-              Analyser
-            </Button>
-          </div>
+
+        {/* Tips Card */}
+        <div className="leather-card rounded-2xl p-6 stitched">
+          <h3 className="text-gold-400 font-bold mb-3 embossed">
+            💡 Conseils pour un post viral
+          </h3>
+          <ul className="space-y-2 text-leather-200 text-sm">
+            <li className="flex items-start gap-2">
+              <span className="text-gold-500 mt-0.5">⚜️</span>
+              <span>Utilise des hashtags québécois (#Quebec, #MTL, #QC)</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-gold-500 mt-0.5">📍</span>
+              <span>Tag ta région pour plus de visibilité locale</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-gold-500 mt-0.5">🔥</span>
+              <span>Poste entre 18h-21h pour plus d'engagement</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-gold-500 mt-0.5">🎬</span>
+              <span>Les vidéos courtes (15-60s) performent mieux</span>
+            </li>
+          </ul>
         </div>
-        {/* Region & City */}
-        <div className="glass-card rounded-2xl p-6 mb-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-white font-semibold mb-2 text-sm">
-                Région
-              </label>
-              <select
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold-400"
-              >
-                <option value="">Sélectionne</option>
-                {QUEBEC_REGIONS.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.emoji} {r.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-white font-semibold mb-2 text-sm">
-                Ville
-              </label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Montréal"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-gold-400"
-              />
-            </div>
-          </div>
-        </div>
-        {/* Upload button */}
-        <Button
-          variant="primary"
-          size="lg"
-          className="w-full"
-          onClick={handleUpload}
-          isLoading={isUploading}
-          disabled={!file}
-        >
-          {isUploading ? 'Téléversement...' : 'Publier 🔥'}
-        </Button>
       </div>
     </div>
   );

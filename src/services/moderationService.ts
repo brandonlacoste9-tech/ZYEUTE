@@ -1,13 +1,17 @@
 /**
  * AI Content Moderation Service
- * Uses Google Gemini 2.0 Flash for Quebec-aware content moderation
+ * Uses OpenAI GPT-4o for Quebec-aware content moderation
  */
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import { supabase } from '../lib/supabase';
-import { toast } from '../components/ui/Toast';
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+// Initialize OpenAI
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+const openai = apiKey ? new OpenAI({
+  apiKey: apiKey,
+  dangerouslyAllowBrowser: true
+}) : null;
 
 export type ModerationSeverity = 'safe' | 'low' | 'medium' | 'high' | 'critical';
 export type ModerationAction = 'allow' | 'flag' | 'hide' | 'remove' | 'ban';
@@ -117,31 +121,26 @@ export async function analyzeText(text: string): Promise<ModerationResult> {
       };
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-    
-    const result = await model.generateContent(
-      `${MODERATION_PROMPT}\n\nTEXTE: "${text}"`
-    );
-    
-    const response = result.response.text();
-    
-    // Extract JSON from response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('No JSON found in Gemini response:', response);
-      // Default to safe if parsing fails
-      return {
-        is_safe: true,
-        severity: 'safe',
-        categories: [],
-        confidence: 50,
-        reason: 'Erreur d\'analyse, publié par défaut',
-        action: 'allow',
-      };
+    if (!openai) {
+      console.warn('⚠️ No OpenAI API Key. Skipping moderation.');
+      return { is_safe: true, severity: 'safe', categories: [], confidence: 0, reason: 'Modération inactive', action: 'allow' };
     }
 
-    const moderationResult: ModerationResult = JSON.parse(jsonMatch[0]);
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: MODERATION_PROMPT },
+        { role: "user", content: `TEXTE: "${text}"` }
+      ],
+      response_format: { type: "json_object" }
+    });
+    
+    const resultText = response.choices[0].message.content;
+    if (!resultText) throw new Error("No response from OpenAI");
+
+    const moderationResult: ModerationResult = JSON.parse(resultText);
     return moderationResult;
+
   } catch (error) {
     console.error('Error in analyzeText:', error);
     // Fail open - allow content if moderation fails
@@ -158,52 +157,41 @@ export async function analyzeText(text: string): Promise<ModerationResult> {
 }
 
 /**
- * Analyze image content using Gemini Vision
+ * Analyze image content using OpenAI Vision
  */
 export async function analyzeImage(imageUrl: string): Promise<ModerationResult> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-
-    const prompt = `${MODERATION_PROMPT}\n\nIMAGE: Analyse cette image pour détecter:
-- Nudité ou contenu sexuel explicite
-- Violence graphique ou gore
-- Symboles de haine
-- Drogues illégales visibles
-- Armes dangereuses
-- Exploitation de mineurs (CRITIQUE)
-
-CONTEXTE QUÉBÉCOIS OK:
-- Fleur-de-lys, drapeau québécois
-- Poutine, sirop d'érable
-- Vêtements culturels
-- Art et nudité artistique (si contexte approprié)`;
-
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          mimeType: 'image/jpeg',
-          data: imageUrl,
-        },
-      },
-    ]);
-
-    const response = result.response.text();
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    
-    if (!jsonMatch) {
-      return {
-        is_safe: true,
-        severity: 'safe',
-        categories: [],
-        confidence: 50,
-        reason: 'Image analysée, aucun problème détecté',
-        action: 'allow',
-      };
+    if (!openai) {
+      return { is_safe: true, severity: 'safe', categories: [], confidence: 0, reason: 'Modération inactive', action: 'allow' };
     }
 
-    const moderationResult: ModerationResult = JSON.parse(jsonMatch[0]);
-    return moderationResult;
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: MODERATION_PROMPT },
+        { 
+          role: "user", 
+          content: [
+            { type: "text", text: "Analyse cette image pour détecter: Nudité, violence, haine, drogues, armes." },
+            { type: "image_url", image_url: { url: imageUrl } }
+          ]
+        }
+      ],
+      max_tokens: 300,
+    });
+
+    const resultText = response.choices[0].message.content || "{}";
+    // Cleanup JSON if needed (sometimes model adds markdown)
+    const cleanJson = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
+    
+    try {
+      const moderationResult: ModerationResult = JSON.parse(cleanJson);
+      return moderationResult;
+    } catch (e) {
+      console.error("Failed to parse JSON from vision response", resultText);
+      return { is_safe: true, severity: 'safe', categories: [], confidence: 50, reason: 'Analyse incertaine', action: 'allow' };
+    }
+
   } catch (error) {
     console.error('Error in analyzeImage:', error);
     return {
@@ -469,4 +457,3 @@ export default {
   moderateContent,
   isUserBanned,
 };
-

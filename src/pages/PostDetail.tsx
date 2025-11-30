@@ -4,16 +4,16 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Header } from '../components/layout/Header';
-import { Avatar } from '../components/ui/Avatar';
-import { Button } from '../components/ui/Button';
+import { Header } from '../components/Header';
+import { Avatar } from '../components/Avatar';
+import { Button } from '../components/Button';
 import { FireRating } from '../components/features/FireRating';
 import { VideoPlayer } from '../components/features/VideoPlayer';
 import { CommentThread } from '../components/features/CommentThread';
 import { GiftModal } from '../components/features/GiftModal';
 import { supabase } from '../lib/supabase';
 import { formatNumber, getTimeAgo } from '../lib/utils';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/Toast';
 import type { Post, Comment as CommentType, User } from '../types';
 
 export const PostDetail: React.FC = () => {
