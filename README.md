@@ -114,7 +114,7 @@ See `SETUP_GUIDE.md` for detailed setup instructions.
 - **Storage**: Supabase Storage
 - **Payments**: Stripe
 - **AI**: OpenAI (GPT-4, DALL-E 3)
-- **Deployment**: Vercel / Netlify
+- **Deployment**: Vercel
 
 ---
 
@@ -158,7 +158,9 @@ See `SETUP_GUIDE.md` for detailed instructions.
 
 ## 🚢 Deployment
 
-### Vercel (Recommended)
+Zyeuté is deployed on **Vercel** for optimal performance and seamless integration.
+
+### Deploy to Vercel
 
 ```bash
 # Install Vercel CLI
@@ -168,17 +170,7 @@ npm i -g vercel
 vercel
 ```
 
-### Netlify
-
-```bash
-# Install Netlify CLI
-npm i -g netlify-cli
-
-# Deploy
-netlify deploy --prod
-```
-
-**Important**: Set all environment variables in your deployment platform!
+**Important**: Set all environment variables in your Vercel project settings!
 
 ---
 
