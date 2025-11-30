@@ -47,7 +47,8 @@ Thumbs.db
 .azure/
 .browserstack/
 .claude/
-.cursor/
+.cursor/*
+!.cursor/extensions/
 .docker/
 .github/
 .gitlab/
