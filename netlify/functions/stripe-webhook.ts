@@ -158,7 +158,6 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
         .from('platform_subscriptions')
         .update({
           status: 'canceled',
-          is_premium: false,
           canceled_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })

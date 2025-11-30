@@ -78,6 +78,8 @@ BEGIN
     RETURN NEW;
   ELSIF TG_OP = 'DELETE' THEN
     -- Reset premium status when subscription is deleted
+    -- Note: Each user can only have ONE platform VIP subscription (enforced by UNIQUE constraint)
+    -- This is different from creator subscriptions where a user can subscribe to multiple creators
     UPDATE users
     SET 
       is_premium = FALSE,

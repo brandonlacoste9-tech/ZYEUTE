@@ -143,7 +143,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .from('platform_subscriptions')
         .update({
           status: 'canceled',
-          is_premium: false,
           canceled_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
