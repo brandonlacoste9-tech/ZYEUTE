@@ -66,10 +66,11 @@
   # Branch deployments
   # Inherits build settings from [build]
 
-# Functions configuration (for future use if needed)
-# Uncomment when you add serverless functions
-# [functions]
-#   directory = "netlify/functions"
+# Functions configuration
+# Stripe webhook endpoint: /.netlify/functions/stripe-webhook
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 
 # Plugins (optional - uncomment as needed)
 # [[plugins]]
