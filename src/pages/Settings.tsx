@@ -14,6 +14,7 @@ import { toast } from '@/components/Toast';
 import { generateId } from '@/lib/utils';
 import { QUEBEC_REGIONS } from '@/lib/quebecFeatures';
 import { useBorderColor } from '@/contexts/BorderColorContext';
+import { useHaptics } from '@/hooks/useHaptics';
 import type { User } from '@/types';
 
 interface SettingItem {
@@ -30,6 +31,7 @@ export const Settings: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [searchQuery, setSearchQuery] = React.useState('');
   const { borderColor, setBorderColor, defaultGold } = useBorderColor();
+  const { tap, success, selection } = useHaptics();
 
   // Fetch current user
   React.useEffect(() => {
@@ -75,13 +77,16 @@ export const Settings: React.FC = () => {
 
   // Handle border color change
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    selection(); // Haptic feedback for color selection
     setBorderColor(event.target.value);
     toast.success('Couleur d\'accent mise à jour! ✨');
   };
 
   // Reset to default gold
   const resetToGold = () => {
+    tap(); // Haptic feedback for button press
     setBorderColor(defaultGold);
+    success(); // Success haptic for completed action
     toast.success('Couleur réinitialisée à l\'or par défaut! ⚜️');
   };
 
@@ -278,7 +283,10 @@ export const Settings: React.FC = () => {
       <div className="sticky top-0 z-30 bg-black/95 backdrop-blur-sm border-b border-gold-500/20">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              tap();
+              navigate(-1);
+            }}
             className="text-gold-500 hover:text-gold-400 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,6 +322,7 @@ export const Settings: React.FC = () => {
             <Link
               key={index}
               to={item.path || '#'}
+              onClick={() => tap()}
               className="flex items-center gap-4 p-4 hover:bg-leather-800/40 transition-all rounded-xl group border-b border-leather-800/30 last:border-b-0"
             >
               <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
@@ -358,6 +367,7 @@ export const Settings: React.FC = () => {
             <Link
               key={index}
               to={item.path || '#'}
+              onClick={() => tap()}
               className="flex items-center gap-4 p-4 hover:bg-leather-800/30 transition-colors rounded-xl group"
             >
               <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
@@ -442,6 +452,7 @@ export const Settings: React.FC = () => {
               <Link
                 key={index}
                 to={item.path || '#'}
+                onClick={() => tap()}
                 className="flex items-center gap-4 p-4 hover:bg-leather-700/30 transition-colors group border-b border-leather-700/30 last:border-b-0"
               >
                 <div className="text-2xl group-hover:scale-110 transition-transform">
@@ -468,6 +479,7 @@ export const Settings: React.FC = () => {
             <Link
               key={index}
               to={item.path || '#'}
+              onClick={() => tap()}
               className="flex items-center gap-4 p-4 hover:bg-leather-800/30 transition-colors rounded-xl group"
             >
               <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
@@ -487,7 +499,10 @@ export const Settings: React.FC = () => {
         {/* Sign Out Button */}
         <div className="leather-card rounded-2xl p-4 mb-6 stitched">
           <button
-            onClick={handleSignOut}
+            onClick={() => {
+              impact();
+              handleSignOut();
+            }}
             className="w-full text-center py-3 text-red-400 font-bold hover:text-red-300 transition-colors"
           >
             Se déconnecter
