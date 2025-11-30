@@ -1,0 +1,32 @@
+name: 💰 Revenue Flow Validation (Self-Hosted)
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  validate_webhook_logic:
+    runs-on: self-hosted
+    environment: staging_validation
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run E2E Revenue Verification Script
+        run: python .cursor/extensions/colony-os/app/kernel/run_e2e_revenue_test.py
+        env:
+          SUPABASE_SERVICE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.STAGING_SERVICE_ROLE_KEY }}
+          STRIPE_TEST_SECRET: ${{ secrets.STAGING_STRIPE_SECRET }}
+
+      - name: Report Success
+        run: echo "Revenue validation passed successfully. Ready for merge."
