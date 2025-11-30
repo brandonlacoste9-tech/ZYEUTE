@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- PWA icon generation utility (`scripts/generate-icons.js`)
+  - Programmatically generates minimal gold-colored placeholder PNG icons
+  - Creates icons at 144x144 and 512x512 sizes for PWA usage
+  - Base64-encoded minimal PNG generation (~70 bytes each)
+  - Includes warnings for production replacement
+- PWA placeholder icons (`public/icon-144x144.png`, `public/icon-512x512.png`)
+  - Minimal 1x1 pixel gold-colored PNGs for PWA compliance
+  - Generated via generate-icons.js script
+  - 70 bytes each for optimal performance
+- Korean AI compliance reference file (`korean-AI-compliance-`)
+  - Subproject commit reference: 029fa78db179e11134f10b00ae5fca63d44fb638
+  - Asset hygiene and governance tracking
 - Netlify deployment configuration with `netlify.toml`
 - SPA routing support with `public/_redirects`
 - ESLint configuration for code quality standards
