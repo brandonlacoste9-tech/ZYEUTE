@@ -79,6 +79,18 @@ exports.handler = async (event) => {
                 };
             }
 
+            // Verify that the update actually affected a row
+            if (!updateData || updateData.length === 0) {
+                console.error(`❌ Update failed: No profile found with userId ${userId}. Customer may have paid but will not receive premium access.`);
+                return { 
+                    statusCode: 404, 
+                    body: JSON.stringify({ 
+                        error: 'Profile not found',
+                        message: `No user profile found with id: ${userId}. Payment processed but premium status not granted.` 
+                    }) 
+                };
+            }
+
             console.log(`✅ User ${userId} upgraded to ${newTier} tier.`);
             return { 
                 statusCode: 200, 
@@ -95,28 +107,49 @@ exports.handler = async (event) => {
             const customerId = subscription.customer;
             
             // Find user by stripe_customer_id
-            const { data: userProfile } = await supabase
+            const { data: userProfile, error: userError } = await supabase
                 .from('user_profiles')
                 .select('id')
                 .eq('stripe_customer_id', customerId)
                 .single();
 
-            if (userProfile && subscription.status === 'active') {
+            if (userError || !userProfile) {
+                console.error(`❌ User profile not found for Stripe customer: ${customerId}`);
+                // Continue processing but log the error
+            } else if (subscription.status === 'active') {
                 // Subscription is active - ensure premium status
-                await supabase
+                const { data: updateData, error: updateError } = await supabase
                     .from('user_profiles')
                     .update({ is_premium: true })
-                    .eq('id', userProfile.id);
-            } else if (userProfile && subscription.status === 'canceled') {
+                    .eq('id', userProfile.id)
+                    .select();
+
+                if (updateError) {
+                    console.error(`❌ Failed to update premium status for user ${userProfile.id}:`, updateError);
+                } else if (!updateData || updateData.length === 0) {
+                    console.error(`❌ Update failed: No profile found with id ${userProfile.id} for subscription update`);
+                } else {
+                    console.log(`✅ Updated premium status for user ${userProfile.id}`);
+                }
+            } else if (subscription.status === 'canceled') {
                 // Subscription canceled - downgrade to free
-                await supabase
+                const { data: updateData, error: updateError } = await supabase
                     .from('user_profiles')
                     .update({ 
                         subscription_tier: null,
                         plan: 'free',
                         is_premium: false 
                     })
-                    .eq('id', userProfile.id);
+                    .eq('id', userProfile.id)
+                    .select();
+
+                if (updateError) {
+                    console.error(`❌ Failed to downgrade user ${userProfile.id}:`, updateError);
+                } else if (!updateData || updateData.length === 0) {
+                    console.error(`❌ Update failed: No profile found with id ${userProfile.id} for subscription cancellation`);
+                } else {
+                    console.log(`✅ Downgraded user ${userProfile.id} to free tier`);
+                }
             }
         }
 
@@ -136,23 +169,32 @@ exports.handler = async (event) => {
             const customerId = subscription.customer;
             
             // Downgrade user to free
-            const { data: userProfile } = await supabase
+            const { data: userProfile, error: userError } = await supabase
                 .from('user_profiles')
                 .select('id')
                 .eq('stripe_customer_id', customerId)
                 .single();
 
-            if (userProfile) {
-                await supabase
+            if (userError || !userProfile) {
+                console.error(`❌ User profile not found for Stripe customer: ${customerId}`);
+            } else {
+                const { data: updateData, error: updateError } = await supabase
                     .from('user_profiles')
                     .update({ 
                         subscription_tier: null,
                         plan: 'free',
                         is_premium: false 
                     })
-                    .eq('id', userProfile.id);
-                
-                console.log(`⬇️ User ${userProfile.id} downgraded to free tier.`);
+                    .eq('id', userProfile.id)
+                    .select();
+
+                if (updateError) {
+                    console.error(`❌ Failed to downgrade user ${userProfile.id}:`, updateError);
+                } else if (!updateData || updateData.length === 0) {
+                    console.error(`❌ Update failed: No profile found with id ${userProfile.id} for subscription deletion`);
+                } else {
+                    console.log(`⬇️ User ${userProfile.id} downgraded to free tier.`);
+                }
             }
         }
 
