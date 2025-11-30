@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/Toast';
 import { generateId } from '@/lib/utils';
 import { QUEBEC_REGIONS } from '@/lib/quebecFeatures';
+import { useBorderColor } from '@/contexts/BorderColorContext';
 import type { User } from '@/types';
 
 interface SettingItem {
@@ -28,6 +29,7 @@ export const Settings: React.FC = () => {
   const [user, setUser] = React.useState<User | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const { borderColor, setBorderColor, defaultGold } = useBorderColor();
 
   // Fetch current user
   React.useEffect(() => {
@@ -69,6 +71,18 @@ export const Settings: React.FC = () => {
     await supabase.auth.signOut();
     toast.success('À la prochaine! 👋');
     setTimeout(() => navigate('/login'), 500);
+  };
+
+  // Handle border color change
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setBorderColor(event.target.value);
+    toast.success('Couleur d\'accent mise à jour! ✨');
+  };
+
+  // Reset to default gold
+  const resetToGold = () => {
+    setBorderColor(defaultGold);
+    toast.success('Couleur réinitialisée à l\'or par défaut! ⚜️');
   };
 
   // Settings sections
@@ -355,6 +369,66 @@ export const Settings: React.FC = () => {
               </svg>
             </Link>
           ))}
+        </div>
+
+        {/* Personalization Section */}
+        <div className="mb-6">
+          <h2 className="text-gold-500/70 text-xs font-bold uppercase tracking-wider mb-3 px-4">
+            Personnalisation
+          </h2>
+          
+          {/* RGB Lighting Setting Item */}
+          <div className="leather-card rounded-xl overflow-hidden mb-2">
+            <div className="flex items-center justify-between p-4 hover:bg-leather-700/30 transition-colors group border-b border-leather-700/30">
+              <div className="flex items-center gap-4 flex-1">
+                <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-white font-medium group-hover:text-gold-400 transition-colors">
+                    Éclairage d'accent de l'app
+                  </p>
+                  <p className="text-sm text-leather-400 mt-0.5">
+                    Couleur de bordure personnalisable autour de l'app
+                  </p>
+                </div>
+              </div>
+              
+              {/* Color Picker Input */}
+              <input
+                type="color"
+                value={borderColor}
+                onChange={handleColorChange}
+                className="w-10 h-10 p-0 border-2 border-gold-500/50 rounded-full cursor-pointer bg-transparent hover:border-gold-500 transition-colors"
+                style={{ 
+                  WebkitAppearance: 'none',
+                  appearance: 'none',
+                  cursor: 'pointer',
+                }}
+                title="Changer la couleur d'accent"
+              />
+            </div>
+
+            {/* Reset to Default Gold Option */}
+            <button
+              onClick={resetToGold}
+              className="w-full flex items-center justify-between p-4 hover:bg-gold-500/10 transition-colors group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="text-gold-500">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-white font-medium group-hover:text-gold-400 transition-colors">
+                  Réinitialiser à l'or par défaut
+                </p>
+              </div>
+              <span className="text-sm text-gold-500/80 font-mono">{defaultGold}</span>
+            </button>
+          </div>
         </div>
 
         {/* Quebec Heritage Section */}

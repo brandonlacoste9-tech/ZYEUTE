@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
+import { BorderColorProvider, useBorderColor } from '@/contexts/BorderColorContext';
 import { TiGuy } from '@/components/features/TiGuy';
 import { LoadingScreen } from '@/components/LoadingScreen';
 
@@ -51,6 +52,23 @@ import CommunityGuidelines from '@/pages/legal/CommunityGuidelines';
 import TermsOfService from '@/pages/legal/TermsOfService';
 import PrivacyPolicy from '@/pages/legal/PrivacyPolicy';
 
+// Main Layout Component with Dynamic Border Lighting
+const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { borderColor } = useBorderColor();
+
+  // Create a subtle gold glow/shadow effect using the current border color
+  const dynamicBorderStyle: React.CSSProperties = {
+    boxShadow: `0 0 20px 2px ${borderColor}40 inset, 0 0 40px 4px ${borderColor}20 inset`,
+    transition: 'box-shadow 0.5s ease-in-out',
+  };
+
+  return (
+    <div className="min-h-screen leather-overlay text-white" style={dynamicBorderStyle}>
+      {children}
+    </div>
+  );
+};
+
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean | null>(null);
@@ -83,9 +101,9 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <NotificationProvider>
-          <BrowserRouter>
-          {/* Global Leather Overlay for consistent texture */}
-          <div className="min-h-screen leather-overlay text-white">
+          <BorderColorProvider>
+            <BrowserRouter>
+              <MainLayout>
             
             {/* Achievement Listener (Global) */}
             <AchievementListener />
@@ -303,10 +321,11 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             
-            {/* Ti-Guy mascot assistant (always available) */}
-            <TiGuy />
-          </div>
-          </BrowserRouter>
+                {/* Ti-Guy mascot assistant (always available) */}
+                <TiGuy />
+              </MainLayout>
+            </BrowserRouter>
+          </BorderColorProvider>
         </NotificationProvider>
       </ThemeProvider>
     </ErrorBoundary>
