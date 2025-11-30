@@ -137,13 +137,13 @@ export function AIAgent({ dashboardData, portfolioData }: AIAgentProps) {
             ) : (
               <>
                 <div className="text-7xl">👑</div>
-                <p className="text-xl font-bold text-white">What's Good King?</p>
+                <p className="text-xl font-bold text-white">What&apos;s Good King?</p>
                 <div className="mt-6 text-left bg-purple-900/20 border border-purple-500/20 rounded-xl p-4 space-y-2 text-sm text-gray-300">
                   <p className="font-semibold text-white mb-3">Try asking:</p>
-                  <p>• "Why is Solana moomin'?" 🚀</p>
-                  <p>• "Should I buy XRP now?"</p>
-                  <p>• "Is my portfolio safe?"</p>
-                  <p>• "Explain this market dump"</p>
+                  <p>• &quot;Why is Solana moomin&apos;?&quot; 🚀</p>
+                  <p>• &quot;Should I buy XRP now?&quot;</p>
+                  <p>• &quot;Is my portfolio safe?&quot;</p>
+                  <p>• &quot;Explain this market dump&quot;</p>
                 </div>
               </>
             )}
