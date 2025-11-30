@@ -12,7 +12,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
-    "health-check": "npm run type-check || true && npm run build"
+    "health-check": "npm run type-check || true && npm run build",
+    "setup:preview-branch": "bash scripts/setup-preview-branch.sh"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.74",

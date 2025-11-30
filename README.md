@@ -101,6 +101,8 @@ VITE_GOOGLE_CLIENT_ID=your-google-client-id
 
 See `SETUP_GUIDE.md` for detailed setup instructions.
 
+**Preview Environments**: For isolated database testing, see `SUPABASE_PREVIEW_SETUP.md` to learn about Supabase branching.
+
 ---
 
 ## 📦 Tech Stack
