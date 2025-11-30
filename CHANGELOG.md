@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Securely passes SUPABASE_SERVICE_ROLE_KEY from GitHub Secrets
   - Includes comprehensive audit comments for security and maintenance
 - This CHANGELOG file to track project changes
+- Security Audit Schema (`src/types/SecurityAuditSchema.ts`)
+  - JSON schema for security vulnerability findings from security audits
+  - Used by IntegrityForeman and security scanning tools
+  - Defines SecurityAuditFinding TypeScript interface for type safety
 
 ### Changed
 - Nothing yet
