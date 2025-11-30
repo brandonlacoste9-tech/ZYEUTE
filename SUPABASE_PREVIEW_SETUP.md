@@ -279,8 +279,11 @@ CROSS JOIN generate_series(1, 5);
 Run the seed script:
 
 ```bash
-# Seed the preview branch
-supabase db seed --db-url [preview-branch-url]
+# Switch to the preview branch first
+supabase db branch switch dev-preview-main
+
+# Then seed the database
+supabase db seed
 ```
 
 ---

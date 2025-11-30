@@ -64,8 +64,14 @@ if [ -z "$PROJECT_REF" ] || [ "$PROJECT_REF" = "your-project-id" ]; then
     
     # Update config.toml with actual project ID
     if [ -f "supabase/config.toml" ]; then
-        sed -i.bak "s/project_id = \"your-project-id\"/project_id = \"$PROJECT_REF\"/" supabase/config.toml
-        rm -f supabase/config.toml.bak
+        # Use a portable sed approach that works on both Linux and macOS
+        if sed --version &> /dev/null; then
+            # GNU sed (Linux)
+            sed -i "s/project_id = \"your-project-id\"/project_id = \"$PROJECT_REF\"/" supabase/config.toml
+        else
+            # BSD sed (macOS)
+            sed -i '' "s/project_id = \"your-project-id\"/project_id = \"$PROJECT_REF\"/" supabase/config.toml
+        fi
         echo -e "${GREEN}✓ Updated config.toml with project ID${NC}"
         echo ""
     fi
@@ -127,22 +133,19 @@ echo ""
 echo "4. For detailed instructions, see: SUPABASE_PREVIEW_SETUP.md"
 echo ""
 
-# Optionally create/update .env.local
-read -p "Would you like to update .env.local with preview credentials? (y/N): " UPDATE_ENV
-
-if [ "$UPDATE_ENV" = "y" ] || [ "$UPDATE_ENV" = "Y" ]; then
-    echo ""
-    echo "Getting branch credentials..."
-    
-    # This is a simplified approach - in reality, you'd parse the output
-    # For now, we'll just provide guidance
-    echo ""
-    echo -e "${YELLOW}⚠ Please manually copy the credentials from above into your .env.local${NC}"
-    echo ""
-    echo "If .env.local doesn't exist, create it by copying .env.example:"
-    echo "  cp .env.example .env.local"
-    echo ""
-fi
+# Guidance for updating .env.local
+echo -e "${YELLOW}💡 To use the preview branch locally:${NC}"
+echo ""
+echo "1. If you don't have .env.local, create it:"
+echo "   cp .env.example .env.local"
+echo ""
+echo "2. Manually copy the API URL and Anon Key from above to .env.local:"
+echo "   VITE_SUPABASE_URL_PREVIEW=<API URL>"
+echo "   VITE_SUPABASE_ANON_KEY_PREVIEW=<Anon Key>"
+echo ""
+echo "Note: Automatic credential parsing is not implemented yet."
+echo "Please copy the credentials manually from the output above."
+echo ""
 
 echo -e "${GREEN}🎉 Setup complete!${NC}"
 echo ""
