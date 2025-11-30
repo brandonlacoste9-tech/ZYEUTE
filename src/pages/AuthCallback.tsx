@@ -1,6 +1,10 @@
 /**
  * OAuth Callback Handler
  * Handles the OAuth redirect from providers like Google
+ * 
+ * Note: Supabase client is configured with detectSessionInUrl: true in src/lib/supabase.ts,
+ * which automatically processes the OAuth callback URL and establishes the session.
+ * This component provides a loading state and redirects after session establishment.
  */
 
 import React, { useEffect } from 'react';
@@ -12,23 +16,24 @@ const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleCallback = async () => {
+    // Listen for auth state changes to know when session is ready
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // Successful login - redirect to home
+        navigate('/', { replace: true });
+      } else if (event === 'SIGNED_OUT' || !session) {
+        // No session or signed out - redirect to login
+        navigate('/login', { replace: true });
+      }
+    });
+
+    // Also check current session immediately in case auth already completed
+    const checkSession = async () => {
       try {
-        // Supabase automatically handles the OAuth callback with detectSessionInUrl: true
-        // This page just provides a loading state while the session is being established
-        
-        // Wait a moment for the session to be established
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Check if we have a session
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
-          // Successful login - redirect to home
           navigate('/', { replace: true });
-        } else {
-          // No session - redirect to login
-          navigate('/login', { replace: true });
         }
       } catch (error) {
         console.error('Auth callback error:', error);
@@ -36,7 +41,12 @@ const AuthCallback: React.FC = () => {
       }
     };
 
-    handleCallback();
+    checkSession();
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   return <LoadingScreen message="Connexion en cours..." />;
