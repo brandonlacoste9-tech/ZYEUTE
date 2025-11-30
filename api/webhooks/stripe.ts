@@ -12,7 +12,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize Stripe with secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-11-17.clover',
 });
 
 // Admin client to bypass RLS for database updates
@@ -108,7 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Handle subscription updates
     if (event.type === 'customer.subscription.updated') {
-      const subscription = event.data.object as Stripe.Subscription;
+      const subscription = event.data.object as any;
       const userId = subscription.metadata?.userId;
 
       if (userId) {
@@ -121,7 +121,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .from('platform_subscriptions')
           .update({
             status: status,
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            current_period_end: subscription.current_period_end 
+              ? new Date(subscription.current_period_end * 1000).toISOString()
+              : undefined,
             updated_at: new Date().toISOString(),
           })
           .eq('stripe_subscription_id', subscription.id);
@@ -172,18 +174,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Handle payment failures
     if (event.type === 'invoice.payment_failed') {
-      const invoice = event.data.object as Stripe.Invoice;
-      const subscriptionId = invoice.subscription as string;
+      const invoice = event.data.object as any;
+      const subscriptionId = typeof invoice.subscription === 'string' 
+        ? invoice.subscription 
+        : invoice.subscription?.id;
 
-      console.log(`⚠️ Payment failed for subscription: ${subscriptionId}`);
+      if (subscriptionId) {
+        console.log(`⚠️ Payment failed for subscription: ${subscriptionId}`);
 
-      await supabaseAdmin
-        .from('platform_subscriptions')
-        .update({
-          status: 'past_due',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('stripe_subscription_id', subscriptionId);
+        await supabaseAdmin
+          .from('platform_subscriptions')
+          .update({
+            status: 'past_due',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('stripe_subscription_id', subscriptionId);
+      }
     }
 
     return res.status(200).json({ received: true });
