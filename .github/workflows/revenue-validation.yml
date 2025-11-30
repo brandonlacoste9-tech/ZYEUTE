@@ -8,6 +8,8 @@ jobs:
   validate_webhook_logic:
     runs-on: self-hosted
     environment: staging_validation
+    permissions:
+      contents: read
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
