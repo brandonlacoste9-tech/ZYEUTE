@@ -1,57 +1,24 @@
 /**
- * ChatModal - Full-screen chat interface with TI-Guy
- * Premium Quebec Heritage Design with smooth slide animations
+ * ChatModal - Premium Full-Screen Chat Interface
+ * Features TI-Guy's authentic Quebec French slang personality
+ * Smooth slide animations and gold/leather theme
  */
 
 import React, { useState, useEffect, useRef } from 'react';
 import { IoCloseOutline, IoSend } from 'react-icons/io5';
 import { useHaptics } from '@/hooks/useHaptics';
-import { GoldInput } from '@/components/GoldInput';
-import { ChatMessage } from '@/types/chat';
-import { getTiGuyResponse } from '@/utils/tiGuyResponses';
+import { getTiGuyResponse, getTiGuyWelcomeMessage } from '@/utils/tiGuyResponses';
+import type { ChatMessage } from '@/types/chat';
 import { cn } from '@/lib/utils';
 
 interface ChatModalProps {
   onClose: () => void;
 }
 
-// Initial welcome message from TI-Guy
-const initialMessages: ChatMessage[] = [
-  {
-    id: '0',
-    sender: 'tiGuy',
-    text: "Hé ben! Bienvenue dans le chat. Qu'est-ce que j'peux faire pour toé aujourd'hui? 🦫",
-    timestamp: new Date(),
-  },
-];
-
-const MessageBubble: React.FC<{ message: ChatMessage }> = ({ message }) => {
-  const isTiGuy = message.sender === 'tiGuy';
-
-  // Gold/Black theme styling for bubbles
-  const bubbleClasses = isTiGuy
-    ? 'bg-gold-500 text-black self-start rounded-r-xl rounded-bl-xl'
-    : 'bg-gray-700 text-white self-end rounded-l-xl rounded-br-xl';
-
-  return (
-    <div className={cn('flex mb-3', isTiGuy ? 'justify-start' : 'justify-end')}>
-      <div className={cn('max-w-xs px-4 py-2.5 text-sm shadow-lg', bubbleClasses)}>
-        <p className="leading-relaxed">{message.text}</p>
-        <span className="block text-xs mt-1.5 opacity-70 text-right">
-          {message.timestamp.toLocaleTimeString('fr-CA', {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </span>
-      </div>
-    </div>
-  );
-};
-
 export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
   const { tap, impact } = useHaptics();
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -59,10 +26,12 @@ export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
 
   // Slide-in animation on mount
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 50);
-    // Focus input when modal opens
-    setTimeout(() => inputRef.current?.focus(), 350);
-    return () => clearTimeout(timer);
+    // Trigger animation after mount
+    setTimeout(() => setIsVisible(true), 10);
+    
+    // Add welcome message
+    const welcomeMessage = getTiGuyWelcomeMessage();
+    setMessages([welcomeMessage]);
   }, []);
 
   // Auto-scroll to bottom when new messages arrive
@@ -70,56 +39,91 @@ export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const handleClose = () => {
+  // Focus input on mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Handle sending a message
+  const handleSendMessage = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    
+    const text = inputText.trim();
+    if (!text || isTyping) return;
+
     tap();
-    // Start slide-out animation
-    setIsVisible(false);
-    // Wait for animation to complete before unmounting
-    setTimeout(onClose, 300);
-  };
-
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim() === '') return;
-
-    impact(); // Strong haptic feedback
 
     // Add user message
     const userMessage: ChatMessage = {
-      id: Date.now().toString(),
+      id: `user-${Date.now()}-${Math.random()}`,
       sender: 'user',
-      text: input.trim(),
+      text: text,
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    setMessages(prev => [...prev, userMessage]);
+    setInputText('');
     setIsTyping(true);
 
-    // Simulate TI-Guy typing delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    // Simulate typing delay (800ms for natural feel)
+    setTimeout(() => {
+      const tiGuyResponse = getTiGuyResponse(text);
+      setMessages(prev => [...prev, tiGuyResponse]);
+      setIsTyping(false);
+    }, 800);
+  };
 
-    // Get and add TI-Guy's response
-    const tiGuyResponse = getTiGuyResponse(userMessage.text);
-    setMessages((prev) => [...prev, tiGuyResponse]);
-    setIsTyping(false);
+  // Handle close with slide-out animation
+  const handleClose = () => {
+    impact();
+    setIsVisible(false);
+    // Delay unmounting until animation completes
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  // Format timestamp in French
+  const formatTime = (date: Date): string => {
+    return new Intl.DateTimeFormat('fr-CA', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex justify-center items-end z-50 backdrop-blur-sm">
-      {/* Modal Container with Slide Animation */}
+    <div
+      className={cn(
+        'fixed inset-0 z-50 flex items-end justify-center',
+        'transition-transform duration-300 ease-out',
+        isVisible ? 'translate-y-0' : 'translate-y-full'
+      )}
+      style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backdropFilter: 'blur(4px)',
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
+    >
       <div
         className={cn(
-          'w-full max-w-sm h-full bg-black leather-overlay text-white flex flex-col shadow-2xl shadow-gold-500/20',
-          'transform transition-transform duration-300 ease-out',
+          'w-full max-w-md h-full bg-black leather-overlay',
+          'flex flex-col',
+          'border-t-4 border-gold-500',
+          'shadow-2xl',
+          'transition-transform duration-300 ease-out',
           isVisible ? 'translate-y-0' : 'translate-y-full'
         )}
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
-        <div className="flex justify-between items-center p-4 border-b-2 border-gold-500/50 bg-neutral-900/50">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-neutral-900/95 backdrop-blur-md border-b-2 border-gold-500/30 p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center border-2 border-gold-700 glow-gold relative">
-              <span className="text-xl">🦫</span>
+            <div className="w-12 h-12 rounded-full bg-gold-500 flex items-center justify-center border-2 border-gold-700 glow-gold relative">
+              <span className="text-2xl">🦫</span>
               {/* Embossed effect ring */}
               <div
                 className="absolute inset-0 rounded-full border-2 border-neutral-700"
@@ -127,31 +131,63 @@ export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
               />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gold-500 tracking-wider embossed">
-                Chat avec TI-GUY
-              </h2>
-              <p className="text-xs text-stone-400">Ton assistant québécois</p>
+              <h3 className="text-gold-400 font-bold text-lg embossed">Ti-Guy</h3>
+              <p className="text-stone-400 text-xs embossed">Ton assistant québécois</p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 text-gold-500 hover:text-white transition-colors rounded-full hover:bg-gold-500/20"
-            aria-label="Fermer"
+            className="p-2 hover:bg-gold-500/20 rounded-full transition-colors"
+            aria-label="Fermer le chat"
           >
-            <IoCloseOutline className="text-2xl" />
+            <IoCloseOutline className="w-6 h-6 text-gold-400" />
           </button>
         </div>
 
-        {/* Chat Conversation Area */}
-        <div className="flex-grow overflow-y-auto p-4 space-y-3 flex flex-col bg-black/30">
-          {messages.map((msg) => (
-            <MessageBubble key={msg.id} message={msg} />
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black gold-scrollbar">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={cn(
+                'flex gap-3',
+                message.sender === 'user' ? 'justify-end' : 'justify-start'
+              )}
+            >
+              {/* TI-Guy Avatar (only for TI-Guy messages) */}
+              {message.sender === 'tiGuy' && (
+                <div className="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center flex-shrink-0 border border-gold-700 glow-gold-subtle">
+                  <span className="text-lg">🦫</span>
+                </div>
+              )}
+
+              {/* Message Bubble */}
+              <div
+                className={cn(
+                  'max-w-[75%] rounded-2xl p-3 text-sm',
+                  'transition-all duration-200',
+                  message.sender === 'user'
+                    ? 'bg-gradient-to-r from-gold-400 to-gold-600 text-black font-medium'
+                    : 'bg-neutral-800 text-white border border-neutral-700'
+                )}
+              >
+                <p className="whitespace-pre-wrap break-words">{message.text}</p>
+                <span
+                  className={cn(
+                    'text-xs mt-1 block',
+                    message.sender === 'user' ? 'text-black/60' : 'text-stone-400'
+                  )}
+                >
+                  {formatTime(message.timestamp)}
+                </span>
+              </div>
+            </div>
           ))}
 
           {/* Typing Indicator */}
           {isTyping && (
-            <div className="flex gap-2 items-center">
-              <div className="w-8 h-8 rounded-full bg-gold-500 flex items-center justify-center border border-gold-700">
+            <div className="flex gap-3 items-center">
+              <div className="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center flex-shrink-0 border border-gold-700">
                 <span className="text-lg">🦫</span>
               </div>
               <div className="bg-neutral-800 p-3 rounded-2xl border border-neutral-700">
@@ -177,31 +213,42 @@ export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
         </div>
 
         {/* Input Area */}
-        <form
-          onSubmit={handleSend}
-          className="p-3 border-t-2 border-gold-500/50 bg-neutral-900/50 flex gap-2"
-        >
-          <GoldInput
-            ref={inputRef}
-            type="text"
-            placeholder="Écris ton message, mon loup..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="flex-grow rounded-full"
-            size="md"
-          />
-          <button
-            type="submit"
-            disabled={!input.trim()}
-            className="bg-gold-500 text-black p-3 rounded-full hover:bg-gold-400 transition disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 active:scale-95"
-            aria-label="Envoyer"
+        <div className="sticky bottom-0 p-4 border-t-2 border-gold-500/30 bg-neutral-900 backdrop-blur-md">
+          <form
+            onSubmit={handleSendMessage}
+            className="flex gap-2 items-center"
           >
-            <IoSend className="text-xl" />
-          </button>
-        </form>
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Pose une question..."
+              className="flex-1 input-premium text-sm"
+              disabled={isTyping}
+            />
+            <button
+              type="submit"
+              disabled={!inputText.trim() || isTyping}
+              className={cn(
+                'p-3 rounded-full',
+                'bg-gradient-to-r from-gold-400 to-gold-600',
+                'text-black font-bold',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
+                'hover:scale-110 active:scale-95',
+                'transition-transform duration-200',
+                'glow-gold',
+                'flex items-center justify-center'
+              )}
+              aria-label="Envoyer"
+            >
+              <IoSend className="w-5 h-5" />
+            </button>
+          </form>
+        </div>
 
         {/* Quebec Pride Footer */}
-        <div className="px-4 py-2 bg-neutral-950 border-t border-gold-700/20">
+        <div className="px-4 py-2 bg-neutral-950 border-t border-gold-500/20">
           <p className="text-center text-stone-500 text-xs embossed flex items-center justify-center gap-1">
             <span className="text-gold-500">⚜️</span>
             <span>Propulsé par l'IA québécoise</span>
@@ -212,4 +259,3 @@ export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
     </div>
   );
 };
-

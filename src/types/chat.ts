@@ -1,5 +1,5 @@
 /**
- * Chat Types - Message structure for TI-Guy chat
+ * Chat Message Types for TI-Guy Chat Modal
  */
 
 export type Sender = 'user' | 'tiGuy';
@@ -10,4 +10,3 @@ export interface ChatMessage {
   text: string;
   timestamp: Date;
 }
-

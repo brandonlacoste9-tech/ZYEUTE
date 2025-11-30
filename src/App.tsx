@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import { BorderColorProvider } from '@/contexts/BorderColorContext';
 import { MainLayout } from '@/components/MainLayout';
+import { PageTransition } from '@/components/AnimatedRoutes';
 import { TiGuy } from '@/components/features/TiGuy';
 import { LoadingScreen } from '@/components/LoadingScreen';
 
@@ -107,7 +108,8 @@ function App() {
                   path="*"
                   element={
                     <MainLayout>
-                      <Routes>
+                      <PageTransition>
+                        <Routes>
                         {/* Public Routes */}
                         <Route path="/login" element={<Login />} />
                         <Route path="/signup" element={<Signup />} />
@@ -318,7 +320,8 @@ function App() {
 
                         {/* Catch all - redirect to feed */}
                         <Route path="*" element={<Navigate to="/" replace />} />
-                      </Routes>
+                        </Routes>
+                      </PageTransition>
                       
                       {/* Ti-Guy mascot assistant (always available) */}
                       <TiGuy />
