@@ -55,16 +55,31 @@
 
 # Deploy contexts for different environments
 [context.production]
-  # Production-specific settings (if any)
-  # Environment variables should be set in Netlify UI for security
+  # Production-specific settings
+  # Uses production Supabase project
+  # Environment variables should be set in Netlify UI for security:
+  #   VITE_SUPABASE_URL (production project URL)
+  #   VITE_SUPABASE_ANON_KEY (production anon key)
 
 [context.deploy-preview]
   # Preview deployments (for PRs)
-  # Inherits build settings from [build]
+  # Uses 'dev-preview-main' Supabase branch for isolated testing
+  # Environment variables required in Netlify UI with scope "Deploy previews":
+  #   VITE_SUPABASE_URL_PREVIEW (preview branch URL)
+  #   VITE_SUPABASE_ANON_KEY_PREVIEW (preview branch anon key)
+  # 
+  # To set up:
+  # 1. Create Supabase preview branch: supabase branches create dev-preview-main
+  # 2. Get credentials: supabase branches get dev-preview-main
+  # 3. Add credentials in Netlify: Site settings > Environment variables
+  # 4. Scope: "Deploy previews" only
+  #
+  # See SUPABASE_PREVIEW_SETUP.md for detailed instructions
 
 [context.branch-deploy]
   # Branch deployments
-  # Inherits build settings from [build]
+  # Uses same configuration as deploy-preview
+  # Inherits preview Supabase branch settings
 
 # Functions configuration (for future use if needed)
 # Uncomment when you add serverless functions

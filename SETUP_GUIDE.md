@@ -145,6 +145,30 @@ VALUES (
 
 **✅ Supabase Setup Complete!** You can now log in with `test@zyeute.com` / `Test123456!`
 
+### Step 7: Set Up Preview Branches (Optional)
+
+For isolated preview environments, you can set up Supabase database branches:
+
+1. See **SUPABASE_PREVIEW_SETUP.md** for detailed instructions
+2. Preview branches allow you to test changes without affecting production
+3. Recommended for teams and CI/CD workflows
+
+Quick setup:
+```bash
+# Install Supabase CLI
+npm install -g supabase
+
+# Login and link project
+supabase login
+supabase link --project-ref your-project-id
+
+# Create preview branch
+supabase branches create dev-preview-main
+
+# Get preview credentials and add to your .env.local
+supabase branches get dev-preview-main
+```
+
 ---
 
 ## 🤖 Part 3: OpenAI Setup
