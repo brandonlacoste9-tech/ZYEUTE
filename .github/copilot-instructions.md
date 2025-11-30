@@ -78,14 +78,21 @@ Zyeuté is **Quebec-first** in everything:
 ```
 zyeute/
 ├── src/
-│   ├── components/       # Reusable UI components
+│   ├── components/       # All UI components (base components + subdirectories)
 │   │   ├── auth/        # Authentication components
 │   │   ├── features/    # Feature-specific components (TiGuy, StoryViewer, etc.)
 │   │   ├── gamification/# Achievement and challenge components
-│   │   ├── layout/      # Layout components (Header, BottomNav, etc.)
 │   │   ├── moderation/  # Content moderation components
 │   │   ├── settings/    # Settings page components
-│   │   └── ui/          # Base UI components (Button, Toast, etc.)
+│   │   ├── Avatar.tsx   # User avatar component
+│   │   ├── BottomNav.tsx # Bottom navigation bar
+│   │   ├── Button.tsx   # Reusable button component
+│   │   ├── ErrorBoundary.tsx # Error handling wrapper
+│   │   ├── FeedGrid.tsx # Post grid layout
+│   │   ├── Header.tsx   # Top header/navigation
+│   │   ├── LoadingScreen.tsx # Loading state component
+│   │   ├── Logo.tsx     # App logo component
+│   │   └── Toast.tsx    # Toast notification component
 │   ├── pages/           # Page components (one per route)
 │   │   ├── admin/       # Admin dashboard pages
 │   │   ├── legal/       # Legal pages (terms, privacy, guidelines)
@@ -98,6 +105,7 @@ zyeute/
 │   │   ├── openaiService.ts
 │   │   ├── stripeService.ts
 │   │   ├── subscriptionService.ts
+│   │   ├── tiGuyAgent.ts
 │   │   └── videoService.ts
 │   ├── hooks/           # Custom React hooks
 │   │   ├── usePremium.ts
@@ -126,11 +134,11 @@ zyeute/
 
 ### Component Categories
 
-1. **Pages**: Route-level components (one per URL path)
-2. **Features**: Complex, feature-specific components with their own state
-3. **UI Components**: Reusable, presentational components
-4. **Layout**: App-wide layout components (headers, navbars, footers)
-5. **Services**: Business logic abstracted from components
+1. **Pages**: Route-level components (one per URL path) in `src/pages/`
+2. **Features**: Complex, feature-specific components with their own state in `src/components/features/`
+3. **Base UI Components**: Reusable components like Button, Avatar, Logo, Toast in `src/components/`
+4. **Layout Components**: App-wide layout like Header, BottomNav in `src/components/`
+5. **Services**: Business logic abstracted from components in `src/services/`
 
 ---
 
@@ -173,7 +181,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { openaiService } from '../services/openaiService';
-import { Button } from '../components/ui/Button';
+import { Button } from '../components/Button';
+import { Header } from '../components/Header';
 import { User } from '../types';
 ```
 
@@ -556,7 +565,7 @@ Page components are top-level route handlers. They:
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Header } from '../components/layout/Header';
+import { Header } from '../components/Header';
 import { FeedGrid } from '../components/FeedGrid';
 
 function Profile() {
@@ -593,14 +602,18 @@ Feature components are self-contained, reusable features with their own state an
 - `CommentThread` - Comment section
 - Located in `src/components/features/`
 
-#### 3. UI Components
+#### 3. Base UI & Layout Components
 
-Base, reusable UI components:
+Base UI and layout components in `src/components/`:
 - `Button` - Primary/secondary buttons
 - `Avatar` - User avatar display
 - `Logo` - App logo with variations
 - `Toast` - Notification toasts
-- Located in `src/components/ui/` or root `src/components/`
+- `Header` - Top navigation bar
+- `BottomNav` - Bottom navigation
+- `FeedGrid` - Post grid layout
+- `LoadingScreen` - Loading states
+- `ErrorBoundary` - Error handling wrapper
 
 ### Component Props Pattern
 
