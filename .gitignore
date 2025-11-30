@@ -37,6 +37,7 @@ Thumbs.db
 # Misc
 *.log
 .vercel
+tsconfig.tsbuildinfo
 
 # Bun cache
 .bun/
