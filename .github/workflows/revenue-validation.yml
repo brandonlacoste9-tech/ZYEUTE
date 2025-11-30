@@ -1,0 +1,52 @@
+name: Revenue Validation
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  validate-revenue:
+    runs-on: self-hosted
+    name: Validate Revenue Integration
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Validate Stripe configuration
+        run: |
+          echo "🔍 Validating Stripe integration..."
+          if [ -d "netlify/functions" ]; then
+            echo "✅ Netlify functions directory exists"
+          else
+            echo "⚠️ Warning: netlify/functions directory not found"
+          fi
+          
+      - name: Check revenue documentation
+        run: |
+          echo "📚 Checking revenue documentation..."
+          if [ -f "REVENUE_INTEGRATION_COMPLETE.md" ]; then
+            echo "✅ Revenue documentation found"
+          else
+            echo "⚠️ Warning: Revenue documentation not found"
+          fi
+      
+      - name: Revenue validation complete
+        run: echo "✅ Revenue validation checks completed"

@@ -3,6 +3,10 @@
 
 Zyeuté is Quebec's first social media platform built specifically for Quebecers, by Quebecers. Share photos, videos, stories, and connect with your community in authentic Joual.
 
+**✨ Now featuring:**
+- **Leather UI** - Premium, modern user interface with rich textures and smooth animations
+- **Working Stripe Subscriptions** - Fully integrated payment system for VIP memberships and premium features
+
 ## ✨ Features
 
 ### 🎨 Creative Tools
