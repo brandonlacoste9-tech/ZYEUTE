@@ -16,6 +16,8 @@ jobs:
   validate-revenue:
     runs-on: self-hosted
     name: Validate Revenue Integration
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code

@@ -7,6 +7,8 @@ jobs:
   lint_and_typecheck:
     runs-on: ubuntu-latest
     name: Lint and Type Check
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
