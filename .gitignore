@@ -46,3 +46,7 @@ supabase/generated
 supabase/.branches
 supabase/.temp
 
+# Unrelated projects (exclude from build)
+korean-AI-compliance-/
+korean-AI-compliance-~*/
+

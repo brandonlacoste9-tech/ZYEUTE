@@ -12,7 +12,7 @@ import { GoldButton } from '@/components/GoldButton';
 import { SectionHeader } from '@/components/SectionHeader';
 import { StoryCarousel } from '@/components/features/StoryCircle';
 import { VideoCard } from '@/components/features/VideoCard';
-import { supabase } from '@/lib/supabase';
+import { getCurrentUser, getFeedPosts, getStories } from '@/services/api';
 import type { Post, User, Story } from '@/types';
 
 export const Feed: React.FC = () => {
@@ -26,16 +26,8 @@ export const Feed: React.FC = () => {
   // Fetch current user
   React.useEffect(() => {
     const fetchCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (data) setCurrentUser(data);
-      }
+      const user = await getCurrentUser();
+      if (user) setCurrentUser(user);
     };
 
     fetchCurrentUser();
@@ -45,25 +37,14 @@ export const Feed: React.FC = () => {
   const fetchPosts = React.useCallback(async (pageNum: number) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          user:users(*)
-        `)
-        .order('created_at', { ascending: false })
-        .range(pageNum * 20, (pageNum + 1) * 20 - 1);
+      const data = await getFeedPosts(pageNum, 20);
 
-      if (error) throw error;
-
-      if (data) {
-        if (pageNum === 0) {
-          setPosts(data);
-        } else {
-          setPosts(prev => [...prev, ...data]);
-        }
-        setHasMore(data.length === 20);
+      if (pageNum === 0) {
+        setPosts(data);
+      } else {
+        setPosts(prev => [...prev, ...data]);
       }
+      setHasMore(data.length === 20);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
@@ -75,54 +56,14 @@ export const Feed: React.FC = () => {
   React.useEffect(() => {
     const fetchStories = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data, error } = await supabase
-          .from('stories')
-          .select('*, user:users(*)')
-          .gt('expires_at', new Date().toISOString())
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching stories:', error);
-          return;
-        }
-
-        if (data) {
-          const storyMap = new Map<string, { user: User; story: Story; isViewed: boolean }>();
-          
-          data.forEach((story) => {
-            if (story.user && !storyMap.has(story.user.id)) {
-              storyMap.set(story.user.id, {
-                user: story.user,
-                story: story,
-                isViewed: false,
-              });
-            }
-          });
-
-          const storyList = Array.from(storyMap.values());
-          
-          if (currentUser) {
-            const userStory = storyList.find(s => s.user.id === currentUser.id);
-            if (userStory) {
-              setStories([userStory, ...storyList.filter(s => s.user.id !== currentUser.id)]);
-            } else {
-              setStories([{ user: currentUser }, ...storyList]);
-            }
-          } else {
-            setStories(storyList);
-          }
-        }
+        const storyList = await getStories(currentUser?.id);
+        setStories(storyList);
       } catch (error) {
         console.error('Error fetching stories:', error);
       }
     };
 
-    if (currentUser) {
-      fetchStories();
-    }
+    fetchStories();
   }, [currentUser]);
 
   // Initial fetch

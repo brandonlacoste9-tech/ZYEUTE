@@ -12,7 +12,7 @@ import { GoldButton } from '@/components/GoldButton';
 import { Avatar } from '@/components/Avatar';
 import { Image } from '@/components/Image';
 import { Button } from '@/components/Button';
-import { supabase } from '@/lib/supabase';
+import { getCurrentUser, getUserProfile, getUserPosts, checkFollowing, toggleFollow } from '@/services/api';
 import { formatNumber } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
 import { IoShareOutline } from 'react-icons/io5';
@@ -43,16 +43,8 @@ export const Profile: React.FC = () => {
   // Fetch current user
   React.useEffect(() => {
     const fetchCurrentUser = async () => {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        const { data } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-
-        if (data) setCurrentUser(data);
-      }
+      const user = await getCurrentUser();
+      if (user) setCurrentUser(user);
     };
 
     fetchCurrentUser();
@@ -63,26 +55,12 @@ export const Profile: React.FC = () => {
     const fetchUser = async () => {
       setIsLoading(true);
       try {
-        let query;
-
-        if (slug === 'me' && currentUser) {
-          query = supabase
-            .from('users')
-            .select('*')
-            .eq('id', currentUser.id)
-            .single();
+        const profileUser = await getUserProfile(slug || '', currentUser?.id);
+        if (profileUser) {
+          setUser(profileUser);
         } else {
-          query = supabase
-            .from('users')
-            .select('*')
-            .eq('username', slug)
-            .single();
+          navigate('/');
         }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-        if (data) setUser(data);
       } catch (error) {
         console.error('Error fetching user:', error);
         navigate('/');
@@ -101,13 +79,8 @@ export const Profile: React.FC = () => {
     const fetchPosts = async () => {
       if (!user) return;
 
-      const { data } = await supabase
-        .from('posts')
-        .select('*, user:users(*)')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (data) setPosts(data);
+      const userPosts = await getUserPosts(user.id);
+      setPosts(userPosts);
     };
 
     fetchPosts();
@@ -115,41 +88,23 @@ export const Profile: React.FC = () => {
 
   // Check if following
   React.useEffect(() => {
-    const checkFollowing = async () => {
+    const checkFollowStatus = async () => {
       if (!user || !currentUser || isOwnProfile) return;
 
-      const { data } = await supabase
-        .from('follows')
-        .select('*')
-        .eq('follower_id', currentUser.id)
-        .eq('following_id', user.id)
-        .single();
-
-      setIsFollowing(!!data);
+      const following = await checkFollowing(currentUser.id, user.id);
+      setIsFollowing(following);
     };
 
-    checkFollowing();
+    checkFollowStatus();
   }, [user, currentUser, isOwnProfile]);
 
   const handleFollow = async () => {
     if (!user || !currentUser) return;
     impact();
 
-    if (isFollowing) {
-      await supabase
-        .from('follows')
-        .delete()
-        .eq('follower_id', currentUser.id)
-        .eq('following_id', user.id);
-      setIsFollowing(false);
-    } else {
-      await supabase
-        .from('follows')
-        .insert({
-          follower_id: currentUser.id,
-          following_id: user.id,
-        });
-      setIsFollowing(true);
+    const success = await toggleFollow(currentUser.id, user.id, isFollowing);
+    if (success) {
+      setIsFollowing(!isFollowing);
     }
   };
 
