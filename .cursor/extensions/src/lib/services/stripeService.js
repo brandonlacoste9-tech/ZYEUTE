@@ -9,10 +9,10 @@
  * @returns {Promise<{url: string, sessionId: string}>} Checkout session details
  */
 export async function createStripeCheckoutSession(tier, userEmail, userId) {
-    // For React Native, you'll need to configure your Netlify function URL
-    // In production, use your actual Netlify site URL
-    const netlifyUrl = process.env.EXPO_PUBLIC_NETLIFY_URL || 'https://your-site.netlify.app';
-    const endpoint = `${netlifyUrl}/.netlify/functions/stripe-checkout`;
+    // Use Vercel/Next.js API route for Stripe checkout
+    // In production, use your actual Vercel deployment URL
+    const apiUrl = process.env.EXPO_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://your-site.vercel.app';
+    const endpoint = `${apiUrl}/api/stripe/checkout`;
     
     try {
         const response = await fetch(endpoint, {
