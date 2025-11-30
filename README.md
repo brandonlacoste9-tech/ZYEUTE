@@ -90,10 +90,10 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 
 # OpenAI (for AI features)
-VITE_OPENAI_API_KEY=sk-proj-...
+VITE_OPENAI_API_KEY=your_openai_api_key_here
 
 # Stripe (for payments)
-VITE_STRIPE_PUBLIC_KEY=pk_test_...
+VITE_STRIPE_PUBLIC_KEY=your_stripe_publishable_key_here
 
 # Optional: Google OAuth
 VITE_GOOGLE_CLIENT_ID=your-google-client-id
@@ -208,13 +208,17 @@ Zyeuté is built for the Quebec community. Contributions are welcome!
 
 This project is proprietary. All rights reserved.
 
+**Note**: While this repository is publicly accessible for transparency and community collaboration, the codebase remains proprietary. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
 ---
 
 ## 💬 Support
 
-- **Email**: support@zyeute.com
+- **GitHub Issues**: [Report bugs or request features](https://github.com/brandonlacoste9-tech/Zyeute/issues)
 - **Discord**: [Join our community](#)
 - **Docs**: See `SETUP_GUIDE.md`
+
+> **Note**: For production support, please use GitHub Issues. Email support will be available once the domain is active.
 
 ---
 
