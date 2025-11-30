@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "description": "L'app sociale du Québec - Fait au Québec, pour le Québec 🇨🇦⚜️",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

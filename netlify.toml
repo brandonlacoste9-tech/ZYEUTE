@@ -12,9 +12,9 @@
   publish = "dist"
   
   # Set Node.js version for the build environment
-  # Using Node 18+ as required by the project
+  # Using Node 20.19.0+ as required by Vite 7.2.4 and other dependencies
   [build.environment]
-    NODE_VERSION = "18"
+    NODE_VERSION = "20.19.0"
 
 # SPA routing: Redirect all requests to index.html for client-side routing
 # This is also configured in public/_redirects as a backup
