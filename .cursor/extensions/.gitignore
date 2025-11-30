@@ -116,3 +116,37 @@ Desktop.ini
 *.backup
 *~
 
+# ============================================
+# Supabase Generated Artifacts
+# ============================================
+
+# Supabase CLI generated artifacts
+supabase/.temp/
+supabase/.branches/
+supabase/.snapshots/
+supabase/.studio/
+supabase/.logs/
+supabase/.history/
+
+# Schema exports and large docs (keep only canonical ones)
+SUPABASE_SCHEMA_EXPORT_*.md
+SUPABASE_COMPARISON_*.md
+# Keep canonical docs tracked
+!SUPABASE_SCHEMA_EXPORT.md
+!SUPABASE_COMPARISON_CHECKLIST.md
+
+# ============================================
+# Additional Node/Yarn artifacts
+# ============================================
+
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# ============================================
+# Additional Environment files (already covered, but explicit)
+# ============================================
+
+.env
+.env.*
+!.env.example

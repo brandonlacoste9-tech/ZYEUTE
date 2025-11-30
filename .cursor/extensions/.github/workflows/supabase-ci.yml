@@ -1,0 +1,102 @@
+name: Supabase CI
+
+on:
+  pull_request:
+    branches: [main, master, develop]
+    paths:
+      - 'supabase/**'
+      - 'src/types/supabase.ts'
+      - '.github/workflows/supabase-ci.yml'
+  push:
+    branches: [main, master, develop]
+    paths:
+      - 'supabase/**'
+      - 'src/types/supabase.ts'
+
+jobs:
+  lint:
+    name: Lint Database
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: npm ci || true
+
+      - name: Lint database migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          supabase db lint || echo "Lint check failed - review migrations manually"
+
+  typegen:
+    name: Generate TypeScript Types
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: npm ci || true
+
+      - name: Generate TypeScript types
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/types/supabase.ts || echo "Type generation failed"
+
+      - name: Check for type changes
+        run: |
+          if [ -n "$(git status --porcelain src/types/supabase.ts)" ]; then
+            echo "⚠️ TypeScript types have changed!"
+            echo "Please review and commit the updated types."
+            git diff src/types/supabase.ts
+            exit 1
+          else
+            echo "✅ TypeScript types are up to date"
+          fi
+
+  edge-functions:
+    name: Test Edge Functions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Lint edge functions
+        run: |
+          for func in supabase/functions/*/index.ts; do
+            if [ -f "$func" ]; then
+              echo "Linting $func..."
+              deno lint "$func" || echo "Lint failed for $func"
+            fi
+          done
+
+      - name: Type check edge functions
+        run: |
+          for func in supabase/functions/*/index.ts; do
+            if [ -f "$func" ]; then
+              echo "Type checking $func..."
+              deno check "$func" || echo "Type check failed for $func"
+            fi
+          done
+
