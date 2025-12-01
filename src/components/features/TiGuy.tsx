@@ -156,24 +156,8 @@ export const TiGuy: React.FC = () => {
 
   return (
     <>
-      {/* Floating button - Ti-Guy Beaver Emblem */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-24 right-4 z-50 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform animate-bounce overflow-hidden"
-          style={{
-            boxShadow: '0 0 20px rgba(255, 191, 0, 0.4), 0 4px 15px rgba(0,0,0,0.6)',
-            border: '3px solid #B38600',
-          }}
-          aria-label="Ouvre Ti-Guy"
-        >
-          <img
-            src="/ti-guy-logo.jpg"
-            alt="Ti-Guy"
-            className="w-full h-full object-cover"
-          />
-        </button>
-      )}
+      {/* Floating button removed - using ChatButton component instead */}
+      {/* The ChatButton opens ChatModal which uses TiGuy chat functionality */}
 
       {/* Chat window - Luxury Leather Emblem Design */}
       {isOpen && (
@@ -203,7 +187,7 @@ export const TiGuy: React.FC = () => {
                 }}
               >
                 <img
-                  src="/ti-guy-logo.jpg"
+                  src="/ti-guy-logo.jpg?v=2"
                   alt="Ti-Guy"
                   className="w-full h-full object-cover"
                 />

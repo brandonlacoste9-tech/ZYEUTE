@@ -122,11 +122,15 @@ export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
         {/* Header */}
         <div className="sticky top-0 z-10 bg-neutral-900/95 backdrop-blur-md border-b-2 border-gold-500/30 p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gold-500 flex items-center justify-center border-2 border-gold-700 glow-gold relative">
-              <span className="text-2xl">🦫</span>
+            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gold-700 glow-gold relative">
+              <img
+                src="/ti-guy-logo.jpg?v=2"
+                alt="Ti-Guy"
+                className="w-full h-full object-cover"
+              />
               {/* Embossed effect ring */}
               <div
-                className="absolute inset-0 rounded-full border-2 border-neutral-700"
+                className="absolute inset-0 rounded-full border-2 border-neutral-700 pointer-events-none"
                 style={{ transform: 'scale(1.1)' }}
               />
             </div>
@@ -156,8 +160,12 @@ export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
             >
               {/* TI-Guy Avatar (only for TI-Guy messages) */}
               {message.sender === 'tiGuy' && (
-                <div className="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center flex-shrink-0 border border-gold-700 glow-gold-subtle">
-                  <span className="text-lg">🦫</span>
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-gold-700 glow-gold-subtle">
+                  <img
+                    src="/ti-guy-logo.jpg?v=2"
+                    alt="Ti-Guy"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               )}
 
@@ -187,8 +195,12 @@ export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
           {/* Typing Indicator */}
           {isTyping && (
             <div className="flex gap-3 items-center">
-              <div className="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center flex-shrink-0 border border-gold-700">
-                <span className="text-lg">🦫</span>
+              <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-gold-700">
+                <img
+                  src="/ti-guy-logo.jpg?v=2"
+                  alt="Ti-Guy"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="bg-neutral-800 p-3 rounded-2xl border border-neutral-700">
                 <div className="flex gap-1">

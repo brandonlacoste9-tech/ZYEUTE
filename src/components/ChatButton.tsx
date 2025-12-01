@@ -96,15 +96,11 @@ export const ChatButton: React.FC<ChatButtonProps> = ({
         style={goldEmbossedStyle}
         aria-label="Ouvrir le chat"
       >
-        {/* Chat Icon with gold glow effect */}
-        <IoChatbubbleEllipsesOutline
-          className={cn(
-            iconSizes[size],
-            'text-gold-500',
-            'drop-shadow-[0_0_8px_rgba(255,191,0,0.8)]',
-            'group-hover:text-gold-400',
-            'transition-colors duration-300'
-          )}
+        {/* Beaver Gold Coin Image */}
+        <img
+          src="/ti-guy-logo.jpg?v=2"
+          alt="Ti-Guy"
+          className="w-full h-full object-cover rounded-full"
         />
         
         {/* Subtle inner ring highlight */}
