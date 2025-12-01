@@ -49,7 +49,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         .select(`
           *,
           actor:users!actor_id(*),
-          post:posts(*)
+          post:posts!post_id(*)
         `)
         .eq('user_id', currentUserId)
         .order('created_at', { ascending: false })
