@@ -8,54 +8,64 @@
  */
 
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { LoadingScreen } from '@/components/LoadingScreen';
 
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
     let hasNavigated = false;
 
-    // Log current URL for debugging
-    console.log('[AuthCallback] Current URL:', window.location.href);
-    console.log('[AuthCallback] Pathname:', window.location.pathname);
-    console.log('[AuthCallback] Search params:', window.location.search);
+    // Check for OAuth error in URL parameters
+    const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
+    
+    if (error) {
+      console.error('OAuth error:', error, errorDescription);
+      hasNavigated = true;
+      navigate('/login?error=oauth_failed', { replace: true });
+      return;
+    }
 
     // Listen for auth state changes to know when session is ready
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('[AuthCallback] Auth state change:', event, session ? 'has session' : 'no session');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event, session ? 'has session' : 'no session');
+      
       if (event === 'SIGNED_IN' && session) {
         // Successful login - redirect to home
-        console.log('[AuthCallback] Sign in successful, redirecting to home');
         hasNavigated = true;
         if (timeoutId) clearTimeout(timeoutId);
         navigate('/', { replace: true });
       } else if (event === 'SIGNED_OUT') {
         // Explicitly signed out - redirect to login
-        console.log('[AuthCallback] Signed out, redirecting to login');
         hasNavigated = true;
         if (timeoutId) clearTimeout(timeoutId);
         navigate('/login', { replace: true });
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        // Token refreshed - we have a valid session
+        hasNavigated = true;
+        if (timeoutId) clearTimeout(timeoutId);
+        navigate('/', { replace: true });
       }
       // Ignore INITIAL_SESSION with null session - OAuth token exchange may still be in progress
-      // We'll wait for SIGNED_IN event or check session after a delay
     });
 
     // Also check current session immediately in case auth already completed
     const checkSession = async () => {
       try {
-        console.log('[AuthCallback] Checking session...');
+        // First, try to get the session from the URL hash/query params
+        // Supabase's detectSessionInUrl should have processed this already
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error('[AuthCallback] Session error:', sessionError);
+          console.error('Session error:', sessionError);
         }
         
         if (session) {
-          console.log('[AuthCallback] Session found, redirecting to home');
           hasNavigated = true;
           if (timeoutId) clearTimeout(timeoutId);
           navigate('/', { replace: true });
@@ -68,29 +78,33 @@ const AuthCallback: React.FC = () => {
           if (hasNavigated) return; // Already navigated via onAuthStateChange
           
           try {
-            const { data: { session: retrySession } } = await supabase.auth.getSession();
+            const { data: { session: retrySession }, error: retryError } = await supabase.auth.getSession();
+            
+            if (retryError) {
+              console.error('Retry session error:', retryError);
+            }
+            
             if (retrySession) {
               hasNavigated = true;
               navigate('/', { replace: true });
-        } else {
-          // Still no session after delay - likely a failed OAuth flow
-          console.warn('[AuthCallback] No session established after OAuth callback');
-          console.warn('[AuthCallback] URL params:', new URLSearchParams(window.location.search).toString());
-          hasNavigated = true;
-          navigate('/login', { replace: true });
-        }
+            } else {
+              // Still no session after delay - likely a failed OAuth flow
+              console.warn('No session established after OAuth callback');
+              console.warn('Current URL:', window.location.href);
+              hasNavigated = true;
+              navigate('/login?error=no_session', { replace: true });
+            }
           } catch (error) {
             console.error('Auth callback retry error:', error);
             hasNavigated = true;
-            navigate('/login', { replace: true });
+            navigate('/login?error=callback_failed', { replace: true });
           }
-        }, 2000); // Wait 2 seconds for OAuth token exchange
+        }, 3000); // Wait 3 seconds for OAuth token exchange
       } catch (error) {
-        console.error('[AuthCallback] Error:', error);
-        console.error('[AuthCallback] Error details:', JSON.stringify(error, null, 2));
+        console.error('Auth callback error:', error);
         hasNavigated = true;
         if (timeoutId) clearTimeout(timeoutId);
-        navigate('/login', { replace: true });
+        navigate('/login?error=callback_error', { replace: true });
       }
     };
 
@@ -101,7 +115,7 @@ const AuthCallback: React.FC = () => {
       subscription.unsubscribe();
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [navigate]);
+  }, [navigate, searchParams]);
 
   return <LoadingScreen message="Connexion en cours..." />;
 };
