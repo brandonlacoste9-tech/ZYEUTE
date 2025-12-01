@@ -1,4 +1,92 @@
-# 🔐 OAuth Configuration Verification Checklist
+# ✅ Supabase OAuth Verification Checklist (Updated for Netlify)
+
+_Last updated: 2025-12-01_
+
+---
+
+## 🔧 Supabase Auth Configuration
+
+### ✅ Site URL
+
+```
+https://zyeute.com
+```
+
+(Use `https://zyeute-netlify.netlify.app` temporarily while DNS finishes propagating)
+
+---
+
+### ✅ Redirect URLs (copy-paste these into Supabase Dashboard → Auth → URL Configuration)
+
+```
+https://zyeute.com
+https://zyeute.com/auth/callback
+https://zyeute.com/**
+https://www.zyeute.com
+https://www.zyeute.com/auth/callback
+https://www.zyeute.com/**
+https://zyeute-netlify.netlify.app
+https://zyeute-netlify.netlify.app/auth/callback
+https://zyeute-netlify.netlify.app/**
+http://localhost:5173
+http://localhost:5173/auth/callback
+http://localhost:5173/**
+```
+
+---
+
+## 🧹 Remove These (from old Vercel config)
+
+```
+https://brandonlacoste9-tech-zyeute-as15lomj2.vercel.app
+https://brandonlacoste9-tech-zyeute-l7i6iwtux.vercel.app
+```
+
+**Important:** Remove ALL Vercel URLs if you've fully migrated to Netlify.
+
+---
+
+## ✅ Test Steps
+
+1. Go to your deployed site (Netlify or custom domain)
+2. Click "Sign in with Google"
+3. Complete OAuth flow
+4. Confirm redirect returns to:
+   - `/auth/callback` with `code=` and `provider=google` in query
+5. Check browser console:
+   - ✅ `exchangeCodeForSession` succeeds
+   - ✅ Redirect to `/` (home feed)
+   - ❌ No errors like `"requested path is invalid"`
+
+---
+
+## ✅ Optional Logging (AuthCallback.tsx)
+
+Enable temporary logs like:
+
+```tsx
+console.log(window.location.href);
+console.log(searchParams.get("code"));
+console.log(searchParams.get("provider"));
+```
+
+---
+
+## 🧪 Local Testing
+
+* Use: `http://localhost:5173/auth/callback`
+* Make sure it's in Supabase allowed list
+* Run your local dev server and test the login
+
+---
+
+## 🔒 Security Tips
+
+* Do NOT include Netlify/Vercel deploy preview URLs unless necessary
+* Avoid redirecting to untrusted subdomains
+* Use wildcards (`/**`) only when safe
+
+---
 
 ## Quick Verification Script
 
@@ -16,45 +104,9 @@ This will check:
 
 ---
 
-## Manual Verification Steps
-
-### 1. Supabase Dashboard Configuration
-
-**Go to:** https://supabase.com/dashboard/project/vuanulvyqkfefmjcikfk/settings/auth
-
-#### Site URL
-- [ ] **Site URL** is set to: `https://zyeute.com`
-- [ ] **NOT** set to `localhost` or `http://`
-
-#### Redirect URLs
-Add these **exact** URLs (one per line):
-
-```
-https://zyeute.com/auth/callback
-https://zyeute.com/**
-https://brandonlacoste9-tech-zyeute-l7i6iwtux.vercel.app/auth/callback
-https://brandonlacoste9-tech-zyeute-l7i6iwtux.vercel.app/**
-http://localhost:5173/auth/callback
-http://localhost:5173/**
-```
-
-**Important:** The wildcard `/**` allows all paths under that domain.
-
-#### Google OAuth Provider
-- [ ] Go to: **Authentication → Providers → Google**
-- [ ] **Enabled** toggle is ON
-- [ ] **Client ID** is set (from Google Cloud Console)
-- [ ] **Client Secret** is set (from Google Cloud Console)
-
----
-
-### 2. Google Cloud Console Configuration
+## Google Cloud Console Configuration
 
 **Go to:** https://console.cloud.google.com/apis/credentials
-
-#### OAuth 2.0 Client ID
-- [ ] Find your OAuth 2.0 Client ID (the one used in Supabase)
-- [ ] Click **Edit**
 
 #### Authorized redirect URIs
 Add this **exact** URL:
@@ -68,21 +120,15 @@ https://vuanulvyqkfefmjcikfk.supabase.co/auth/v1/callback
 #### Authorized JavaScript origins (optional but recommended)
 ```
 https://zyeute.com
+https://www.zyeute.com
 https://vuanulvyqkfefmjcikfk.supabase.co
 ```
 
 ---
 
-### 3. Environment Variables (Netlify/Vercel)
+## Environment Variables (Netlify)
 
-#### Netlify Environment Variables
 **Go to:** Netlify Dashboard → Site Settings → Environment Variables
-
-- [ ] `VITE_SUPABASE_URL` = `https://vuanulvyqkfefmjcikfk.supabase.co`
-- [ ] `VITE_SUPABASE_ANON_KEY` = (your anon key from Supabase Dashboard)
-
-#### Vercel Environment Variables (if using Vercel)
-**Go to:** Vercel Dashboard → Project Settings → Environment Variables
 
 - [ ] `VITE_SUPABASE_URL` = `https://vuanulvyqkfefmjcikfk.supabase.co`
 - [ ] `VITE_SUPABASE_ANON_KEY` = (your anon key from Supabase Dashboard)
@@ -91,7 +137,7 @@ https://vuanulvyqkfefmjcikfk.supabase.co
 
 ---
 
-### 4. Code Verification
+## Code Verification
 
 #### `src/lib/supabase.ts`
 - [ ] `signInWithGoogle()` uses `redirectTo: ${window.location.origin}/auth/callback`
@@ -99,6 +145,7 @@ https://vuanulvyqkfefmjcikfk.supabase.co
 
 #### `src/pages/AuthCallback.tsx`
 - [ ] Component handles OAuth errors from URL parameters
+- [ ] Component uses `exchangeCodeForSession()` for code-based OAuth
 - [ ] Component listens for `SIGNED_IN` event
 - [ ] Component redirects to `/` on success
 
@@ -112,57 +159,25 @@ https://vuanulvyqkfefmjcikfk.supabase.co
 
 ### Issue: `{"error":"requested path is invalid"}`
 
-**Cause:** Redirect URL mismatch between Supabase and Google Cloud Console.
+**Cause:** Redirect URL mismatch - Supabase doesn't recognize the redirect URL.
 
 **Fix:**
 1. Verify Supabase **Redirect URLs** includes: `https://zyeute.com/auth/callback`
 2. Verify Google Cloud Console **Authorized redirect URIs** includes: `https://vuanulvyqkfefmjcikfk.supabase.co/auth/v1/callback`
-3. These are **different URLs** - don't confuse them!
+3. Remove any old Vercel URLs from Supabase Redirect URLs
+4. These are **different URLs** - don't confuse them!
 
 ---
 
-### Issue: Redirects to `localhost:3000` after login
+### Issue: Redirects to wrong domain after login
 
-**Cause:** `VITE_APP_URL` or Supabase Site URL is set to localhost.
+**Cause:** Old Vercel URLs still in Supabase configuration.
 
 **Fix:**
-1. Check Netlify/Vercel environment variables - remove any `VITE_APP_URL` pointing to localhost
-2. Update Supabase **Site URL** to `https://zyeute.com`
-3. Trigger a new deployment
-
----
-
-### Issue: OAuth works locally but not in production
-
-**Cause:** Environment variables not set in production.
-
-**Fix:**
-1. Verify `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set in Netlify/Vercel
-2. Ensure they match your Supabase project (`vuanulvyqkfefmjcikfk`)
-3. Trigger a new deployment after updating
-
----
-
-## Testing OAuth Flow
-
-### 1. Test in Incognito Mode
-1. Open `https://zyeute.com` in incognito window
-2. Click "Continue with Google"
-3. Complete Google OAuth flow
-4. Should redirect to `/auth/callback` then `/` (home feed)
-
-### 2. Check Browser Console
-Look for:
-- ✅ `[Supabase] Using URL: https://vuanulvyqkfefmjcikfk.supabase.co`
-- ✅ `Auth state change: SIGNED_IN`
-- ❌ Any errors about redirect URLs
-- ❌ Any 404 errors
-
-### 3. Verify Session
-After login:
-- [ ] User is redirected to home feed (`/`)
-- [ ] Profile page loads (`/profile/me`)
-- [ ] No "Profile Not Found" errors
+1. Remove ALL Vercel URLs from Supabase Redirect URLs
+2. Add Netlify URLs (see Redirect URLs section above)
+3. Update Supabase **Site URL** to `https://zyeute.com`
+4. Trigger a new deployment
 
 ---
 
@@ -171,9 +186,10 @@ After login:
 Before considering OAuth "fixed":
 
 - [ ] Supabase Site URL = `https://zyeute.com`
-- [ ] Supabase Redirect URLs include `https://zyeute.com/auth/callback` and `https://zyeute.com/**`
+- [ ] Supabase Redirect URLs include Netlify URLs (see above)
+- [ ] ALL Vercel URLs removed from Supabase Redirect URLs
 - [ ] Google Cloud Console Authorized redirect URI = `https://vuanulvyqkfefmjcikfk.supabase.co/auth/v1/callback`
-- [ ] Environment variables set in Netlify/Vercel
+- [ ] Environment variables set in Netlify
 - [ ] Code uses `window.location.origin` for redirectTo (not hardcoded localhost)
 - [ ] `/auth/callback` route exists in App.tsx
 - [ ] Tested in incognito mode - login works end-to-end
@@ -181,18 +197,6 @@ Before considering OAuth "fixed":
 
 ---
 
-## Need Help?
+✅ You're now fully aligned with Supabase + Netlify OAuth best practices.
 
-If OAuth still fails after verifying all above:
-
-1. **Check browser console** for specific error messages
-2. **Check Netlify/Vercel build logs** for environment variable issues
-3. **Check Supabase Dashboard → Logs** for authentication errors
-4. **Share the exact error message** you see
-
-The error `{"error":"requested path is invalid"}` specifically means:
-- Supabase received a redirect request to a path not in your Redirect URLs list
-- OR Google is redirecting to the wrong Supabase callback URL
-
-Double-check both configurations!
-
+🧠 This checklist documents your current working configuration for future reference.
