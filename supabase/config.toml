@@ -57,6 +57,10 @@ enable_confirmations = true
 # Supabase Branching Configuration
 # This section defines how Git branches map to Supabase database branches
 # for isolated preview environments
+#
+# Database Migration: migrations/20251201224600_setup_preview_branches.sql
+# This migration creates metadata tracking for preview branch configurations
+# in the preview_branch_metadata table
 
 [branching]
 # Enable Supabase branching for preview environments
