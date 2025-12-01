@@ -50,3 +50,9 @@ supabase/.temp
 korean-AI-compliance-/
 korean-AI-compliance-~*/
 
+# Temporary files and scripts
+_codebase_digest.txt
+fix-imports.js
+*_DEBUG.md
+*_FIX.md
+
