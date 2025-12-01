@@ -1,7 +1,8 @@
 /**
- * Ti-Guy - Premium Quebec Heritage Design
- * The Zyeuté Mascot & AI Assistant with embossed beaver emblem
- * Luxury leather chat widget with gold stitching
+ * Ti-Guy - Premium Quebec Heritage Emblem Design
+ * The Zyeuté Mascot & AI Assistant featuring the iconic beaver emblem
+ * Luxury leather chat widget with gold medallion styling
+ * Inspired by the Ti-Guy Quebec CA logo
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -155,45 +156,99 @@ export const TiGuy: React.FC = () => {
 
   return (
     <>
-      {/* Floating button - Premium Beaver Emblem */}
+      {/* Floating button - Ti-Guy Beaver Emblem */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-24 right-20 z-50 w-14 h-14 btn-gold rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform glow-gold animate-bounce"
+          className="fixed bottom-24 right-4 z-50 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform animate-bounce overflow-hidden"
+          style={{
+            boxShadow: '0 0 20px rgba(255, 191, 0, 0.4), 0 4px 15px rgba(0,0,0,0.6)',
+            border: '3px solid #B38600',
+          }}
           aria-label="Ouvre Ti-Guy"
         >
-          <span className="text-3xl">🦫</span>
+          <img
+            src="/ti-guy-logo.jpg"
+            alt="Ti-Guy"
+            className="w-full h-full object-cover"
+          />
         </button>
       )}
 
-      {/* Chat window - Luxury Leather Design */}
+      {/* Chat window - Luxury Leather Emblem Design */}
       {isOpen && (
-        <div className="fixed bottom-24 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] leather-card rounded-2xl shadow-2xl overflow-hidden stitched">
-          {/* Header - Gold Gradient with Embossed Beaver */}
-          <div className="bg-neutral-900 p-4 flex items-center justify-between border-b-2 border-gold-700/50">
+        <div
+          className="fixed bottom-24 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-2xl shadow-2xl overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, #1a1512 0%, #0d0a08 50%, #1a1512 100%)',
+            border: '3px solid #4a3b22',
+            boxShadow: '0 0 30px rgba(0,0,0,0.8), 0 0 15px rgba(255, 191, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.05)',
+          }}
+        >
+          {/* Header - Emblem Style with Beaver Logo */}
+          <div
+            className="p-4 flex items-center justify-between relative"
+            style={{
+              background: 'linear-gradient(180deg, #2d2218 0%, #1a1512 100%)',
+              borderBottom: '2px solid #4a3b22',
+            }}
+          >
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gold-500 flex items-center justify-center border-2 border-gold-700 glow-gold relative">
-                <span className="text-2xl">🦫</span>
-                {/* Embossed effect ring */}
-                <div className="absolute inset-0 rounded-full border-2 border-neutral-700" style={{ transform: 'scale(1.1)' }} />
+              {/* Circular Emblem Avatar */}
+              <div
+                className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0"
+                style={{
+                  border: '3px solid #B38600',
+                  boxShadow: '0 0 15px rgba(255, 191, 0, 0.3), inset 0 0 10px rgba(0,0,0,0.5)',
+                }}
+              >
+                <img
+                  src="/ti-guy-logo.jpg"
+                  alt="Ti-Guy"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
-                <h3 className="text-gold-400 font-bold embossed">Ti-Guy</h3>
-                <p className="text-stone-400 text-xs embossed">Ton assistant québécois</p>
+                <h3
+                  className="font-bold text-lg"
+                  style={{
+                    background: 'linear-gradient(180deg, #FFD966 0%, #B38600 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                  }}
+                >
+                  Ti-Guy
+                </h3>
+                <p
+                  className="text-xs"
+                  style={{ color: '#8B7355' }}
+                >
+                  QUEBEC CA 🦫
+                </p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="p-2 hover:bg-gold-500/20 rounded-full transition-colors"
+              className="p-2 rounded-full transition-colors"
+              style={{
+                background: 'rgba(179, 134, 0, 0.2)',
+              }}
             >
-              <svg className="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" style={{ color: '#B38600' }} fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
               </svg>
             </button>
           </div>
 
           {/* Messages - Dark Leather Background */}
-          <div className="h-96 overflow-y-auto p-4 space-y-3 bg-black gold-scrollbar">
+          <div
+            className="h-96 overflow-y-auto p-4 space-y-3"
+            style={{
+              background: 'linear-gradient(180deg, #0d0a08 0%, #1a1512 50%, #0d0a08 100%)',
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E")`,
+            }}
+          >
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -203,17 +258,39 @@ export const TiGuy: React.FC = () => {
                 )}
               >
                 {message.sender === 'tiguy' && (
-                  <div className="w-8 h-8 rounded-full bg-gold-500 flex items-center justify-center flex-shrink-0 border border-gold-700 glow-gold-subtle">
-                    <span className="text-lg">🦫</span>
+                  <div
+                    className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
+                    style={{
+                      border: '2px solid #B38600',
+                      boxShadow: '0 0 8px rgba(255, 191, 0, 0.3)',
+                    }}
+                  >
+                    <img
+                      src="/ti-guy-logo.jpg"
+                      alt="Ti-Guy"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 )}
                 <div
                   className={cn(
                     'max-w-[70%] p-3 rounded-2xl text-sm',
                     message.sender === 'user'
-                      ? 'bg-gradient-to-r from-gold-400 to-gold-600 text-black font-medium'
-                      : 'bg-neutral-800 text-white border border-neutral-700'
+                      ? 'text-black font-medium'
+                      : 'text-white'
                   )}
+                  style={
+                    message.sender === 'user'
+                      ? {
+                          background: 'linear-gradient(135deg, #FFD966 0%, #B38600 100%)',
+                          boxShadow: '0 2px 8px rgba(179, 134, 0, 0.4)',
+                        }
+                      : {
+                          background: 'linear-gradient(135deg, #2d2218 0%, #1a1512 100%)',
+                          border: '1px solid #4a3b22',
+                          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+                        }
+                  }
                 >
                   {message.text}
                 </div>
@@ -222,14 +299,30 @@ export const TiGuy: React.FC = () => {
 
             {isTyping && (
               <div className="flex gap-2 items-center">
-                <div className="w-8 h-8 rounded-full bg-gold-500 flex items-center justify-center border border-gold-700">
-                  <span className="text-lg">🦫</span>
+                <div
+                  className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
+                  style={{
+                    border: '2px solid #B38600',
+                    boxShadow: '0 0 8px rgba(255, 191, 0, 0.3)',
+                  }}
+                >
+                  <img
+                    src="/ti-guy-logo.jpg"
+                    alt="Ti-Guy"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <div className="bg-neutral-800 p-3 rounded-2xl border border-neutral-700">
+                <div
+                  className="p-3 rounded-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #2d2218 0%, #1a1512 100%)',
+                    border: '1px solid #4a3b22',
+                  }}
+                >
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-gold-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 bg-gold-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 bg-gold-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -240,13 +333,25 @@ export const TiGuy: React.FC = () => {
 
           {/* Quick actions - Leather Buttons */}
           {messages.length <= 2 && (
-            <div className="p-3 border-t border-gold-700/30 bg-neutral-900">
+            <div
+              className="p-3"
+              style={{
+                background: 'linear-gradient(180deg, #1a1512 0%, #2d2218 100%)',
+                borderTop: '1px solid #4a3b22',
+              }}
+            >
               <div className="flex flex-wrap gap-2">
                 {QUICK_ACTIONS.map((action) => (
                   <button
                     key={action.key}
                     onClick={() => handleQuickAction(action.key, action.label)}
-                    className="px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 rounded-full text-gold-400 text-xs transition-colors embossed border border-neutral-700"
+                    className="px-3 py-1.5 rounded-full text-xs transition-all hover:scale-105"
+                    style={{
+                      background: 'linear-gradient(135deg, #2d2218 0%, #1a1512 100%)',
+                      border: '1px solid #4a3b22',
+                      color: '#B38600',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                    }}
                   >
                     {action.label}
                   </button>
@@ -256,7 +361,13 @@ export const TiGuy: React.FC = () => {
           )}
 
           {/* Input - Premium Gold Accent */}
-          <div className="p-3 border-t-2 border-gold-700/50 bg-neutral-900">
+          <div
+            className="p-3"
+            style={{
+              background: 'linear-gradient(180deg, #2d2218 0%, #1a1512 100%)',
+              borderTop: '2px solid #4a3b22',
+            }}
+          >
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -269,12 +380,22 @@ export const TiGuy: React.FC = () => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Pose une question..."
-                className="input-premium text-sm"
+                className="w-full px-4 py-3 rounded-xl text-sm transition-all"
+                style={{
+                  background: 'rgba(0,0,0,0.4)',
+                  border: '1px solid #4a3b22',
+                  color: '#FFD966',
+                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)',
+                }}
               />
               <button
                 type="submit"
                 disabled={!inputText.trim()}
-                className="p-2 btn-gold rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 transition-transform glow-gold"
+                className="p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 transition-transform"
+                style={{
+                  background: 'linear-gradient(135deg, #FFD966 0%, #B38600 100%)',
+                  boxShadow: '0 0 10px rgba(255, 191, 0, 0.3)',
+                }}
               >
                 <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
@@ -284,11 +405,20 @@ export const TiGuy: React.FC = () => {
           </div>
 
           {/* Quebec Pride Footer */}
-          <div className="px-4 py-2 bg-neutral-950 border-t border-gold-700/20">
-            <p className="text-center text-stone-500 text-xs embossed flex items-center justify-center gap-1">
-              <span className="text-gold-500">⚜️</span>
+          <div
+            className="px-4 py-2"
+            style={{
+              background: 'linear-gradient(180deg, #1a1512 0%, #0d0a08 100%)',
+              borderTop: '1px solid #4a3b22',
+            }}
+          >
+            <p
+              className="text-center text-xs flex items-center justify-center gap-1"
+              style={{ color: '#8B7355' }}
+            >
+              <span style={{ color: '#B38600' }}>⚜️</span>
               <span>Propulsé par l'IA québécoise</span>
-              <span className="text-gold-500">🦫</span>
+              <span style={{ color: '#B38600' }}>🦫</span>
             </p>
           </div>
         </div>
