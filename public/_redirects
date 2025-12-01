@@ -6,10 +6,14 @@
 # The 200 status code is a "rewrite" - it serves index.html but keeps the original URL
 
 # Exclude source files (shouldn't exist in production, return 404)
-# Note: Netlify _redirects requires a "to" field even for 404s
-/src/*    /.netlify/functions/404    404
+# This prevents the SPA fallback from serving index.html for /src/* requests
+# which would cause MIME type errors (expecting JavaScript, got HTML)
+/src/*    /404.html    404
 
 # SPA fallback - redirect everything else to index.html
+# Standard Netlify SPA rewrite for React Router
+# All unknown paths serve index.html (200 = rewrite, keeps URL)
+# This is the recommended pattern from Netlify docs for Vite/React SPAs
 /*    /index.html    200
 
 # Note: This is also configured in netlify.toml as a backup.
