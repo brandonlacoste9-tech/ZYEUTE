@@ -59,6 +59,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip Vercel Live feedback script (not needed on Netlify)
+  if (event.request.url.includes('vercel.live') || event.request.url.includes('_next-live')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

@@ -1,7 +1,8 @@
 # Netlify Configuration for Vite + React SPA
 # Documentation: https://docs.netlify.com/configure-builds/file-based-configuration/
 
-# Build settings
+# IMPORTANT: This is a Vite app, NOT Next.js
+# Disable Next.js auto-detection
 [build]
   # Command to build your Vite project for production
   # This runs 'vite build' which outputs to the 'dist' directory by default
@@ -15,6 +16,8 @@
   # Using Node 20.19.0+ as required by Vite 7.2.4 and other dependencies
   [build.environment]
     NODE_VERSION = "20.19.0"
+    # Disable Next.js plugin auto-detection
+    NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 # SPA routing: Redirect all requests to index.html for client-side routing
 # This is also configured in public/_redirects as a backup
@@ -85,6 +88,13 @@
 # Uncomment when you add serverless functions
 # [functions]
 #   directory = "netlify/functions"
+
+# IMPORTANT: Explicitly disable Next.js plugin for Vite app
+# Netlify auto-detects Next.js and injects vercel.live scripts
+# This causes CSP violations and 404 errors
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+  enabled = false
 
 # Plugins (optional - uncomment as needed)
 # [[plugins]]
