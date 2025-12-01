@@ -89,12 +89,10 @@
 # [functions]
 #   directory = "netlify/functions"
 
-# IMPORTANT: Explicitly disable Next.js plugin for Vite app
+# IMPORTANT: Next.js plugin is disabled via NETLIFY_NEXT_PLUGIN_SKIP environment variable
 # Netlify auto-detects Next.js and injects vercel.live scripts
-# This causes CSP violations and 404 errors
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-  enabled = false
+# Setting NETLIFY_NEXT_PLUGIN_SKIP = "true" prevents this
+# If the plugin was added in Netlify UI, remove it from Site settings > Plugins
 
 # Plugins (optional - uncomment as needed)
 # [[plugins]]
