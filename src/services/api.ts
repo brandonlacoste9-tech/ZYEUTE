@@ -78,7 +78,7 @@ export async function getFeedPosts(page: number = 0, limit: number = 20): Promis
       .from('posts')
       .select(`
         *,
-        user:user_profiles(*)
+        user:user_profiles!user_id(*)
       `)
       .order('created_at', { ascending: false })
       .range(start, end);
@@ -141,7 +141,7 @@ export async function getUserPosts(userId: string): Promise<Post[]> {
   try {
     const { data, error } = await supabase
       .from('posts')
-      .select('*, user:user_profiles(*)')
+      .select('*, user:user_profiles!user_id(*)')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -166,7 +166,7 @@ export async function getStories(
   try {
     const { data, error } = await supabase
       .from('stories')
-      .select('*, user:user_profiles(*)')
+      .select('*, user:user_profiles!user_id(*)')
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false });
 
