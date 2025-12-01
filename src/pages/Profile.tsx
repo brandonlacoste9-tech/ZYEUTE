@@ -37,6 +37,7 @@ export const Profile: React.FC = () => {
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [isFollowing, setIsFollowing] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<'posts' | 'fires' | 'saved'>('posts');
 
   const isOwnProfile = slug === 'me' || user?.id === currentUser?.id;
@@ -55,64 +56,50 @@ export const Profile: React.FC = () => {
   React.useEffect(() => {
     const fetchUser = async () => {
       setIsLoading(true);
+      setError(null);
       try {
-        // For `/profile/me`, get auth user directly if currentUser isn't available yet
+        // For `/profile/me`, use getCurrentUser() directly - it's designed for this
         if (slug === 'me') {
-          // Try to get auth user directly
-          const { data: { user: authUser } } = await supabase.auth.getUser();
-          
-          if (!authUser) {
-            // Not logged in, redirect to login
-            navigate('/login');
-            return;
-          }
-
-          // Try to get profile using auth user ID
-          const profileUser = await getUserProfile('me', authUser.id);
+          console.log('[Profile] Fetching current user for /profile/me');
+          const profileUser = await getCurrentUser();
+          console.log('[Profile] getCurrentUser result:', profileUser ? 'found' : 'null');
           
           if (profileUser) {
             setUser(profileUser);
-            // Also set currentUser if not already set
-            if (!currentUser) {
-              setCurrentUser(profileUser);
-            }
+            setCurrentUser(profileUser);
+            setError(null);
           } else {
-            // Profile doesn't exist, try getCurrentUser as fallback
-            const fallbackUser = await getCurrentUser();
-            if (fallbackUser) {
-              setUser(fallbackUser);
-              setCurrentUser(fallbackUser);
+            // Check if user is authenticated
+            const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+            console.log('[Profile] Auth check:', authUser ? 'authenticated' : 'not authenticated', authError);
+            
+            if (!authUser) {
+              // Not logged in, redirect to login
+              navigate('/login');
+              return;
             } else {
-              // No profile found, show error state
-              console.error('Profile not found for current user');
+              // User is authenticated but profile doesn't exist in user_profiles table
+              setError('Profile not found. Please contact support.');
               setIsLoading(false);
               return;
             }
           }
         } else {
-          // Regular profile lookup
+          // Regular profile lookup by username
           const profileUser = await getUserProfile(slug || '', currentUser?.id);
           if (profileUser) {
             setUser(profileUser);
+            setError(null);
           } else {
             // User not found, redirect home
             navigate('/');
           }
         }
       } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error('[Profile] Error fetching user:', error);
+        setError('Failed to load profile. Please try again.');
         if (slug !== 'me') {
           navigate('/');
-        } else {
-          // For 'me', try to at least show something
-          const { data: { user: authUser } } = await supabase.auth.getUser();
-          if (authUser) {
-            // Try one more time with auth user ID
-            const profileUser = await getUserProfile('me', authUser.id);
-            if (profileUser) {
-              setUser(profileUser);
-            }
-          }
         }
       } finally {
         setIsLoading(false);
@@ -121,7 +108,7 @@ export const Profile: React.FC = () => {
 
     if (!slug) return;
 
-    // For `/profile/me`, don't wait for currentUser - get auth user directly
+    // Fetch immediately - don't wait for anything
     fetchUser();
   }, [slug, navigate]);
 
@@ -175,10 +162,25 @@ export const Profile: React.FC = () => {
     return posts.reduce((sum, post) => sum + post.fire_count, 0);
   }, [posts]);
 
-  if (isLoading || !user) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-black leather-overlay flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-gold-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !user) {
+    return (
+      <div className="min-h-screen bg-black leather-overlay flex items-center justify-center pb-20">
+        <div className="text-center px-4">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold text-gold-500 mb-2">Profile Not Found</h2>
+          <p className="text-gray-400 mb-6">{error || 'Unable to load profile'}</p>
+          <GoldButton onClick={() => navigate('/')} size="md">
+            Go Home
+          </GoldButton>
+        </div>
       </div>
     );
   }
