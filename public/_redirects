@@ -11,6 +11,9 @@
 /src/*    /404.html    404
 
 # SPA fallback - redirect everything else to index.html
+# Standard Netlify SPA rewrite for React Router
+# All unknown paths serve index.html (200 = rewrite, keeps URL)
+# This is the recommended pattern from Netlify docs for Vite/React SPAs
 /*    /index.html    200
 
 # Note: This is also configured in netlify.toml as a backup.

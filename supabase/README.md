@@ -73,6 +73,24 @@ Migrations are SQL files that define the database schema. They must be run in or
    - Email campaign management
    - Tables: `email_campaigns`, `email_preferences`
 
+8. **007_fix_rls_001_critical.sql**
+   - Critical RLS (Row Level Security) fixes
+   - Security patches for existing tables
+
+9. **20250102000000_fix_table_names.sql**
+   - Table name corrections and standardization
+   - Schema consistency improvements
+
+10. **20250102000001_fix_posts_view_joins.sql**
+    - Post view query optimizations
+    - Join performance improvements
+
+11. **20251201224600_setup_preview_branches.sql** ⭐ NEW
+    - Preview branch metadata tracking
+    - Tables: `preview_branch_metadata`
+    - Functions: `get_preview_branch_config()`
+    - Enables Supabase preview branch support for isolated testing environments
+
 ### Running Migrations
 
 #### Production Database
@@ -158,6 +176,16 @@ This means:
 - Preview deployments use this isolated database
 - Data is preserved between deployments
 - Branch is automatically created if it doesn't exist
+
+### Preview Branch Metadata Tracking
+
+The migration `20251201224600_setup_preview_branches.sql` creates infrastructure to track preview branch configurations:
+
+- **`preview_branch_metadata` table**: Stores information about configured preview branches
+- **`get_preview_branch_config()` function**: Retrieves preview branch configuration for a given Git branch
+- **Row Level Security (RLS)**: Ensures secure access to preview branch metadata
+
+This allows the application to programmatically determine which Supabase branch to use based on the current Git branch or deployment environment.
 
 ---
 
