@@ -14,20 +14,54 @@ export async function getCurrentUser(): Promise<User | null> {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) return null;
 
+    // Try to fetch existing profile
     const { data, error } = await supabase
       .from('user_profiles')
       .select('*')
       .eq('id', authUser.id)
       .single();
 
-    if (error) {
-      console.error('Error fetching current user:', error);
-      return null;
+    // If profile exists, return it
+    if (data && !error) {
+      return data as User;
     }
 
-    return data as User;
+    // If profile doesn't exist (error code PGRST116 = not found), create it
+    if (error && error.code === 'PGRST116') {
+      console.log('[getCurrentUser] Profile not found, creating new profile for user:', authUser.id);
+      
+      // Extract username from email or use a default
+      const email = authUser.email || '';
+      const username = email.split('@')[0] || `user_${authUser.id.slice(0, 8)}`;
+      const displayName = authUser.user_metadata?.full_name || authUser.user_metadata?.name || username;
+
+      // Create the profile
+      const { data: newProfile, error: createError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: authUser.id,
+          username: username,
+          display_name: displayName,
+          email: email,
+          avatar_url: authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture || null,
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('[getCurrentUser] Error creating profile:', createError);
+        return null;
+      }
+
+      console.log('[getCurrentUser] Profile created successfully');
+      return newProfile as User;
+    }
+
+    // Other errors
+    console.error('[getCurrentUser] Error fetching current user:', error);
+    return null;
   } catch (error) {
-    console.error('Error in getCurrentUser:', error);
+    console.error('[getCurrentUser] Error in getCurrentUser:', error);
     return null;
   }
 }
