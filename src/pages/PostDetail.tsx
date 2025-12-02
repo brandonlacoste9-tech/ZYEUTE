@@ -54,13 +54,14 @@ export const PostDetail: React.FC = () => {
       setIsLoading(true);
       try {
         const { data, error } = await supabase
-          .from('posts')
+          .from('publications')
           .select(`
             *,
             user:user_profiles!user_id(*),
             user_fire:fires!user_id(fire_level)
           `)
           .eq('id', id)
+          .is('deleted_at', null)
           .single();
 
         if (error) throw error;
