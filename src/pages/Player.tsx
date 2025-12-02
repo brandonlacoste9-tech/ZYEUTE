@@ -119,10 +119,12 @@ export const Player: React.FC = () => {
         .select(
           `
           *,
-          user:users(*)
+          user:user_profiles!user_id(*)
         `
         )
-        .eq('type', 'video')
+        .eq('visibilite', 'public')
+        .is('est_masque', null)
+        .is('deleted_at', null)
         .lt('created_at', lastPost.created_at)
         .order('created_at', { ascending: false })
         .limit(20);
