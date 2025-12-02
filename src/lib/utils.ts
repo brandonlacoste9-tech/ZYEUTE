@@ -155,11 +155,12 @@ export function throttle<T extends (...args: any[]) => any>(
 /**
  * Extract Supabase project reference from URL
  * @param url - Supabase URL
- * @returns Project reference ID
- * @example extractSupabaseProjectRef('https://abc123.supabase.co') => 'abc123'
+ * @returns Project reference ID or null if invalid
+ * @example extractSupabaseProjectRef('https://vuanulvyqkfefmjcikfk.supabase.co') => 'vuanulvyqkfefmjcikfk'
  */
-export function extractSupabaseProjectRef(url: string): string {
-  return url.split('//')[1]?.split('.')[0] || 'unknown';
+export function extractSupabaseProjectRef(url: string): string | null {
+  const match = url.match(/https?:\/\/([^.]+)\.supabase\.(co|in)/);
+  return match ? match[1] : null;
 }
 
 /**
@@ -169,6 +170,11 @@ export function extractSupabaseProjectRef(url: string): string {
  */
 export function validateSupabaseUrl(url: string, expectedRef: string = 'vuanulvyqkfefmjcikfk'): void {
   const projectRef = extractSupabaseProjectRef(url);
+  
+  if (!projectRef) {
+    console.warn('⚠️ Supabase URL format is unexpected:', url);
+    return;
+  }
   
   if (url.includes('kihxqurnmyxnsyqgpdaw')) {
     console.error('❌ WRONG SUPABASE PROJECT DETECTED!');
@@ -184,43 +190,4 @@ export function validateSupabaseUrl(url: string, expectedRef: string = 'vuanulvy
     console.warn('⚠️ Using unexpected Supabase project:', projectRef);
     console.warn(`   Expected: ${expectedRef}`);
   }
-}
- * @example extractSupabaseProjectRef('https://vuanulvyqkfefmjcikfk.supabase.co') => 'vuanulvyqkfefmjcikfk'
- */
-export function extractSupabaseProjectRef(url: string): string | null {
-  const match = url.match(/https?:\/\/([^.]+)\.supabase\.(co|in)/);
-  return match ? match[1] : null;
-}
-
-/**
- * Validate Supabase URL and log status
- * @param url - Supabase URL to validate
- * @param expectedRef - Expected project reference (e.g., 'vuanulvyqkfefmjcikfk')
- * @returns true if valid, false otherwise
- */
-export function validateSupabaseUrl(url: string, expectedRef: string): boolean {
-  const projectRef = extractSupabaseProjectRef(url);
-  
-  if (!projectRef) {
-    console.error('❌ Invalid Supabase URL format:', url);
-    return false;
-  }
-  
-  if (projectRef === expectedRef) {
-    console.log(`✅ Supabase URL valid: ${url}`);
-    console.log(`   Project: ${projectRef}`);
-    return true;
-  }
-  
-  // Check for known wrong projects
-  const wrongProjects = ['kihxqurnmyxnsyqgpdaw', 'qnookjbtudghzzizofxy', 'ubgrkqdjsnaqmvbyrykn'];
-  if (wrongProjects.includes(projectRef)) {
-    console.error(`❌ WRONG SUPABASE PROJECT! Using ${projectRef} instead of ${expectedRef}`);
-    console.error(`❌ Please update VITE_SUPABASE_URL in Netlify environment variables`);
-    return false;
-  }
-  
-  // Unknown project
-  console.warn(`⚠️ Unknown Supabase project: ${projectRef} (expected: ${expectedRef})`);
-  return false;
 }
