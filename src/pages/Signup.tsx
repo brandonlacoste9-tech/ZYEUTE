@@ -12,6 +12,8 @@ import { toast } from '@/components/Toast';
 
 export const Signup: React.FC = () => {
   const navigate = useNavigate();
+  const isMountedRef = React.useRef(true);
+  const navigationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -19,8 +21,20 @@ export const Signup: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
+  // Cleanup on unmount to prevent state updates after navigation
+  React.useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isMountedRef.current) return;
+    
     setError('');
 
     // Validation
@@ -41,17 +55,27 @@ export const Signup: React.FC = () => {
 
       if (error) throw error;
 
+      // Check if component is still mounted before updating state
+      if (!isMountedRef.current) return;
+
       // Show success toast (non-blocking)
       toast.success('Compte créé! Vérifie ton courriel pour confirmer ton compte.');
       
-      // Use setTimeout to ensure state updates complete before navigation
-      // This prevents React DOM manipulation errors
-      setTimeout(() => {
-        navigate('/login', { replace: true });
-      }, 100);
+      // Use window.location for immediate redirect to bypass animation system
+      // This prevents React DOM manipulation errors with AnimatePresence
+      navigationTimeoutRef.current = setTimeout(() => {
+        if (isMountedRef.current) {
+          // Use window.location instead of navigate() to bypass PageTransition animations
+          // This prevents AnimatePresence from trying to animate during unmount
+          window.location.href = '/login';
+        }
+      }, 150);
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de l\'inscription');
-      setIsLoading(false);
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setError(err.message || 'Erreur lors de l\'inscription');
+        setIsLoading(false);
+      }
     }
   };
 
