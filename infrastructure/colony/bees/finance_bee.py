@@ -46,6 +46,45 @@ from guardian import Guardian
 class FinanceBee:
     """Finance Worker Bee for Stripe webhook processing"""
     
+    def _execute_with_retry(self, func, max_retries=3, base_delay=1, operation_name="operation"):
+        """
+        Execute function with exponential backoff retry
+        
+        Args:
+            func: Function to execute
+            max_retries: Maximum number of retry attempts
+            base_delay: Base delay in seconds (doubles each retry)
+            operation_name: Name of operation for logging
+            
+        Returns:
+            Result from function
+            
+        Raises:
+            Exception: If all retries exhausted
+        """
+        for attempt in range(max_retries):
+            try:
+                return func()
+            except Exception as e:
+                # Check if error is retryable
+                error_str = str(e).lower()
+                non_retryable = ['invalid', 'not found', 'unauthorized', 'forbidden']
+                
+                if any(term in error_str for term in non_retryable):
+                    # Don't retry non-retryable errors
+                    print(f"   ❌ Non-retryable error in {operation_name}: {e}")
+                    raise
+                
+                if attempt == max_retries - 1:
+                    # Last attempt failed
+                    print(f"   ❌ {operation_name} failed after {max_retries} attempts")
+                    raise
+                
+                # Calculate delay with exponential backoff
+                delay = base_delay * (2 ** attempt)
+                print(f"   ⚠️  {operation_name} failed (attempt {attempt + 1}/{max_retries}), retrying in {delay}s: {e}")
+                time.sleep(delay)
+    
     def __init__(self):
         print("🐝 Initializing Finance Bee...")
         
@@ -169,7 +208,14 @@ class FinanceBee:
             raise RuntimeError(error_msg)
     
     def _handle_checkout_completed(self, payload: Dict[str, Any]) -> str:
-        """Handle checkout.session.completed event"""
+        """
+        Handle checkout.session.completed event
+        
+        Uses compensating transactions pattern for atomicity:
+        - Store original state before updates
+        - On failure, rollback changes
+        - Idempotency via stripe_subscription_id
+        """
         session = payload['data']['object']
         user_id = session['metadata'].get('userId')
         tier = session['metadata'].get('tier')
@@ -178,32 +224,68 @@ class FinanceBee:
         if not user_id or not tier or not subscription_id:
             raise RuntimeError(f"Missing required metadata: userId={user_id}, tier={tier}, subscription={subscription_id}")
         
-        # Get subscription period from Stripe
-        subscription = stripe.Subscription.retrieve(subscription_id)
+        # Check for idempotency - if subscription already exists, skip
+        existing_sub = self.supabase.table('subscriptions').select('id').eq('stripe_subscription_id', subscription_id).execute()
+        if existing_sub.data and len(existing_sub.data) > 0:
+            print(f"   ℹ️  Subscription {subscription_id} already processed (idempotent)")
+            return f"Subscription already activated for user {user_id}: {tier} (idempotent)"
+        
+        # Get original user profile state for rollback
+        original_profile = self.supabase.table('user_profiles').select('subscription_tier, is_premium').eq('id', user_id).execute()
+        original_state = original_profile.data[0] if original_profile.data else None
+        
+        # Get subscription period from Stripe (with retry)
+        subscription = self._execute_with_retry(
+            lambda: stripe.Subscription.retrieve(subscription_id),
+            operation_name="Stripe subscription retrieve"
+        )
         current_period_start = datetime.fromtimestamp(subscription.current_period_start).isoformat()
         current_period_end = datetime.fromtimestamp(subscription.current_period_end).isoformat()
         
-        # Update user profile
-        profile_result = self.supabase.table('user_profiles').update({
-            'subscription_tier': tier,
-            'is_premium': True,
-        }).eq('id', user_id).execute()
+        try:
+            # Step 1: Update user profile (with retry)
+            profile_result = self._execute_with_retry(
+                lambda: self.supabase.table('user_profiles').update({
+                    'subscription_tier': tier,
+                    'is_premium': True,
+                }).eq('id', user_id).execute(),
+                operation_name="Update user_profiles"
+            )
+            
+            if not profile_result.data:
+                raise RuntimeError(f"Failed to update user_profiles for user {user_id}")
+            
+            # Step 2: Create subscription record (with retry)
+            sub_result = self._execute_with_retry(
+                lambda: self.supabase.table('subscriptions').upsert({
+                    'subscriber_id': user_id,
+                    'creator_id': user_id,
+                    'status': 'active',
+                    'stripe_subscription_id': subscription_id,
+                    'stripe_customer_id': session.get('customer'),
+                    'current_period_start': current_period_start,
+                    'current_period_end': current_period_end,
+                }, on_conflict='stripe_subscription_id').execute(),
+                operation_name="Upsert subscription"
+            )
+            
+            if not sub_result.data:
+                # Rollback: Revert user profile to original state
+                if original_state:
+                    self.supabase.table('user_profiles').update(original_state).eq('id', user_id).execute()
+                raise RuntimeError(f"Failed to create subscription record for {subscription_id}")
+            
+            return f"Subscription activated for user {user_id}: {tier} (subscription_id: {subscription_id})"
         
-        if not profile_result.data:
-            raise RuntimeError(f"Failed to update user_profiles for user {user_id}")
-        
-        # Create subscription record
-        sub_result = self.supabase.table('subscriptions').upsert({
-            'subscriber_id': user_id,
-            'creator_id': user_id,
-            'status': 'active',
-            'stripe_subscription_id': subscription_id,
-            'stripe_customer_id': session.get('customer'),
-            'current_period_start': current_period_start,
-            'current_period_end': current_period_end,
-        }, on_conflict='stripe_subscription_id').execute()
-        
-        return f"Subscription activated for user {user_id}: {tier} (subscription_id: {subscription_id})"
+        except Exception as e:
+            # Compensating transaction: Rollback profile update
+            if original_state:
+                print(f"   🔄 Rolling back user profile update for {user_id}")
+                try:
+                    self.supabase.table('user_profiles').update(original_state).eq('id', user_id).execute()
+                except Exception as rollback_error:
+                    print(f"   ⚠️  Rollback failed: {rollback_error}")
+            raise
     
     def _handle_subscription_updated(self, payload: Dict[str, Any]) -> str:
         """Handle customer.subscription.updated event"""
@@ -217,35 +299,70 @@ class FinanceBee:
         current_period_start = datetime.fromtimestamp(subscription['current_period_start']).isoformat()
         current_period_end = datetime.fromtimestamp(subscription['current_period_end']).isoformat()
         
-        # Update subscription status
-        result = self.supabase.table('subscriptions').update({
-            'status': 'active' if subscription['status'] == 'active' else 'canceled',
-            'current_period_start': current_period_start,
-            'current_period_end': current_period_end,
-        }).eq('stripe_subscription_id', subscription['id']).execute()
+        # Update subscription status (with retry)
+        result = self._execute_with_retry(
+            lambda: self.supabase.table('subscriptions').update({
+                'status': 'active' if subscription['status'] == 'active' else 'canceled',
+                'current_period_start': current_period_start,
+                'current_period_end': current_period_end,
+            }).eq('stripe_subscription_id', subscription['id']).execute(),
+            operation_name="Update subscription"
+        )
         
         return f"Subscription updated for user {user_id}: {subscription['status']}"
     
     def _handle_subscription_deleted(self, payload: Dict[str, Any]) -> str:
-        """Handle customer.subscription.deleted event"""
+        """
+        Handle customer.subscription.deleted event
+        
+        Uses compensating transactions pattern for atomicity
+        """
         subscription = payload['data']['object']
         user_id = subscription['metadata'].get('userId')
         
         if not user_id:
             return f"Subscription deleted but missing userId in metadata"
         
-        # Update subscription status
-        self.supabase.table('subscriptions').update({
-            'status': 'canceled'
-        }).eq('stripe_subscription_id', subscription['id']).execute()
+        # Get original state for rollback
+        original_profile = self.supabase.table('user_profiles').select('subscription_tier, is_premium').eq('id', user_id).execute()
+        original_state = original_profile.data[0] if original_profile.data else None
         
-        # Update user profile
-        self.supabase.table('user_profiles').update({
-            'subscription_tier': None,
-            'is_premium': False,
-        }).eq('id', user_id).execute()
+        try:
+            # Step 1: Update subscription status (with retry)
+            sub_result = self._execute_with_retry(
+                lambda: self.supabase.table('subscriptions').update({
+                    'status': 'canceled'
+                }).eq('stripe_subscription_id', subscription['id']).execute(),
+                operation_name="Cancel subscription"
+            )
+            
+            # Step 2: Update user profile (with retry)
+            profile_result = self._execute_with_retry(
+                lambda: self.supabase.table('user_profiles').update({
+                    'subscription_tier': None,
+                    'is_premium': False,
+                }).eq('id', user_id).execute(),
+                operation_name="Update user profile (cancel)"
+            )
+            
+            if not profile_result.data:
+                # Rollback: Revert subscription status
+                self.supabase.table('subscriptions').update({
+                    'status': 'active'
+                }).eq('stripe_subscription_id', subscription['id']).execute()
+                raise RuntimeError(f"Failed to update user profile for {user_id}")
+            
+            return f"Subscription canceled for user {user_id}"
         
-        return f"Subscription canceled for user {user_id}"
+        except Exception as e:
+            # Compensating transaction: Rollback if needed
+            if original_state:
+                print(f"   🔄 Rolling back subscription cancellation for {user_id}")
+                try:
+                    self.supabase.table('user_profiles').update(original_state).eq('id', user_id).execute()
+                except Exception as rollback_error:
+                    print(f"   ⚠️  Rollback failed: {rollback_error}")
+            raise
     
     def start(self):
         """Main event loop - polls for tasks and executes them"""
