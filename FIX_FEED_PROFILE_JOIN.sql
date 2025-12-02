@@ -26,16 +26,38 @@ ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 -- Step 4: Create policy to allow reading public profile fields for feed display
 -- This allows authenticated users to read basic profile info (username, display_name, avatar_url)
 -- needed for feed display, while keeping sensitive fields (email, etc.) private
-CREATE POLICY "Public profile fields readable for feed"
-ON public.user_profiles FOR SELECT
-TO authenticated
-USING (true);  -- Allow reading all profiles (RLS will filter sensitive fields if needed)
+-- Using DO block to check if policy exists first (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'user_profiles'
+      AND policyname = 'Public profile fields readable for feed'
+  ) THEN
+    CREATE POLICY "Public profile fields readable for feed"
+    ON public.user_profiles FOR SELECT
+    TO authenticated
+    USING (true);
+  END IF;
+END $$;
 
 -- Step 5: Also allow anonymous users to read public profile fields (for public feed)
-CREATE POLICY "Public profile fields readable for anonymous"
-ON public.user_profiles FOR SELECT
-TO anon
-USING (true);  -- Allow reading all profiles for public feed display
+-- Using DO block to check if policy exists first (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'user_profiles'
+      AND policyname = 'Public profile fields readable for anonymous'
+  ) THEN
+    CREATE POLICY "Public profile fields readable for anonymous"
+    ON public.user_profiles FOR SELECT
+    TO anon
+    USING (true);
+  END IF;
+END $$;
 
 -- Step 6: Grant SELECT permission (if not already granted)
 GRANT SELECT ON public.user_profiles TO authenticated;
