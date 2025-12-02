@@ -9,31 +9,46 @@ const sanitizeLogger = logger.withContext('Sanitize');
 
 /**
  * Sanitize HTML content to prevent XSS attacks
- * Removes all HTML tags except safe ones
+ * 
+ * IMPORTANT: This function strips ALL HTML tags for maximum security.
+ * For user-generated content (comments, captions), use sanitizeText() instead.
+ * 
+ * Note: CodeQL may flag regex patterns as incomplete, but this is a false positive
+ * because we remove ALL HTML tags at the end (<[^>]*>) which catches any edge cases.
+ * The intermediate steps are defense-in-depth layers.
  */
 export function sanitizeHTML(input: string): string {
   if (!input) return '';
 
-  // Remove script tags and their content
-  let sanitized = input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  let sanitized = input;
   
-  // Remove event handlers (onclick, onerror, etc.)
-  sanitized = sanitized.replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '');
-  sanitized = sanitized.replace(/\son\w+\s*=\s*[^\s>]*/gi, '');
+  // Defense layer 1: Remove script tags (multiple passes for nested tags)
+  // Note: Final HTML strip catches any edge cases, this is defense-in-depth
+  let previousLength = 0;
+  while (sanitized.length !== previousLength) {
+    previousLength = sanitized.length;
+    sanitized = sanitized.replace(/<script[^>]*>[\s\S]*?<\/script[^>]*>/gi, '');
+    sanitized = sanitized.replace(/<script[^>]*>/gi, '');
+  }
   
-  // Remove javascript: protocol
-  sanitized = sanitized.replace(/javascript:/gi, '');
+  // Defense layer 2: Remove event handlers (multiple passes)
+  // Note: Final HTML strip catches any edge cases, this is defense-in-depth
+  previousLength = 0;
+  while (sanitized.length !== previousLength) {
+    previousLength = sanitized.length;
+    sanitized = sanitized.replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '');
+    sanitized = sanitized.replace(/\bon\w+\s*=\s*[^\s>"']*/gi, '');
+  }
   
-  // Remove data: protocol (can be used for XSS)
-  sanitized = sanitized.replace(/data:text\/html/gi, '');
+  // Defense layer 3: Remove dangerous protocols
+  sanitized = sanitized.replace(/javascript:/gi, 'removed:');
+  sanitized = sanitized.replace(/data:/gi, 'removed:'); // Catches data:text/html and all data: URLs
+  sanitized = sanitized.replace(/vbscript:/gi, 'removed:');
   
-  // Remove potentially dangerous tags
-  const dangerousTags = ['iframe', 'embed', 'object', 'link', 'style', 'meta'];
-  dangerousTags.forEach(tag => {
-    const regex = new RegExp(`<${tag}\\b[^<]*(?:(?!<\\/${tag}>)<[^<]*)*<\\/${tag}>`, 'gi');
-    sanitized = sanitized.replace(regex, '');
-  });
-
+  // Final defense: Remove ALL HTML tags for maximum safety
+  // This catches any XSS attempts that bypassed previous layers
+  sanitized = sanitized.replace(/<[^>]*>/g, '');
+  
   return sanitized.trim();
 }
 
