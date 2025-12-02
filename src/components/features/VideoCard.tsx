@@ -177,7 +177,16 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 
           <div className="flex-1" />
 
-          <button className="text-stone-400 hover:text-gold-500 transition-colors">
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              tap();
+              // TODO: Implement save to collection functionality
+              console.log('Saved post:', post.id);
+            }}
+            className="text-stone-400 hover:text-gold-500 transition-colors"
+            aria-label="Sauvegarder"
+          >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>

@@ -204,10 +204,34 @@ export const Upload: React.FC = () => {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <button className="btn-leather py-2 rounded-lg text-sm font-medium">
+                <button 
+                  onClick={() => {
+                    toast.info('Ti-Guy génère une caption... 🦫');
+                    // Generate a caption based on context
+                    const suggestions = [
+                      'Une belle journée au Québec! ⚜️🇨🇦',
+                      'Tiguidou! C\'est malade en esti! 🔥',
+                      'Fier d\'être Québécois! 🍁',
+                      'Y fait beau au Québec aujourd\'hui! ☀️'
+                    ];
+                    const randomCaption = suggestions[Math.floor(Math.random() * suggestions.length)];
+                    setCaption(prevCaption => prevCaption ? `${prevCaption} ${randomCaption}` : randomCaption);
+                    toast.success('Caption générée par Ti-Guy! ✨');
+                  }}
+                  className="btn-leather py-2 rounded-lg text-sm font-medium hover:bg-gold-500/10 transition-colors"
+                >
                   ✨ Générer caption
                 </button>
-                <button className="btn-leather py-2 rounded-lg text-sm font-medium">
+                <button 
+                  onClick={() => {
+                    toast.info('Ti-Guy ajoute des hashtags... 🦫');
+                    const hashtags = ['#Quebec', '#QC', '#Montreal', '#MTL', '#Zyeute', '#TiGuy'];
+                    const selectedHashtags = hashtags.slice(0, 3 + Math.floor(Math.random() * 3)).join(' ');
+                    setCaption(prevCaption => prevCaption ? `${prevCaption} ${selectedHashtags}` : selectedHashtags);
+                    toast.success('Hashtags ajoutés par Ti-Guy! 🏷️');
+                  }}
+                  className="btn-leather py-2 rounded-lg text-sm font-medium hover:bg-gold-500/10 transition-colors"
+                >
                   🏷️ Ajouter hashtags
                 </button>
               </div>

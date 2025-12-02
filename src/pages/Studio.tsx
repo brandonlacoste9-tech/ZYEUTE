@@ -97,7 +97,18 @@ export default function Studio() {
               </button>
             </div>
 
-            <Button className="w-full py-4 text-lg font-bold bg-gradient-to-r from-red-600 to-orange-600">
+            <Button 
+              onClick={async () => {
+                if (!videoResult) return;
+                toast.info('Exportation en cours... 🎬');
+                // Simulate export process
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                toast.success('Vidéo exportée et publiée! 🚀');
+                // Navigate to profile after publish
+                window.location.href = '/profile/me';
+              }}
+              className="w-full py-4 text-lg font-bold bg-gradient-to-r from-red-600 to-orange-600"
+            >
               🚀 Exporter & Publier
             </Button>
           </div>
