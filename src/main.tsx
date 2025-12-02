@@ -2,10 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
-
+import { extractSupabaseProjectRef } from './lib/utils';
 import { logger } from './lib/logger';
 
 const errorLogger = logger.withContext('GlobalError');
+const appLogger = logger.withContext('App');
 
 // Add error handler for uncaught errors
 window.addEventListener('error', (event) => {
@@ -16,45 +17,7 @@ window.addEventListener('unhandledrejection', (event) => {
   errorLogger.error('Unhandled promise rejection:', event.reason);
 });
 
-import { extractSupabaseProjectRef } from './lib/utils';
-import { logger } from './lib/logger';
-
-const appLogger = logger.withContext('App');
-
 // Log that we're starting
-console.log('🚀 Starting Zyeuté app...');
-console.log('📍 Environment check:', {
-  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL || '❌ Missing',
-  VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅ Set (hidden)' : '❌ Missing',
-  NODE_ENV: import.meta.env.MODE,
-});
-
-// Additional debug logging for Supabase URL
-if (import.meta.env.VITE_SUPABASE_URL) {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  
-  // Import utilities dynamically to avoid circular dependency
-  const extractSupabaseProjectRef = (url: string) => url.split('//')[1]?.split('.')[0] || 'unknown';
-  
-  console.log('🔍 Supabase URL Details:', {
-    full_url: url,
-    project_ref: extractSupabaseProjectRef(url),
-    expected_ref: 'vuanulvyqkfefmjcikfk',
-  });
-  
-  // Validate URL (inline to avoid import issues at startup)
-  const projectRef = extractSupabaseProjectRef(url);
-  if (url.includes('kihxqurnmyxnsyqgpdaw')) {
-    console.error('❌ WRONG PROJECT! Using kihxqurnmyxnsyqgpdaw instead of vuanulvyqkfefmjcikfk');
-  } else if (projectRef === 'vuanulvyqkfefmjcikfk') {
-    console.log('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
-  } else if (url.includes('demo.supabase.co')) {
-    console.warn('⚠️ Using demo Supabase URL');
-  } else {
-    console.warn('⚠️ Unknown Supabase project. Expected: vuanulvyqkfefmjcikfk');
-  }
-} else {
-  console.error('❌ VITE_SUPABASE_URL not set! App may not function correctly.');
 appLogger.info('🚀 Starting Zyeuté app...');
 appLogger.info('📍 Environment check:', {
   VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL 
@@ -69,6 +32,20 @@ appLogger.info('📍 Environment check:', {
 // Show actual Supabase URL if set
 if (import.meta.env.VITE_SUPABASE_URL) {
   appLogger.debug('📍 Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+  
+  // Validate URL
+  const projectRef = extractSupabaseProjectRef(import.meta.env.VITE_SUPABASE_URL);
+  if (import.meta.env.VITE_SUPABASE_URL.includes('kihxqurnmyxnsyqgpdaw')) {
+    appLogger.error('❌ WRONG PROJECT! Using kihxqurnmyxnsyqgpdaw instead of vuanulvyqkfefmjcikfk');
+  } else if (projectRef === 'vuanulvyqkfefmjcikfk') {
+    appLogger.info('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
+  } else if (import.meta.env.VITE_SUPABASE_URL.includes('demo.supabase.co')) {
+    appLogger.warn('⚠️ Using demo Supabase URL');
+  } else {
+    appLogger.warn('⚠️ Unknown Supabase project. Expected: vuanulvyqkfefmjcikfk');
+  }
+} else {
+  appLogger.error('❌ VITE_SUPABASE_URL not set! App may not function correctly.');
 }
 
 try {
