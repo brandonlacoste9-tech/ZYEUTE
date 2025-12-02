@@ -85,7 +85,7 @@ export const Feed: React.FC = () => {
     }
   }, [isLoading, hasMore, page, fetchPosts]);
 
-  // Handle fire toggle
+  // Handle fire toggle - memoized to prevent VideoCard re-renders
   const handleFireToggle = React.useCallback(async (postId: string, currentFire: number) => {
     if (!currentUser) return;
     
@@ -104,7 +104,7 @@ export const Feed: React.FC = () => {
     }
   }, [currentUser]);
 
-  // Handle comment
+  // Memoize comment handler to prevent VideoCard re-renders
   const handleComment = React.useCallback((postId: string) => {
     // Navigate to post detail page for comments
     window.location.href = `/p/${postId}`;

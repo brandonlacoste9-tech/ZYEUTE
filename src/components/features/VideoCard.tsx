@@ -23,7 +23,7 @@ interface VideoCardProps {
   onShare?: (postId: string) => void;
 }
 
-export const VideoCard: React.FC<VideoCardProps> = ({
+const VideoCardComponent: React.FC<VideoCardProps> = ({
   post,
   user,
   variant = 'vertical',
@@ -235,5 +235,25 @@ export const VideoCard: React.FC<VideoCardProps> = ({
     </div>
   );
 };
+
+// Memoize VideoCard to prevent unnecessary re-renders
+// Only re-render if post, user, or callback functions change
+export const VideoCard = React.memo(VideoCardComponent, (prevProps, nextProps) => {
+  // Custom comparison function for better performance
+  return (
+    prevProps.post.id === nextProps.post.id &&
+    prevProps.post.fire_count === nextProps.post.fire_count &&
+    prevProps.post.is_fired === nextProps.post.is_fired &&
+    prevProps.user.id === nextProps.user.id &&
+    prevProps.variant === nextProps.variant &&
+    prevProps.autoPlay === nextProps.autoPlay &&
+    prevProps.muted === nextProps.muted &&
+    prevProps.onFireToggle === nextProps.onFireToggle &&
+    prevProps.onComment === nextProps.onComment &&
+    prevProps.onShare === nextProps.onShare
+  );
+});
+
+VideoCard.displayName = 'VideoCard';
 
 export default VideoCard;

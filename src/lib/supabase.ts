@@ -6,6 +6,9 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database';
 
 import { extractSupabaseProjectRef, validateSupabaseUrl } from './utils';
+import { logger } from './logger';
+
+const supabaseLogger = logger.withContext('Supabase');
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://demo.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'demo-key';
@@ -13,26 +16,26 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'demo-key';
 const EXPECTED_PROJECT_REF = 'vuanulvyqkfefmjcikfk';
 
 // Enhanced logging with actual URL values
-console.log('[Supabase] Initializing...');
-console.log('[Supabase] URL:', supabaseUrl);
-console.log('[Supabase] Expected project:', EXPECTED_PROJECT_REF);
+supabaseLogger.info('Initializing...');
+supabaseLogger.info('URL:', supabaseUrl);
+supabaseLogger.info('Expected project:', EXPECTED_PROJECT_REF);
 
 // Extract and validate project reference
 const projectRef = extractSupabaseProjectRef(supabaseUrl);
 if (projectRef) {
-  console.log('[Supabase] Detected project:', projectRef);
+  supabaseLogger.info('Detected project:', projectRef);
   validateSupabaseUrl(supabaseUrl, EXPECTED_PROJECT_REF);
 } else {
-  console.warn('⚠️ Could not extract project reference from URL:', supabaseUrl);
+  supabaseLogger.warn('Could not extract project reference from URL:', supabaseUrl);
 }
 
 // Warn about missing credentials but don't crash
 if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  console.warn('⚠️ Missing Supabase credentials! Using demo mode.');
-  console.warn('⚠️ Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Netlify environment variables');
+  supabaseLogger.warn('Missing Supabase credentials! Using demo mode.');
+  supabaseLogger.warn('Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Netlify environment variables');
 } else {
   // Show that key is set (but don't expose the actual key)
-  console.log('[Supabase] Anon key:', supabaseAnonKey.substring(0, 20) + '...' + ' ✅ Set');
+  supabaseLogger.info('Anon key:', supabaseAnonKey.substring(0, 20) + '...' + ' ✅ Set');
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -104,8 +107,8 @@ export async function signOut() {
  */
 export async function signInWithGoogle() {
   const redirectTo = `${window.location.origin}/auth/callback`;
-  console.log('[Supabase OAuth] Redirect URL:', redirectTo);
-  console.log('[Supabase OAuth] Supabase URL:', supabaseUrl);
+  supabaseLogger.debug('OAuth Redirect URL:', redirectTo);
+  supabaseLogger.debug('OAuth Supabase URL:', supabaseUrl);
   
   try {
     const result = await supabase.auth.signInWithOAuth({
@@ -119,10 +122,10 @@ export async function signInWithGoogle() {
       },
     });
     
-    console.log('[Supabase OAuth] Result:', result);
+    supabaseLogger.debug('OAuth Result:', result);
     return result;
   } catch (error) {
-    console.error('[Supabase OAuth] Exception:', error);
+    supabaseLogger.error('OAuth Exception:', error);
     throw error;
   }
 }
