@@ -151,3 +151,45 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+
+/**
+ * Extract Supabase project reference from URL
+ * @example extractSupabaseProjectRef('https://vuanulvyqkfefmjcikfk.supabase.co') => 'vuanulvyqkfefmjcikfk'
+ */
+export function extractSupabaseProjectRef(url: string): string | null {
+  const match = url.match(/https?:\/\/([^.]+)\.supabase\.(co|in)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Validate Supabase URL and log status
+ * @param url - Supabase URL to validate
+ * @param expectedRef - Expected project reference (e.g., 'vuanulvyqkfefmjcikfk')
+ * @returns true if valid, false otherwise
+ */
+export function validateSupabaseUrl(url: string, expectedRef: string): boolean {
+  const projectRef = extractSupabaseProjectRef(url);
+  
+  if (!projectRef) {
+    console.error('❌ Invalid Supabase URL format:', url);
+    return false;
+  }
+  
+  if (projectRef === expectedRef) {
+    console.log(`✅ Supabase URL valid: ${url}`);
+    console.log(`   Project: ${projectRef}`);
+    return true;
+  }
+  
+  // Check for known wrong projects
+  const wrongProjects = ['kihxqurnmyxnsyqgpdaw', 'qnookjbtudghzzizofxy', 'ubgrkqdjsnaqmvbyrykn'];
+  if (wrongProjects.includes(projectRef)) {
+    console.error(`❌ WRONG SUPABASE PROJECT! Using ${projectRef} instead of ${expectedRef}`);
+    console.error(`❌ Please update VITE_SUPABASE_URL in Netlify environment variables`);
+    return false;
+  }
+  
+  // Unknown project
+  console.warn(`⚠️ Unknown Supabase project: ${projectRef} (expected: ${expectedRef})`);
+  return false;
+}

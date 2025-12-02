@@ -12,13 +12,24 @@ window.addEventListener('unhandledrejection', (event) => {
   console.error('❌ Unhandled promise rejection:', event.reason);
 });
 
+import { extractSupabaseProjectRef } from './lib/utils';
+
 // Log that we're starting
 console.log('🚀 Starting Zyeuté app...');
 console.log('📍 Environment check:', {
-  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL ? '✅ Set' : '❌ Missing',
-  VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
+  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL 
+    ? `✅ Set (${extractSupabaseProjectRef(import.meta.env.VITE_SUPABASE_URL) || 'unknown'})` 
+    : '❌ Missing',
+  VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY 
+    ? `✅ Set (${import.meta.env.VITE_SUPABASE_ANON_KEY.substring(0, 10)}...)` 
+    : '❌ Missing',
   NODE_ENV: import.meta.env.MODE,
 });
+
+// Show actual Supabase URL if set
+if (import.meta.env.VITE_SUPABASE_URL) {
+  console.log('📍 Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+}
 
 try {
   const rootElement = document.getElementById('root');
