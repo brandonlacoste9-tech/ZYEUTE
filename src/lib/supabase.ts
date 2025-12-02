@@ -38,6 +38,8 @@ if (supabaseUrl.includes('kihxqurnmyxnsyqgpdaw')) {
 } else {
   console.warn('⚠️ Using unexpected Supabase project:', projectRef);
   console.warn('   Expected: vuanulvyqkfefmjcikfk');
+}
+
 const EXPECTED_PROJECT_REF = 'vuanulvyqkfefmjcikfk';
 
 // Enhanced logging with actual URL values
@@ -46,9 +48,9 @@ supabaseLogger.info('URL:', supabaseUrl);
 supabaseLogger.info('Expected project:', EXPECTED_PROJECT_REF);
 
 // Extract and validate project reference
-const projectRef = extractSupabaseProjectRef(supabaseUrl);
-if (projectRef) {
-  supabaseLogger.info('Detected project:', projectRef);
+const extractedProjectRef = extractSupabaseProjectRef(supabaseUrl);
+if (extractedProjectRef) {
+  supabaseLogger.info('Detected project:', extractedProjectRef);
   validateSupabaseUrl(supabaseUrl, EXPECTED_PROJECT_REF);
 } else {
   supabaseLogger.warn('Could not extract project reference from URL:', supabaseUrl);
