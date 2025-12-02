@@ -205,9 +205,23 @@ export const Profile: React.FC = () => {
               />
             </div>
             <button
-              onClick={() => {
+              onClick={async () => {
                 tap();
-                // Handle share logic
+                const profileUrl = `${window.location.origin}/profile/${user.username}`;
+                try {
+                  if (navigator.share) {
+                    await navigator.share({
+                      title: `Profil de ${user.display_name || user.username} sur Zyeuté`,
+                      text: `Regarde le profil de @${user.username} sur Zyeuté! ⚜️`,
+                      url: profileUrl,
+                    });
+                  } else {
+                    await navigator.clipboard.writeText(profileUrl);
+                    alert('Lien du profil copié! 📋');
+                  }
+                } catch (error) {
+                  console.error('Error sharing:', error);
+                }
               }}
               className="p-2 text-gold-500 hover:text-white transition"
               aria-label="Partager"
