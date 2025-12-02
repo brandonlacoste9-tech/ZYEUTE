@@ -151,3 +151,37 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+
+/**
+ * Extract Supabase project reference from URL
+ * @param url - Supabase URL
+ * @returns Project reference ID
+ * @example extractSupabaseProjectRef('https://abc123.supabase.co') => 'abc123'
+ */
+export function extractSupabaseProjectRef(url: string): string {
+  return url.split('//')[1]?.split('.')[0] || 'unknown';
+}
+
+/**
+ * Validate Supabase URL and log appropriate messages
+ * @param url - Supabase URL to validate
+ * @param expectedRef - Expected project reference (default: 'vuanulvyqkfefmjcikfk')
+ */
+export function validateSupabaseUrl(url: string, expectedRef: string = 'vuanulvyqkfefmjcikfk'): void {
+  const projectRef = extractSupabaseProjectRef(url);
+  
+  if (url.includes('kihxqurnmyxnsyqgpdaw')) {
+    console.error('❌ WRONG SUPABASE PROJECT DETECTED!');
+    console.error('   Current: kihxqurnmyxnsyqgpdaw');
+    console.error(`   Expected: ${expectedRef}`);
+    console.error(`   Action: Update VITE_SUPABASE_URL to: https://${expectedRef}.supabase.co`);
+    console.error('   Platforms: Check Netlify and Vercel environment variables');
+  } else if (projectRef === expectedRef) {
+    console.log(`✅ Using correct Supabase project: ${expectedRef}`);
+  } else if (url.includes('demo.supabase.co')) {
+    console.warn('⚠️ Using demo Supabase URL - features will be limited');
+  } else {
+    console.warn('⚠️ Using unexpected Supabase project:', projectRef);
+    console.warn(`   Expected: ${expectedRef}`);
+  }
+}

@@ -15,7 +15,7 @@ console.log('  - URL is set:', !!import.meta.env.VITE_SUPABASE_URL);
 console.log('  - Anon key is set:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
 console.log('  - Expected project ref: vuanulvyqkfefmjcikfk');
 
-// Extract and validate project reference
+// Extract and validate project reference (inline to avoid import dependencies at startup)
 const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'unknown';
 console.log('  - Detected project ref:', projectRef);
 

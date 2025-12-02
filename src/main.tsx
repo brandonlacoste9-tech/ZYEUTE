@@ -23,16 +23,22 @@ console.log('📍 Environment check:', {
 // Additional debug logging for Supabase URL
 if (import.meta.env.VITE_SUPABASE_URL) {
   const url = import.meta.env.VITE_SUPABASE_URL;
+  
+  // Import utilities dynamically to avoid circular dependency
+  const extractSupabaseProjectRef = (url: string) => url.split('//')[1]?.split('.')[0] || 'unknown';
+  
   console.log('🔍 Supabase URL Details:', {
     full_url: url,
-    project_ref: url.split('//')[1]?.split('.')[0] || 'unknown',
+    project_ref: extractSupabaseProjectRef(url),
     expected_ref: 'vuanulvyqkfefmjcikfk',
   });
   
-  if (url.includes('vuanulvyqkfefmjcikfk')) {
-    console.log('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
-  } else if (url.includes('kihxqurnmyxnsyqgpdaw')) {
+  // Validate URL (inline to avoid import issues at startup)
+  const projectRef = extractSupabaseProjectRef(url);
+  if (url.includes('kihxqurnmyxnsyqgpdaw')) {
     console.error('❌ WRONG PROJECT! Using kihxqurnmyxnsyqgpdaw instead of vuanulvyqkfefmjcikfk');
+  } else if (projectRef === 'vuanulvyqkfefmjcikfk') {
+    console.log('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
   } else if (url.includes('demo.supabase.co')) {
     console.warn('⚠️ Using demo Supabase URL');
   } else {
