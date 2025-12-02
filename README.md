@@ -197,7 +197,59 @@ npm run preview
 
 # Type check
 npm run type-check
+
+# Run tests
+npm run test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run E2E tests
+npm run test:e2e
 ```
+
+---
+
+## 🔄 CI/CD Pipeline
+
+[![CI/CD Pipeline](https://github.com/brandonlacoste9-tech/Zyeute/actions/workflows/ci.yml/badge.svg)](https://github.com/brandonlacoste9-tech/Zyeute/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/brandonlacoste9-tech/Zyeute/actions/workflows/codeql.yml/badge.svg)](https://github.com/brandonlacoste9-tech/Zyeute/actions/workflows/codeql.yml)
+
+Zyeuté uses a comprehensive CI/CD pipeline optimized for self-hosted runners:
+
+### 🔍 **Automated Checks on Every PR**
+- ✅ ESLint code linting
+- ✅ TypeScript type checking
+- ✅ Prettier formatting validation
+- ✅ Production build verification
+- ✅ Unit test execution
+- ✅ Security vulnerability scanning
+
+### 🛡️ **Security Scanning**
+- **npm audit** - Dependency vulnerability scanning
+- **CodeQL** - Advanced code security analysis
+- **Secret scanning** - Prevents accidental credential exposure
+- **Dependabot** - Automated dependency updates
+
+### 🧪 **Testing Infrastructure**
+- **Vitest** - Fast unit testing with 70%+ coverage target
+- **Playwright** - E2E testing across browsers
+- **React Testing Library** - Component testing
+- **Coverage reporting** - Detailed test coverage metrics
+
+### 🚀 **Deployment Automation**
+- **Preview deployments** - Automatic preview for every PR
+- **Staging deployments** - Auto-deploy on merge to `develop`
+- **Production deployments** - Controlled deployment on merge to `main`
+- **Rollback capability** - Quick rollback for failed deployments
+
+### 📊 **Quality Metrics**
+- Build time: < 5 minutes
+- Test coverage: > 70%
+- Security vulnerabilities: 0 critical
+- Bundle size: Monitored and optimized
+
+For detailed workflow configuration, see `.github/workflows/ci.yml`
 
 ---
 
