@@ -277,15 +277,15 @@ describe('validateSupabaseUrl', () => {
 
   it('should warn for unexpected project', () => {
     validateSupabaseUrl('https://someother.supabase.co');
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('⚠️ Using unexpected Supabase project')
-    );
+    expect(consoleWarnSpy).toHaveBeenCalled();
+    const calls = consoleWarnSpy.mock.calls.flat().join(' ');
+    expect(calls).toContain('⚠️ Using unexpected Supabase project');
   });
 
   it('should warn for invalid URL format', () => {
     validateSupabaseUrl('https://invalid-url.com');
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('⚠️ Supabase URL format is unexpected')
-    );
+    expect(consoleWarnSpy).toHaveBeenCalled();
+    const calls = consoleWarnSpy.mock.calls.flat().join(' ');
+    expect(calls).toContain('⚠️ Supabase URL format is unexpected');
   });
 });
