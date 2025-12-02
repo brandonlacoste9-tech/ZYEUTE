@@ -5,6 +5,8 @@
 
 import { supabase } from '../lib/supabase';
 import { logger } from '@/lib/logger';
+
+const subscriptionServiceLogger = logger.withContext('SubscriptionService');
 import { toast } from '../components/Toast';
 
 export interface SubscriptionTier {

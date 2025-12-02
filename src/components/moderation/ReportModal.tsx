@@ -201,8 +201,6 @@ export const ReportModal: React.FC<ReportModalProps> = ({
     }
   };
 
-  // const selectedOption = REPORT_OPTIONS.find(opt => opt.id === selectedType);
-
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm">
       <div className="w-full max-w-2xl max-h-[90vh] bg-gray-900 md:rounded-2xl overflow-hidden card-edge">

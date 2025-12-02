@@ -6,6 +6,8 @@
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
 
+const openaiServiceLogger = logger.withContext('OpenAIService');
+
 // Initialize OpenAI
 const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 const openai = apiKey ? new OpenAI({

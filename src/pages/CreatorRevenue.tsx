@@ -8,7 +8,6 @@ import { Header } from '../components/Header';
 import { BottomNav } from '../components/BottomNav';
 import { Button } from '../components/Button';
 import { supabase } from '../lib/supabase';
-import { cn} from '../lib/utils';
 import { logger } from '../lib/logger';
 import {
   getCreatorRevenue,

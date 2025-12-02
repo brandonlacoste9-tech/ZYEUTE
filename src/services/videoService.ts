@@ -3,6 +3,10 @@
  * Ti-Guy Studio - Smart video processing
  */
 
+import { logger } from '@/lib/logger';
+
+const videoServiceLogger = logger.withContext('VideoService');
+
 export interface VideoProcessResult {
   url: string;
   duration: number;

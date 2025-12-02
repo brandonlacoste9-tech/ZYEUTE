@@ -5,6 +5,8 @@
 
 import { supabase } from '../lib/supabase';
 import { logger } from '@/lib/logger';
+
+const imageServiceLogger = logger.withContext('ImageService');
 import { toast } from '../components/Toast';
 
 // OpenAI API Key

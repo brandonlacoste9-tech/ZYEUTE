@@ -44,6 +44,8 @@
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
 
+const tiGuyAgentLogger = logger.withContext('TiGuyAgent');
+
 // Initialize OpenAI client
 // NOTE: Using client-side OpenAI is for demo/development purposes
 // In production, this should be moved to a server-side endpoint to protect the API key

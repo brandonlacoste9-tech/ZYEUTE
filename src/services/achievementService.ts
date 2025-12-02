@@ -5,6 +5,8 @@
 
 import { supabase } from '../lib/supabase';
 import { logger } from '@/lib/logger';
+
+const achievementServiceLogger = logger.withContext('AchievementService');
 import { toast } from '../components/Toast';
 
 export type AchievementCategory = 'cultural' | 'regional' | 'engagement' | 'tiguy' | 'elite' | 'seasonal';

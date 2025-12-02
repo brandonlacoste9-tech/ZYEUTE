@@ -5,6 +5,8 @@
 
 import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { logger } from '@/lib/logger';
+
+const stripeServiceLogger = logger.withContext('StripeService');
 import { supabase } from '../lib/supabase';
 import { toast } from '../components/Toast';
 

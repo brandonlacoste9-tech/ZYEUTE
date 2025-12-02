@@ -5,6 +5,8 @@
 
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
+
+const moderationServiceLogger = logger.withContext('ModerationService');
 import { supabase } from '../lib/supabase';
 
 // Initialize OpenAI

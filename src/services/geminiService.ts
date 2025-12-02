@@ -6,6 +6,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '@/lib/logger';
 
+const geminiServiceLogger = logger.withContext('GeminiService');
+
 // Initialize Gemini
 const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = geminiKey ? new GoogleGenerativeAI(geminiKey) : null;
