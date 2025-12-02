@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { supabase } from '@/lib/supabase';
+import { getFeedPosts } from '@/services/api';
 import { QUEBEC_HASHTAGS, QUEBEC_REGIONS } from '@/lib/quebecFeatures';
 import { formatNumber } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -26,32 +27,35 @@ export const Explore: React.FC = () => {
   const fetchPosts = React.useCallback(async () => {
     setIsLoading(true);
     try {
-      let query = supabase
-        .from('publications')
-        .select('*, user:user_profiles!user_id(*)')
-        .eq('visibilite', 'public')  // Only show public posts
-        .is('est_masque', null)      // Not hidden
-        .is('deleted_at', null)      // Not deleted
-        .order('reactions_count', { ascending: false }); // Use reactions_count instead of fire_count
-
+      // Use centralized API function - get all posts then filter client-side
+      // (API function doesn't support region/hashtag filters yet)
+      const allPosts = await getFeedPosts(0, 50);
+      
+      // Apply client-side filters
+      let filtered = allPosts;
+      
       if (selectedRegion) {
-        query = query.eq('region', selectedRegion);
+        filtered = filtered.filter(p => p.region === selectedRegion);
       }
 
       if (selectedHashtag) {
-        // Remove # if present and search in hashtags array
         const tagToSearch = selectedHashtag.startsWith('#') ? selectedHashtag.slice(1) : selectedHashtag;
-        query = query.contains('hashtags', [tagToSearch]);
+        filtered = filtered.filter(p => 
+          p.caption?.toLowerCase().includes(`#${tagToSearch.toLowerCase()}`) ||
+          p.hashtags?.includes(tagToSearch)
+        );
       }
 
       if (searchQuery) {
-        query = query.ilike('caption', `%${searchQuery}%`);
+        filtered = filtered.filter(p => 
+          p.caption?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
       }
 
-      const { data, error } = await query.limit(50);
-
-      if (error) throw error;
-      if (data) setPosts(data);
+      // Sort by fire_count (reactions_count)
+      filtered.sort((a, b) => (b.fire_count || 0) - (a.fire_count || 0));
+      
+      setPosts(filtered);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {

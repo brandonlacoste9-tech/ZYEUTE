@@ -184,6 +184,48 @@ export async function getUserProfile(
 }
 
 /**
+ * Gets a single post by ID
+ */
+export async function getPostById(postId: string): Promise<Post | null> {
+  try {
+    // Query publications directly instead of posts view
+    const { data, error } = await supabase
+      .from('publications')
+      .select('*, user:user_profiles!user_id(*)')
+      .eq('id', postId)
+      .is('deleted_at', null)
+      .single();
+
+    if (error || !data) {
+      console.error('[getPostById] Error:', error);
+      return null;
+    }
+
+    // Map publications columns to Post type
+    return {
+      id: data.id,
+      user_id: data.user_id,
+      type: data.media_url?.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'photo',
+      media_url: data.media_url || '',
+      caption: data.content || null,
+      hashtags: null,
+      region: null,
+      city: null,
+      fire_count: data.reactions_count || 0,
+      comment_count: data.comments_count || 0,
+      created_at: data.created_at,
+      user: data.user,
+      ...data,
+      visibility: data.visibilite,
+      is_hidden: data.est_masque,
+    } as Post;
+  } catch (error) {
+    console.error('[getPostById] Exception:', error);
+    return null;
+  }
+}
+
+/**
  * Gets all posts for a specific user
  */
 export async function getUserPosts(userId: string): Promise<Post[]> {

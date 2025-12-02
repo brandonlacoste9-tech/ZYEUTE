@@ -12,6 +12,7 @@ import { VideoPlayer } from '../components/features/VideoPlayer';
 import { CommentThread } from '../components/features/CommentThread';
 import { GiftModal } from '../components/features/GiftModal';
 import { supabase } from '../lib/supabase';
+import { getPostById } from '../services/api';
 import { formatNumber, getTimeAgo } from '../lib/utils';
 import { toast } from '../components/Toast';
 import type { Post, Comment as CommentType, User } from '../types';
@@ -53,19 +54,22 @@ export const PostDetail: React.FC = () => {
 
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('publications')
-          .select(`
-            *,
-            user:user_profiles!user_id(*),
-            user_fire:fires!user_id(fire_level)
-          `)
-          .eq('id', id)
-          .is('deleted_at', null)
-          .single();
-
-        if (error) throw error;
-        if (data) setPost(data);
+        // Use centralized API function instead of direct query
+        const postData = await getPostById(id);
+        if (postData) {
+          // Fetch fire data separately if needed
+          const { data: fireData } = await supabase
+            .from('fires')
+            .select('fire_level')
+            .eq('post_id', id)
+            .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+            .single();
+          
+          setPost({
+            ...postData,
+            user_fire: fireData ? { fire_level: fireData.fire_level } : undefined,
+          });
+        }
       } catch (error) {
         console.error('Error fetching post:', error);
         navigate('/');
