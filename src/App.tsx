@@ -1,6 +1,7 @@
 /**
  * Main App Component with Routing
  * Global Styles Applied via leather-overlay
+ * Performance: Lazy loading for rarely-accessed routes
  */
 
 import React, { lazy, Suspense } from 'react';
@@ -19,6 +20,10 @@ import { ProtectedAdminRoute } from '@/components/auth/ProtectedAdminRoute';
 
 // Critical pages - loaded immediately
 import Feed from '@/pages/Feed';
+// Core Pages - Eagerly loaded (frequently accessed)
+import Feed from '@/pages/Feed';
+import Profile from '@/pages/Profile';
+import Explore from '@/pages/Explore';
 import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 import AuthCallback from '@/pages/AuthCallback';
@@ -27,6 +32,8 @@ import AuthCallback from '@/pages/AuthCallback';
 const Profile = lazy(() => import('@/pages/Profile'));
 const Upload = lazy(() => import('@/pages/Upload'));
 const Explore = lazy(() => import('@/pages/Explore'));
+// Lazy-loaded Pages - Split into separate bundles (rarely accessed)
+const Upload = lazy(() => import('@/pages/Upload'));
 const PostDetail = lazy(() => import('@/pages/PostDetail'));
 const Player = lazy(() => import('@/pages/Player'));
 const Notifications = lazy(() => import('@/pages/Notifications'));
@@ -67,13 +74,56 @@ import ProfileEditSettings from '@/pages/settings/ProfileEditSettings';
 import PrivacySettings from '@/pages/settings/PrivacySettings';
 import NotificationSettings from '@/pages/settings/NotificationSettings';
 
-// Moderation
-import Moderation from '@/pages/moderation/Moderation';
+// Admin Pages - Lazy loaded (admin only)
+const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
+const EmailCampaigns = lazy(() => import('@/pages/admin/EmailCampaigns'));
 
-// Legal Pages
-import CommunityGuidelines from '@/pages/legal/CommunityGuidelines';
-import TermsOfService from '@/pages/legal/TermsOfService';
-import PrivacyPolicy from '@/pages/legal/PrivacyPolicy';
+// Phase 2 Pages - Lazy loaded (optional features)
+const Artiste = lazy(() => import('@/pages/Artiste'));
+const Studio = lazy(() => import('@/pages/Studio'));
+const Marketplace = lazy(() => import('@/pages/Marketplace'));
+const Premium = lazy(() => import('@/pages/Premium'));
+const Challenges = lazy(() => import('@/pages/Challenges'));
+const VoiceSettingsPage = lazy(() => import('@/pages/VoiceSettingsPage'));
+const GoLive = lazy(() => import('@/pages/GoLive'));
+const WatchLive = lazy(() => import('@/pages/WatchLive'));
+const LiveDiscover = lazy(() => import('@/pages/LiveDiscover'));
+
+// Settings Pages - Lazy loaded (rarely accessed)
+const TagsSettings = lazy(() => import('@/pages/settings/TagsSettings'));
+const CommentsSettings = lazy(() => import('@/pages/settings/CommentsSettings'));
+const SharingSettings = lazy(() => import('@/pages/settings/SharingSettings'));
+const RestrictedAccountsSettings = lazy(() => import('@/pages/settings/RestrictedAccountsSettings'));
+const FavoritesSettings = lazy(() => import('@/pages/settings/FavoritesSettings'));
+const MutedAccountsSettings = lazy(() => import('@/pages/settings/MutedAccountsSettings'));
+const ContentPreferencesSettings = lazy(() => import('@/pages/settings/ContentPreferencesSettings'));
+const MediaSettings = lazy(() => import('@/pages/settings/MediaSettings'));
+const AudioSettings = lazy(() => import('@/pages/settings/AudioSettings'));
+const StorageSettings = lazy(() => import('@/pages/settings/StorageSettings'));
+const AppSettings = lazy(() => import('@/pages/settings/AppSettings'));
+const RegionSettings = lazy(() => import('@/pages/settings/RegionSettings'));
+const LanguageSettings = lazy(() => import('@/pages/settings/LanguageSettings'));
+const ProfileEditSettings = lazy(() => import('@/pages/settings/ProfileEditSettings'));
+const PrivacySettings = lazy(() => import('@/pages/settings/PrivacySettings'));
+const NotificationSettings = lazy(() => import('@/pages/settings/NotificationSettings'));
+
+// Moderation - Lazy loaded (admin only)
+const Moderation = lazy(() => import('@/pages/moderation/Moderation'));
+
+// Legal Pages - Lazy loaded (rarely accessed)
+const CommunityGuidelines = lazy(() => import('@/pages/legal/CommunityGuidelines'));
+const TermsOfService = lazy(() => import('@/pages/legal/TermsOfService'));
+const PrivacyPolicy = lazy(() => import('@/pages/legal/PrivacyPolicy'));
+
+// Loading fallback component with Quebec styling
+const LazyLoadFallback: React.FC = () => (
+  <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-gold-500/30 border-t-gold-500 rounded-full animate-spin mb-4 mx-auto shadow-[0_0_20px_rgba(255,191,0,0.2)]" />
+      <p className="text-stone-400 font-medium">Chargement...</p>
+    </div>
+  </div>
+);
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -123,6 +173,18 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+              <Routes>
+                {/* Full-screen routes (outside MainLayout) - Lazy loaded */}
+                <Route
+                  path="/video/:videoId"
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LazyLoadFallback />}>
+                        <Player />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
 
                   {/* Main App Content (inside MainLayout) */}
                   <Route
@@ -136,12 +198,14 @@ function App() {
                         <Route path="/signup" element={<Signup />} />
                         <Route path="/auth/callback" element={<AuthCallback />} />
 
-                        {/* Protected Routes */}
+                        {/* Protected Routes - with granular error boundaries */}
                         <Route
                           path="/"
                           element={
                             <ProtectedRoute>
-                              <Feed />
+                              <ErrorBoundary>
+                                <Feed />
+                              </ErrorBoundary>
                             </ProtectedRoute>
                           }
                         />
@@ -149,7 +213,9 @@ function App() {
                           path="/explore"
                           element={
                             <ProtectedRoute>
-                              <Explore />
+                              <ErrorBoundary>
+                                <Explore />
+                              </ErrorBoundary>
                             </ProtectedRoute>
                           }
                         />
@@ -157,7 +223,11 @@ function App() {
                           path="/upload"
                           element={
                             <ProtectedRoute>
-                              <Upload />
+                              <ErrorBoundary>
+                                <Suspense fallback={<LazyLoadFallback />}>
+                                  <Upload />
+                                </Suspense>
+                              </ErrorBoundary>
                             </ProtectedRoute>
                           }
                         />
@@ -165,7 +235,9 @@ function App() {
                           path="/story/create"
                           element={
                             <ProtectedRoute>
-                              <StoryCreator />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <StoryCreator />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -173,7 +245,9 @@ function App() {
                           path="/notifications"
                           element={
                             <ProtectedRoute>
-                              <Notifications />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <Notifications />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -181,7 +255,9 @@ function App() {
                           path="/profile/:slug"
                           element={
                             <ProtectedRoute>
-                              <Profile />
+                              <ErrorBoundary>
+                                <Profile />
+                              </ErrorBoundary>
                             </ProtectedRoute>
                           }
                         />
@@ -189,7 +265,11 @@ function App() {
                           path="/p/:id"
                           element={
                             <ProtectedRoute>
-                              <PostDetail />
+                              <ErrorBoundary>
+                                <Suspense fallback={<LazyLoadFallback />}>
+                                  <PostDetail />
+                                </Suspense>
+                              </ErrorBoundary>
                             </ProtectedRoute>
                           }
                         />
@@ -197,7 +277,11 @@ function App() {
                           path="/settings"
                           element={
                             <ProtectedRoute>
-                              <Settings />
+                              <ErrorBoundary>
+                                <Suspense fallback={<LazyLoadFallback />}>
+                                  <Settings />
+                                </Suspense>
+                              </ErrorBoundary>
                             </ProtectedRoute>
                           }
                         />
@@ -205,17 +289,21 @@ function App() {
                           path="/analytics"
                           element={
                             <ProtectedRoute>
-                              <Analytics />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <Analytics />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
                         
-                        {/* Phase 2 Feature Routes */}
+                        {/* Phase 2 Feature Routes - Lazy loaded */}
                         <Route
                           path="/artiste"
                           element={
                             <ProtectedRoute>
-                              <Artiste />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <Artiste />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -223,7 +311,9 @@ function App() {
                           path="/studio"
                           element={
                             <ProtectedRoute>
-                              <Studio />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <Studio />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -231,7 +321,9 @@ function App() {
                           path="/marketplace"
                           element={
                             <ProtectedRoute>
-                              <Marketplace />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <Marketplace />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -239,7 +331,9 @@ function App() {
                           path="/premium"
                           element={
                             <ProtectedRoute>
-                              <Premium />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <Premium />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -247,7 +341,9 @@ function App() {
                           path="/challenges"
                           element={
                             <ProtectedRoute>
-                              <Challenges />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <Challenges />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />

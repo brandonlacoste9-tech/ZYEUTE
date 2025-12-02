@@ -3,12 +3,15 @@
  */
 
 import React, { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { supabase } from '../../lib/supabase';
 import { toast } from '../Toast';
 import { moderateContent } from '../../services/moderationService';
 import { getTimeAgo, formatNumber } from '../../lib/utils';
+import { validateComment, sanitizeText } from '../../lib/validation';
+import { checkRateLimit, RATE_LIMITS } from '../../lib/rateLimiter';
 import type { Comment as CommentType, User } from '../../types';
 import { logger } from '../../lib/logger';
 
@@ -86,11 +89,26 @@ const CommentThreadComponent: React.FC<CommentThreadProps> = ({
   const handleSubmitReply = async () => {
     if (!replyText.trim() || !currentUser) return;
 
+    // Rate limiting - prevent spam
+    if (!checkRateLimit(`comment-${currentUser.id}`, RATE_LIMITS.COMMENT_CREATE)) {
+      return;
+    }
+
+    // Validate input before processing
+    const validation = validateComment(replyText);
+    if (!validation.valid) {
+      toast.error(validation.error || 'Commentaire invalide');
+      return;
+    }
+
+    // Sanitize input
+    const sanitizedText = sanitizeText(replyText.trim());
+
     setIsSubmitting(true);
     try {
       // AI Moderation Check
       const moderationResult = await moderateContent(
-        { text: replyText.trim() },
+        { text: sanitizedText },
         'comment',
         currentUser.id
       );
@@ -112,7 +130,7 @@ const CommentThreadComponent: React.FC<CommentThreadProps> = ({
         .insert({
           post_id: postId,
           user_id: currentUser.id,
-          text: replyText.trim(),
+          text: sanitizedText,
           parent_id: comment.id,
         } as any)
         .select('*, user:user_profiles!user_id(*)')
@@ -123,7 +141,7 @@ const CommentThreadComponent: React.FC<CommentThreadProps> = ({
       if (data) {
         // Log moderation with content ID
         await moderateContent(
-          { text: replyText.trim() },
+          { text: sanitizedText },
           'comment',
           currentUser.id,
           data.id
@@ -203,8 +221,16 @@ const CommentThreadComponent: React.FC<CommentThreadProps> = ({
           </span>
         </div>
 
-        {/* Comment text */}
-        <p className="text-white text-sm mb-2 break-words">{comment.content || comment.text}</p>
+        {/* Comment text - sanitized for XSS protection */}
+        <p 
+          className="text-white text-sm mb-2 break-words"
+          dangerouslySetInnerHTML={{ 
+            __html: DOMPurify.sanitize(comment.content || comment.text || '', {
+              ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'br'],
+              ALLOWED_ATTR: []
+            })
+          }}
+        />
 
         {/* Actions */}
         <div className="flex items-center gap-4 text-xs">

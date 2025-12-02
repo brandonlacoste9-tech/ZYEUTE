@@ -1,0 +1,53 @@
+name: Deploy Colony Finance Bee
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infrastructure/colony/bees/**'
+      - '.github/workflows/deploy-finance-bee.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: production
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip3 install -r infrastructure/colony/bees/requirements.txt
+
+      - name: Deploy Finance Bee
+        env:
+          COLONIES_SERVER_HOST: ${{ secrets.COLONIES_SERVER_HOST }}
+          COLONIES_EXECUTOR_PRVKEY: ${{ secrets.COLONIES_EXECUTOR_PRVKEY }}
+          COLONIES_COLONY_NAME: ${{ secrets.COLONIES_COLONY_NAME }}
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        run: |
+          # Make deployment script executable
+          chmod +x infrastructure/colony/scripts/deploy-bee.sh
+          
+          # Run deployment script
+          sudo -E infrastructure/colony/scripts/deploy-bee.sh
+
+      - name: Verify Service Status
+        run: |
+          sleep 5
+          sudo systemctl status zyeute-finance-bee --no-pager
+
+      - name: Check Logs
+        run: |
+          echo "Recent logs:"
+          sudo journalctl -u zyeute-finance-bee -n 50 --no-pager
+

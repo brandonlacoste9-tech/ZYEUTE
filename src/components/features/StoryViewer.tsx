@@ -2,7 +2,7 @@
  * StoryViewer - View stories with swipe navigation (Instagram/TikTok style)
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar } from '../Avatar';
 import { VideoPlayer } from './VideoPlayer';
@@ -20,7 +20,7 @@ interface StoryViewerProps {
   onClose: () => void;
 }
 
-export const StoryViewer: React.FC<StoryViewerProps> = ({
+const StoryViewerComponent: React.FC<StoryViewerProps> = ({
   stories,
   initialIndex = 0,
   onClose,
@@ -329,6 +329,18 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
     </div>
   );
 };
+
+// Memoize StoryViewer to prevent unnecessary re-renders
+// Performance optimization: Only re-render when stories array or callbacks change
+export const StoryViewer = memo(StoryViewerComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.stories.length === nextProps.stories.length &&
+    prevProps.initialIndex === nextProps.initialIndex &&
+    prevProps.onClose === nextProps.onClose
+  );
+});
+
+StoryViewer.displayName = 'StoryViewer';
 
 export default StoryViewer;
 

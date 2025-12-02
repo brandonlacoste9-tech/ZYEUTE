@@ -3,7 +3,7 @@
  * Leather post cards with gold accents and stitching
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -164,6 +164,12 @@ export const Feed: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
+  // Memoize horizontal posts slice (expensive array operation)
+  // Performance optimization: Only recompute when posts array changes
+  const horizontalPosts = useMemo(() => {
+    return posts.slice(0, 10);
+  }, [posts]);
+
   return (
     <div className="min-h-screen bg-black leather-overlay pb-20">
       {/* Premium Header with leather texture */}
@@ -215,7 +221,7 @@ export const Feed: React.FC = () => {
         <>
           <SectionHeader title="Videos" showArrow linkTo="/explore" />
           <div className="flex overflow-x-auto gap-4 px-4 pb-6 scrollbar-hide">
-            {posts.slice(0, 10).map((post, index) => (
+            {horizontalPosts.map((post, index) => (
               <div
                 key={`h-${post.id}`}
                 className="animate-fade-in-up flex-shrink-0"

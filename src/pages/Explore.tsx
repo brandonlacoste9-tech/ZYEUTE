@@ -3,7 +3,7 @@
  * Discover trending content with leather grid and gold filters
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -26,6 +26,12 @@ export const Explore: React.FC = () => {
   const [selectedRegion, setSelectedRegion] = React.useState('');
   const [selectedHashtag, setSelectedHashtag] = React.useState('');
   const { tap } = useHaptics();
+
+  // Memoize trending hashtags slice (constant array operation)
+  // Performance optimization: Only compute once since QUEBEC_HASHTAGS doesn't change
+  const trendingHashtags = useMemo(() => {
+    return QUEBEC_HASHTAGS.slice(0, 10);
+  }, []);
 
   // Fetch posts
   const fetchPosts = React.useCallback(async () => {
@@ -114,7 +120,7 @@ export const Explore: React.FC = () => {
             <span>Hashtags populaires</span>
           </h2>
           <div className="flex gap-2 overflow-x-auto gold-scrollbar pb-2">
-            {QUEBEC_HASHTAGS.slice(0, 10).map((tag) => {
+            {trendingHashtags.map((tag) => {
               const tagWithoutHash = tag.startsWith('#') ? tag.slice(1) : tag;
               const isSelected = selectedHashtag === tag || selectedHashtag === tagWithoutHash;
               

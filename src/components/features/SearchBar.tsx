@@ -2,10 +2,12 @@
  * SearchBar - Enhanced search with suggestions and recent searches
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Avatar } from '../Avatar';
+import { validateSearchQuery, sanitizeText } from '../../lib/validation';
+import { toast } from '../Toast';
 import type { Post, User } from '../../types';
 import { logger } from '../../lib/logger';
 
@@ -23,7 +25,7 @@ interface SearchResult {
   data: User | string | Post;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({
+const SearchBarComponent: React.FC<SearchBarProps> = ({
   onSearchChange,
   placeholder = 'Recherche des posts, users, hashtags...',
   autoFocus = false,
@@ -53,6 +55,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         return;
       }
 
+      // Validate search query
+      const validation = validateSearchQuery(query);
+      if (!validation.valid) {
+        toast.error(validation.error || 'Requête de recherche invalide');
+        setResults([]);
+        return;
+      }
+
+      // Sanitize query
+      const sanitizedQuery = sanitizeText(query);
+
       setIsLoading(true);
       try {
         const searchResults: SearchResult[] = [];
@@ -61,7 +74,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         const { data: users } = await supabase
           .from('user_profiles')
           .select('*')
-          .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
+          .or(`username.ilike.%${sanitizedQuery}%,display_name.ilike.%${sanitizedQuery}%`)
           .limit(5);
 
         if (users) {
@@ -75,7 +88,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         const { data: posts } = await supabase
           .from('posts')
           .select('*, user:users(*)')
-          .ilike('caption', `%${query}%`)
+          .ilike('caption', `%${sanitizedQuery}%`)
           .limit(5);
 
         if (posts) {
@@ -86,10 +99,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         }
 
         // If query starts with #, add hashtag suggestion
-        if (query.startsWith('#')) {
+        if (sanitizedQuery.startsWith('#')) {
           searchResults.unshift({
             type: 'hashtag',
-            data: query,
+            data: sanitizedQuery,
           });
         }
 
@@ -316,6 +329,18 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     </div>
   );
 };
+
+// Memoize SearchBar to prevent unnecessary re-renders
+// Performance optimization: Only re-render when props change
+export const SearchBar = memo(SearchBarComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.onSearchChange === nextProps.onSearchChange &&
+    prevProps.placeholder === nextProps.placeholder &&
+    prevProps.autoFocus === nextProps.autoFocus
+  );
+});
+
+SearchBar.displayName = 'SearchBar';
 
 export default SearchBar;
 
