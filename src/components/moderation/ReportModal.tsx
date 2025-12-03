@@ -9,6 +9,10 @@ import { supabase } from '../../lib/supabase';
 import { toast } from '../Toast';
 import { cn } from '../../lib/utils';
 import type { User } from '../../types';
+import { logger } from '../../lib/logger';
+
+const reportModalLogger = logger.withContext('ReportModal');
+
 
 type ReportType =
   | 'bullying'
@@ -166,7 +170,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
         });
 
         if (blockError && !blockError.message.includes('duplicate')) {
-          console.error('Error blocking user:', blockError);
+          reportModalLogger.error('Error blocking user:', blockError);
         }
       }
 
@@ -185,7 +189,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
       setBlockUser(false);
       onClose();
     } catch (error: any) {
-      console.error('Error submitting report:', error);
+      reportModalLogger.error('Error submitting report:', error);
       
       if (error.message?.includes('not found')) {
         toast.error('La table "content_reports" n\'existe pas. Exécute le script SQL!');
@@ -196,8 +200,6 @@ export const ReportModal: React.FC<ReportModalProps> = ({
       setIsSubmitting(false);
     }
   };
-
-  const selectedOption = REPORT_OPTIONS.find(opt => opt.id === selectedType);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm">

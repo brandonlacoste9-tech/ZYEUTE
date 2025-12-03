@@ -5,7 +5,11 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { toast } from '../components/Toast';
-import type { Notification, User } from '../types';
+import type { Notification} from '../types';
+import { logger } from '../lib/logger';
+
+const notificationContextLogger = logger.withContext('NotificationContext');
+
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -32,7 +36,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     fetchUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setCurrentUserId(session?.user?.id || null);
     });
 
@@ -63,7 +67,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setUnreadCount(unread);
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      notificationContextLogger.error('Error fetching notifications:', error);
     }
   }, [currentUserId]);
 
@@ -139,7 +143,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      notificationContextLogger.error('Error marking notification as read:', error);
     }
   };
 
@@ -164,7 +168,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       toast.success('Toutes les notifications marquées comme lues!');
     } catch (error) {
-      console.error('Error marking all as read:', error);
+      notificationContextLogger.error('Error marking all as read:', error);
       toast.error('Erreur lors du marquage');
     }
   };
@@ -202,7 +206,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       oscillator.start();
       setTimeout(() => oscillator.stop(), 100);
     } catch (error) {
-      console.warn('Could not play notification sound:', error);
+      notificationContextLogger.warn('Could not play notification sound:', error);
     }
   };
 

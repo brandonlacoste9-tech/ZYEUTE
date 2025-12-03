@@ -1,0 +1,44 @@
+[Unit]
+Description=Zyeute Colony Finance Bee
+Documentation=https://github.com/brandonlacoste9-tech/Zyeute
+After=network.target
+
+[Service]
+Type=simple
+User=colony_user
+WorkingDirectory=/opt/zyeute/infrastructure/colony/bees
+ExecStart=/usr/bin/python3 finance_bee.py
+Restart=always
+RestartSec=5
+
+# Environment variables (injected by deployment script)
+Environment="COLONIES_SERVER_HOST=${COLONIES_SERVER_HOST}"
+Environment="COLONIES_EXECUTOR_PRVKEY=${COLONIES_EXECUTOR_PRVKEY}"
+Environment="COLONIES_COLONY_NAME=${COLONIES_COLONY_NAME}"
+Environment="SUPABASE_URL=${SUPABASE_URL}"
+Environment="SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}"
+Environment="STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}"
+Environment="EXECUTOR_NAME=zyeute-finance-bee-01"
+Environment="EXECUTOR_TYPE=finance-worker"
+Environment="POLL_TIMEOUT=10"
+
+# Resource limits
+CPUShares=512
+MemoryLimit=512M
+IOWeight=100
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/zyeute/infrastructure/colony/bees/logs
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=zyeute-finance-bee
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,430 +1,296 @@
-# 🚀 GitHub Issue: CI/CD Pipeline & Automated Testing
-
-## Issue #5: Set up comprehensive CI/CD pipeline with automated testing
+# GitHub Issue #5: CI/CD Pipeline
 
 **Title:** Set up comprehensive CI/CD pipeline with automated testing and quality checks
 
 **Priority:** High  
 **Labels:** `ci/cd`, `testing`, `automation`, `enhancement`
 
-**Description:**
+---
 
-Set up a comprehensive CI/CD pipeline using GitHub Actions that runs on self-hosted runners. This pipeline should include automated testing, code quality checks, security scanning, and deployment automation.
+## Description
 
-**Current State:**
-- Self-hosted runner available
-- Basic build process exists (Netlify)
-- No automated testing
-- No automated code quality checks
-- No automated security scanning
-- Manual deployment process
+Set up a comprehensive CI/CD pipeline using GitHub Actions optimized for self-hosted runners. The pipeline includes automated testing, code quality checks, security scanning, and deployment automation.
 
-**Goals:**
-1. Automate testing (unit tests, integration tests, E2E tests)
-2. Automate code quality checks (linting, type checking, formatting)
-3. Automate security scanning (dependencies, secrets, vulnerabilities)
-4. Automate performance monitoring (bundle size, Lighthouse scores)
-5. Automate deployment (staging/production with approvals)
+## Why Self-Hosted Runners?
+
+- ⚡ **Faster builds** - No queue time, dedicated resources
+- 🐳 **Docker support** - Consistent test environments
+- 🎛️ **Full control** - Customize environment as needed
+- 💰 **Cost-effective** - No per-minute charges for frequent builds
+- ⏱️ **No time limits** - Run longer tests without restrictions
 
 ---
 
 ## Tasks
 
-### 1. **Set up GitHub Actions Workflow** (High Priority)
+### 1. ✅ GitHub Actions Workflow (High Priority)
+- [x] Create `.github/workflows/ci.yml`
+- [x] Run linting, type checking, tests on every PR
+- [x] Build and deploy on merge to main
+- [x] Use self-hosted runner for faster builds
+- [x] Add concurrency control to cancel in-progress runs
 
-Create `.github/workflows/ci.yml` with:
+### 2. ✅ Automated Testing (High Priority)
+- [x] Set up Vitest for unit tests
+- [x] Set up Playwright for E2E tests
+- [x] Configure test coverage (target: 70%+)
+- [x] Create example test files
+- [ ] Write tests for critical user journeys:
+  - [ ] Signup flow
+  - [ ] Post creation
+  - [ ] Admin access
+  - [ ] Payment flow
 
-**On Push/PR:**
-- Run linting (ESLint)
-- Run type checking (TypeScript)
-- Run unit tests
-- Run integration tests
-- Check code formatting (Prettier)
-- Check bundle size (fail if exceeds threshold)
+### 3. ✅ Code Quality Checks (Medium Priority)
+- [x] ESLint on every PR
+- [x] TypeScript strict mode checking
+- [x] Prettier formatting checks
+- [x] Bundle size monitoring
+- [x] Integration test configuration
 
-**On Merge to Main:**
-- Run all above checks
-- Run E2E tests
-- Build production bundle
-- Run security scanning
-- Deploy to staging (auto)
-- Deploy to production (with approval)
+### 4. ✅ Security Scanning (High Priority)
+- [x] `npm audit` for dependencies
+- [x] Secret scanning (TruffleHog)
+- [x] CodeQL for vulnerability scanning
+- [x] Dependabot for automated updates
 
-**Example Workflow:**
-```yaml
-name: CI/CD Pipeline
+### 5. ✅ Performance Monitoring (Medium Priority)
+- [x] Lighthouse CI on deployments
+- [x] Bundle size tracking
+- [x] Performance score thresholds (90+)
 
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
-
-jobs:
-  lint-and-type-check:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20.19.0'
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run type-check
-      - run: npm run format:check
-
-  test:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20.19.0'
-      - run: npm ci
-      - run: npm run test
-      - run: npm run test:coverage
-      - uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/lcov.info
-
-  build:
-    runs-on: self-hosted
-    needs: [lint-and-type-check, test]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20.19.0'
-      - run: npm ci
-      - run: npm run build
-      - name: Check bundle size
-        run: |
-          SIZE=$(du -sk dist | cut -f1)
-          if [ $SIZE -gt 500 ]; then
-            echo "Bundle size exceeds 500KB: ${SIZE}KB"
-            exit 1
-          fi
-
-  security-scan:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20.19.0'
-      - run: npm ci
-      - run: npm audit --audit-level=moderate
-      - uses: github/super-linter@v4
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy-staging:
-    runs-on: self-hosted
-    needs: [build, security-scan]
-    if: github.ref == 'refs/heads/develop'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to Netlify Staging
-        uses: netlify/actions/cli@master
-        with:
-          args: deploy --dir=dist --prod=false
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID_STAGING }}
-
-  deploy-production:
-    runs-on: self-hosted
-    needs: [build, security-scan]
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: production
-      url: https://zyeute.netlify.app
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to Netlify Production
-        uses: netlify/actions/cli@master
-        with:
-          args: deploy --dir=dist --prod
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-```
-
----
-
-### 2. **Set up Automated Testing** (High Priority)
-
-**Unit Tests:**
-- Set up Vitest or Jest
-- Write tests for critical functions:
-  - `src/lib/utils.ts` (formatNumber, getTimeAgo, extractSupabaseProjectRef)
-  - `src/lib/admin.ts` (isAdmin)
-  - `src/services/api.ts` (API functions)
-- Target: 70%+ code coverage
-
-**Integration Tests:**
-- Test API endpoints
-- Test Supabase queries
-- Test authentication flows
-- Use Playwright or Cypress
-
-**E2E Tests:**
-- Test critical user journeys:
-  - Signup → Login → Create Post → Comment
-  - Admin access control
-  - Premium subscription flow
-- Use Playwright (already available)
-
-**Example Test Setup:**
-```typescript
-// vitest.config.ts
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  test: {
-    environment: 'jsdom',
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'dist/'],
-    },
-  },
-});
-```
-
----
-
-### 3. **Set up Code Quality Checks** (Medium Priority)
-
-**Linting:**
-- ESLint configuration
-- Run on every PR
-- Fail PR if linting errors
-
-**Type Checking:**
-- TypeScript strict mode
-- Run on every PR
-- Fail PR if type errors
-
-**Formatting:**
-- Prettier configuration
-- Run on every PR
-- Auto-fix on commit (pre-commit hook)
-
-**Bundle Size Monitoring:**
-- Track bundle size over time
-- Fail if bundle exceeds threshold
-- Generate bundle analysis report
-
----
-
-### 4. **Set up Security Scanning** (High Priority)
-
-**Dependency Scanning:**
-- `npm audit` on every PR
-- Fail if critical vulnerabilities found
-- Use Dependabot for automated updates
-
-**Secret Scanning:**
-- Scan for exposed secrets (API keys, tokens)
-- Use GitHub's secret scanning
-- Fail if secrets found
-
-**Code Security:**
-- Use CodeQL or similar
-- Scan for common vulnerabilities
-- Review security findings
-
-**Example Dependabot Config:**
-```yaml
-# .github/dependabot.yml
-version: 2
-updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-```
-
----
-
-### 5. **Set up Performance Monitoring** (Medium Priority)
-
-**Bundle Size Tracking:**
-- Track bundle size over time
-- Generate reports
-- Alert if size increases significantly
-
-**Lighthouse CI:**
-- Run Lighthouse on every deployment
-- Track performance scores
-- Fail if score drops below threshold
-
-**Example Lighthouse CI:**
-```yaml
-# .github/workflows/lighthouse.yml
-name: Lighthouse CI
-
-on:
-  deployment:
-
-jobs:
-  lighthouse:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - uses: treosh/lighthouse-ci-action@v9
-        with:
-          urls: |
-            https://zyeute.netlify.app
-            https://zyeute.netlify.app/feed
-          uploadArtifacts: true
-          temporaryPublicStorage: true
-```
-
----
-
-### 6. **Set up Deployment Automation** (High Priority)
-
-**Staging Deployment:**
-- Auto-deploy on merge to `develop` branch
-- Run smoke tests after deployment
-- Notify team on Slack/Discord
-
-**Production Deployment:**
-- Require approval before deployment
-- Deploy on merge to `main` branch
-- Run full test suite before deployment
-- Rollback capability
-
-**Deployment Notifications:**
-- Slack/Discord notifications
-- Email notifications for production deployments
-- Deployment status badges
+### 6. ✅ Deployment Automation (High Priority)
+- [x] Auto-deploy staging on `develop` branch
+- [x] Production deployment with approval on `main`
+- [x] Deployment notifications
+- [x] Preview deployments for PRs
+- [ ] Rollback capability (manual for now)
 
 ---
 
 ## Acceptance Criteria
 
-### Phase 1: Basic CI/CD (Week 1)
-- [ ] GitHub Actions workflow created
-- [ ] Linting runs on every PR
-- [ ] Type checking runs on every PR
-- [ ] Build runs on every PR
-- [ ] Basic unit tests set up (at least 5 tests)
+### Phase 1: Basic CI/CD ✅
+- [x] GitHub Actions workflow created
+- [x] Linting runs on every PR
+- [x] Type checking runs on every PR
+- [x] Build runs on every PR
+- [x] Basic unit tests set up
 
-### Phase 2: Testing (Week 2)
-- [ ] Unit tests for critical functions (70%+ coverage)
-- [ ] Integration tests for API endpoints
-- [ ] E2E tests for critical user journeys
-- [ ] Test coverage reporting
+### Phase 2: Testing ✅ (Infrastructure Ready)
+- [x] Unit tests (70%+ coverage threshold)
+- [x] Integration tests configuration
+- [x] E2E tests for critical journeys (examples provided)
+- [x] Test coverage reporting
+- [ ] **TODO:** Write actual test implementations
 
-### Phase 3: Security & Quality (Week 3)
-- [ ] Security scanning automated
-- [ ] Dependency scanning automated
-- [ ] Code quality checks automated
-- [ ] Bundle size monitoring
+### Phase 3: Security & Quality ✅
+- [x] Security scanning automated
+- [x] Dependency scanning automated
+- [x] Code quality checks automated
+- [x] Bundle size monitoring
+- [x] Dependabot configured
 
-### Phase 4: Deployment Automation (Week 4)
-- [ ] Staging auto-deployment working
-- [ ] Production deployment with approval
-- [ ] Deployment notifications
-- [ ] Rollback capability
-
----
-
-## Technical Requirements
-
-**Self-Hosted Runner:**
-- Node.js 20.19.0 installed
-- Docker available (for containerized tests)
-- Sufficient disk space (for builds and artifacts)
-- Network access to Netlify API
-
-**GitHub Secrets Needed:**
-- `NETLIFY_AUTH_TOKEN` - Netlify authentication token
-- `NETLIFY_SITE_ID` - Production site ID
-- `NETLIFY_SITE_ID_STAGING` - Staging site ID
-- `SUPABASE_URL` - For integration tests
-- `SUPABASE_ANON_KEY` - For integration tests
-- `STRIPE_SECRET_KEY` - For payment tests (test mode)
-
-**Dependencies to Add:**
-```json
-{
-  "devDependencies": {
-    "vitest": "^1.0.0",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/jest-dom": "^6.0.0",
-    "@playwright/test": "^1.40.0",
-    "eslint": "^8.57.0",
-    "prettier": "^3.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0"
-  }
-}
-```
+### Phase 4: Deployment ✅
+- [x] Staging auto-deployment
+- [x] Production deployment with approval
+- [x] Deployment notifications
+- [x] Preview deployments for PRs
+- [ ] Rollback capability (can be added later)
 
 ---
 
 ## Success Metrics
 
-**CI/CD Metrics:**
-- Build time: < 5 minutes
-- Test execution time: < 3 minutes
-- Deployment time: < 2 minutes
-- Pipeline success rate: > 95%
-
-**Quality Metrics:**
-- Code coverage: > 70%
-- Linting errors: 0
-- Type errors: 0
-- Security vulnerabilities: 0 critical
-
-**Performance Metrics:**
-- Bundle size: < 500KB (gzipped)
-- Lighthouse Performance: > 90
-- Lighthouse Accessibility: > 90
-- Lighthouse Best Practices: > 90
+| Metric | Target | Status |
+|--------|--------|--------|
+| Build time | < 5 minutes | ⏱️ To be measured |
+| Test coverage | > 70% | 📊 Configured |
+| Security vulnerabilities | 0 critical | 🛡️ Scanning enabled |
+| Bundle size | < 500KB (gzipped) | 📦 Monitoring enabled |
+| Lighthouse Performance | > 90 | ⚡ CI configured |
 
 ---
 
-## Documentation
+## Workflow Overview
 
-**Create:**
-- `.github/workflows/ci.yml` - Main CI/CD workflow
-- `.github/workflows/lighthouse.yml` - Performance monitoring
-- `.github/dependabot.yml` - Dependency updates
-- `vitest.config.ts` - Test configuration
-- `playwright.config.ts` - E2E test configuration
-- `CONTRIBUTING.md` - Contribution guidelines (include testing instructions)
+The CI/CD pipeline consists of 10 jobs:
+
+1. **🔍 Lint & Format Check** - ESLint, Prettier, TypeScript
+2. **🧪 Unit Tests** - Vitest with coverage reporting
+3. **🔗 Integration Tests** - API and service tests
+4. **🎭 E2E Tests** - Playwright browser tests
+5. **🛡️ Security Scan** - npm audit, CodeQL, secret scanning
+6. **🏗️ Build & Analyze** - Build + bundle size analysis
+7. **⚡ Lighthouse CI** - Performance monitoring
+8. **🚀 Deploy Staging** - Auto-deploy on `develop`
+9. **🚀 Deploy Production** - Deploy on `main` (with approval)
+10. **🔍 Deploy Preview** - Preview deployments for PRs
+
+---
+
+## Required GitHub Secrets
+
+Add these secrets to your GitHub repository:
+
+### Deployment
+- `NETLIFY_AUTH_TOKEN` - Netlify personal access token
+- `NETLIFY_SITE_ID` - Production site ID
+- `NETLIFY_SITE_ID_STAGING` - Staging site ID
+
+### Testing (Optional)
+- `VITE_SUPABASE_URL_TEST` - Test Supabase project URL
+- `VITE_SUPABASE_ANON_KEY_TEST` - Test Supabase anon key
+
+### Security (Optional)
+- `GEMINI_API_KEY` - For SecurityBee audit (if using)
+
+---
+
+## Setup Instructions
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+This will install:
+- Vitest and testing utilities
+- Playwright for E2E tests
+- Lighthouse CI
+- Prettier for formatting
+
+### 2. Run Tests Locally
+
+```bash
+# Unit tests
+npm run test
+
+# Unit tests with coverage
+npm run test:coverage
+
+# Integration tests
+npm run test:integration
+
+# E2E tests
+npm run test:e2e
+
+# All tests
+npm run test:all
+```
+
+### 3. Check Code Quality
+
+```bash
+# Lint
+npm run lint
+
+# Format check
+npm run format:check
+
+# Type check
+npm run type-check
+```
+
+### 4. Configure Self-Hosted Runner
+
+1. Go to repository Settings → Actions → Runners
+2. Click "New self-hosted runner"
+3. Follow the setup instructions for your OS
+4. Label the runner (e.g., "self-hosted")
+5. Update workflow to use `runs-on: self-hosted`
+
+### 5. Set Up GitHub Secrets
+
+1. Go to repository Settings → Secrets and variables → Actions
+2. Add required secrets (see list above)
+
+### 6. Enable Environments (Optional)
+
+For production deployment approval:
+1. Go to repository Settings → Environments
+2. Create "production" environment
+3. Add required reviewers
+4. Configure deployment protection rules
+
+---
+
+## File Structure
+
+```
+.github/
+├── workflows/
+│   └── ci.yml              # Main CI/CD workflow
+└── dependabot.yml          # Automated dependency updates
+
+e2e/
+├── example.spec.ts         # Example E2E tests
+└── auth.spec.ts            # Authentication E2E tests
+
+src/
+├── test/
+│   ├── setup.ts            # Vitest setup
+│   ├── setup.integration.ts # Integration test setup
+│   └── utils.tsx           # Test utilities
+└── components/
+    └── Button.test.tsx     # Example unit test
+
+vitest.config.ts            # Vitest configuration
+vitest.config.integration.ts # Integration test config
+playwright.config.ts        # Playwright configuration
+.lighthouserc.js            # Lighthouse CI config
+```
+
+---
+
+## Next Steps
+
+1. **Write Tests** - Implement actual test cases for:
+   - Components (Button, Avatar, Header, etc.)
+   - Pages (Feed, Profile, Upload, etc.)
+   - Services (Supabase, OpenAI, Stripe)
+   - Critical user flows (signup, post creation, payments)
+
+2. **Set Up Test Data** - Create test fixtures and mock data
+
+3. **Configure Test Environment** - Set up test Supabase project
+
+4. **Monitor Coverage** - Aim for 70%+ coverage on critical paths
+
+5. **Optimize Build Times** - Cache dependencies, parallelize jobs
 
 ---
 
 ## Timeline
 
-**Week 1:** Basic CI/CD setup  
-**Week 2:** Testing infrastructure  
-**Week 3:** Security & quality checks  
-**Week 4:** Deployment automation  
+**Estimated:** 4 weeks (20-30 hours)
 
-**Total Estimated Time:** 20-30 hours
+- Week 1: Infrastructure setup ✅
+- Week 2: Write unit tests
+- Week 3: Write integration & E2E tests
+- Week 4: Optimize, document, and refine
+
+---
+
+## Resources
+
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [Vitest Documentation](https://vitest.dev)
+- [Playwright Documentation](https://playwright.dev)
+- [Lighthouse CI Documentation](https://github.com/GoogleChrome/lighthouse-ci)
+- [Self-Hosted Runners Guide](https://docs.github.com/en/actions/hosting-your-own-runners)
 
 ---
 
 ## Notes
 
-- Leverage self-hosted runner for faster builds (no queue time)
-- Use Docker for consistent test environments
-- Set up monitoring/alerting for pipeline failures
-- Document all workflows for team members
-- Consider adding performance budgets
+- All jobs run on self-hosted runners for faster execution
+- Tests are configured but need actual implementations
+- Coverage threshold is set to 70% (configurable in `vitest.config.ts`)
+- Bundle size threshold is 500KB gzipped (configurable in workflow)
+- Lighthouse performance threshold is 90 (configurable in `.lighthouserc.js`)
 
 ---
 
-**Created:** After delegation strategy  
-**Status:** Ready for GitHub Actions/self-hosted runner  
-**Priority:** High (enables faster iteration and quality assurance)
-
+**Status:** ✅ Infrastructure Complete - Ready for Test Implementation

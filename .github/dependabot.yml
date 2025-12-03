@@ -1,5 +1,6 @@
 # Dependabot Configuration
 # Automated dependency updates for npm packages and GitHub Actions
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
 updates:
@@ -12,6 +13,16 @@ updates:
       time: "09:00"
     # Limit number of open PRs
     open-pull-requests-limit: 10
+    # Auto-merge patch and minor updates
+    reviewers:
+      - "brandonlacoste9-tech"
+    labels:
+      - "dependencies"
+      - "automated"
+    # Commit message prefix
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
     # Group updates by type
     groups:
       production-dependencies:
@@ -24,16 +35,6 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    # Auto-merge patch and minor updates
-    reviewers:
-      - "brandonlacoste9-tech"
-    labels:
-      - "dependencies"
-      - "automated"
-    # Commit message prefix
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
     # Ignore major version updates (review manually)
     ignore:
       - dependency-name: "*"

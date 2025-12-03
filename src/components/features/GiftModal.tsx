@@ -10,6 +10,10 @@ import { supabase } from '../../lib/supabase';
 import { toast } from '../Toast';
 import { cn } from '../../lib/utils';
 import type { User } from '../../types';
+import { logger } from '../../lib/logger';
+
+const giftModalLogger = logger.withContext('GiftModal');
+
 
 interface Gift {
   id: string;
@@ -108,7 +112,7 @@ export const GiftModal: React.FC<GiftModalProps> = ({
       toast.success(`${selectedGift.emoji} Cadeau envoyé! ${selectedGift.name}`);
       onClose();
     } catch (error: any) {
-      console.error('Error sending gift:', error);
+      giftModalLogger.error('Error sending gift:', error);
       
       if (error.message?.includes('not found')) {
         toast.error('La table "gifts" n\'existe pas encore. Crée-la dans Supabase!');

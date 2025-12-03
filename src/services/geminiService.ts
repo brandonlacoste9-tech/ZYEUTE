@@ -4,6 +4,9 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { logger } from '@/lib/logger';
+
+const geminiServiceLogger = logger.withContext('GeminiService');
 
 // Initialize Gemini
 const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -14,7 +17,7 @@ const genAI = geminiKey ? new GoogleGenerativeAI(geminiKey) : null;
  */
 export async function generateCaption(topic: string, tone: string = 'fun'): Promise<string> {
   if (!genAI) {
-    console.warn('⚠️ No Gemini API Key found. Using mock response.');
+    geminiServiceLogger.warn('⚠️ No Gemini API Key found. Using mock response.');
     return "Wow! C'est vraiment malade! 🔥 #Quebec #Fun";
   }
 
@@ -25,7 +28,7 @@ export async function generateCaption(topic: string, tone: string = 'fun'): Prom
     const result = await model.generateContent(prompt);
     return result.response.text();
   } catch (error) {
-    console.error('Caption generation error:', error);
+    geminiServiceLogger.error('Caption generation error:', error);
     return "Impossible de générer la légende pour le moment. 😅";
   }
 }
@@ -46,7 +49,7 @@ export async function generateHashtags(topic: string): Promise<string[]> {
     const text = result.response.text();
     return text.split(' ').filter(tag => tag.startsWith('#'));
   } catch (error) {
-    console.error('Hashtag generation error:', error);
+    geminiServiceLogger.error('Hashtag generation error:', error);
     return ['#Quebec', '#Zyeute'];
   }
 }

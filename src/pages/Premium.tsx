@@ -12,6 +12,10 @@ import { subscribeToPremium } from '../services/stripeService';
 import { usePremium } from '../hooks/usePremium';
 import { toast } from '../components/Toast';
 import { useHaptics } from '../hooks/useHaptics';
+import { logger } from '../lib/logger';
+
+const premiumLogger = logger.withContext('Premium');
+
 
 type SubscriptionTier = 'free' | 'bronze' | 'silver' | 'gold';
 
@@ -80,7 +84,7 @@ export default function Premium() {
     try {
       await subscribeToPremium(tier);
     } catch (error: any) {
-      console.error('Subscription error:', error);
+      premiumLogger.error('Subscription error:', error);
       toast.error('Erreur lors de l\'abonnement. Réessaie plus tard.');
     }
   };

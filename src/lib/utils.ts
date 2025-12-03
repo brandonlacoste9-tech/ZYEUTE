@@ -4,6 +4,10 @@
 
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { logger } from '../lib/logger';
+
+const utilsLogger = logger.withContext('Utils');
+
 
 /**
  * Merge Tailwind classes with proper precedence
@@ -128,7 +132,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
+  let timeout: ReturnType<typeof setTimeout>;
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
@@ -172,22 +176,22 @@ export function validateSupabaseUrl(url: string, expectedRef: string = 'vuanulvy
   const projectRef = extractSupabaseProjectRef(url);
   
   if (!projectRef) {
-    console.warn('⚠️ Supabase URL format is unexpected:', url);
+    utilsLogger.warn('⚠️ Supabase URL format is unexpected:', url);
     return;
   }
   
   if (url.includes('kihxqurnmyxnsyqgpdaw')) {
-    console.error('❌ WRONG SUPABASE PROJECT DETECTED!');
-    console.error('   Current: kihxqurnmyxnsyqgpdaw');
-    console.error(`   Expected: ${expectedRef}`);
-    console.error(`   Action: Update VITE_SUPABASE_URL to: https://${expectedRef}.supabase.co`);
-    console.error('   Platforms: Check Netlify and Vercel environment variables');
+    utilsLogger.error('❌ WRONG SUPABASE PROJECT DETECTED!');
+    utilsLogger.error('   Current: kihxqurnmyxnsyqgpdaw');
+    utilsLogger.error(`   Expected: ${expectedRef}`);
+    utilsLogger.error(`   Action: Update VITE_SUPABASE_URL to: https://${expectedRef}.supabase.co`);
+    utilsLogger.error('   Platforms: Check Netlify and Vercel environment variables');
   } else if (projectRef === expectedRef) {
-    console.log(`✅ Using correct Supabase project: ${expectedRef}`);
+    utilsLogger.debug(`✅ Using correct Supabase project: ${expectedRef}`);
   } else if (url.includes('demo.supabase.co')) {
-    console.warn('⚠️ Using demo Supabase URL - features will be limited');
+    utilsLogger.warn('⚠️ Using demo Supabase URL - features will be limited');
   } else {
-    console.warn('⚠️ Using unexpected Supabase project:', projectRef);
-    console.warn(`   Expected: ${expectedRef}`);
+    utilsLogger.warn('⚠️ Using unexpected Supabase project:', projectRef);
+    utilsLogger.warn(`   Expected: ${expectedRef}`);
   }
 }

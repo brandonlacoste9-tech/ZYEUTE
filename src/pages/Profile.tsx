@@ -18,6 +18,10 @@ import { formatNumber } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
 import { IoShareOutline } from 'react-icons/io5';
 import type { User, Post } from '@/types';
+import { logger } from '../lib/logger';
+
+const profileLogger = logger.withContext('Profile');
+
 
 // Helper component for the Stats bar
 const ProfileStat: React.FC<{ value: number | string; label: string }> = ({ value, label }) => (
@@ -60,9 +64,9 @@ export const Profile: React.FC = () => {
       try {
         // For `/profile/me`, use getCurrentUser() directly - it's designed for this
         if (slug === 'me') {
-          console.log('[Profile] Fetching current user for /profile/me');
+          profileLogger.debug('[Profile] Fetching current user for /profile/me');
           const profileUser = await getCurrentUser();
-          console.log('[Profile] getCurrentUser result:', profileUser ? 'found' : 'null');
+          profileLogger.debug('[Profile] getCurrentUser result:', profileUser ? 'found' : 'null');
           
           if (profileUser) {
             setUser(profileUser);
@@ -71,7 +75,7 @@ export const Profile: React.FC = () => {
           } else {
             // Check if user is authenticated
             const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-            console.log('[Profile] Auth check:', authUser ? 'authenticated' : 'not authenticated', authError);
+            profileLogger.debug('[Profile] Auth check:', authUser ? 'authenticated' : 'not authenticated', authError);
             
             if (!authUser) {
               // Not logged in, redirect to login
@@ -96,7 +100,7 @@ export const Profile: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error('[Profile] Error fetching user:', error);
+        profileLogger.error('[Profile] Error fetching user:', error);
         setError('Failed to load profile. Please try again.');
         if (slug !== 'me') {
           navigate('/');
@@ -151,7 +155,7 @@ export const Profile: React.FC = () => {
     try {
       await supabase.auth.signOut();
     } catch (error) {
-      console.error('Error signing out:', error);
+      profileLogger.error('Error signing out:', error);
     } finally {
       navigate('/login');
     }
@@ -220,7 +224,7 @@ export const Profile: React.FC = () => {
                     alert('Lien du profil copié! 📋');
                   }
                 } catch (error) {
-                  console.error('Error sharing:', error);
+                  profileLogger.error('Error sharing:', error);
                 }
               }}
               className="p-2 text-gold-500 hover:text-white transition"

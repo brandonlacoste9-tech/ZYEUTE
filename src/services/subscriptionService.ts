@@ -4,6 +4,9 @@
  */
 
 import { supabase } from '../lib/supabase';
+import { logger } from '@/lib/logger';
+
+const subscriptionServiceLogger = logger.withContext('SubscriptionService');
 import { toast } from '../components/Toast';
 
 export interface SubscriptionTier {
@@ -71,7 +74,7 @@ export async function getCreatorTiers(creatorId: string): Promise<SubscriptionTi
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching subscription tiers:', error);
+    subscriptionServiceLogger.error('Error fetching subscription tiers:', error);
     return [];
   }
 }
@@ -111,7 +114,7 @@ export async function createSubscriptionTier(
     toast.success(`Abonnement "${tier.name_fr}" créé!`);
     return data;
   } catch (error: any) {
-    console.error('Error creating subscription tier:', error);
+    subscriptionServiceLogger.error('Error creating subscription tier:', error);
     toast.error('Erreur lors de la création');
     return null;
   }
@@ -133,7 +136,7 @@ export async function isSubscribedTo(
     if (error) throw error;
     return data === true;
   } catch (error) {
-    console.error('Error checking subscription:', error);
+    subscriptionServiceLogger.error('Error checking subscription:', error);
     return false;
   }
 }
@@ -152,7 +155,7 @@ export async function getUserSubscriptions(userId: string): Promise<Subscription
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching subscriptions:', error);
+    subscriptionServiceLogger.error('Error fetching subscriptions:', error);
     return [];
   }
 }
@@ -172,7 +175,7 @@ export async function getCreatorSubscribers(creatorId: string): Promise<any[]> {
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching subscribers:', error);
+    subscriptionServiceLogger.error('Error fetching subscribers:', error);
     return [];
   }
 }
@@ -253,7 +256,7 @@ export async function subscribeToCreator(
     toast.success(`Abonné à ${tier.name_fr}! 🎉`);
     return true;
   } catch (error: any) {
-    console.error('Error subscribing:', error);
+    subscriptionServiceLogger.error('Error subscribing:', error);
     toast.error('Erreur lors de l\'abonnement');
     return false;
   }
@@ -282,7 +285,7 @@ export async function unsubscribeFromCreator(
     toast.success('Abonnement annulé');
     return true;
   } catch (error) {
-    console.error('Error unsubscribing:', error);
+    subscriptionServiceLogger.error('Error unsubscribing:', error);
     toast.error('Erreur lors de l\'annulation');
     return false;
   }
@@ -335,7 +338,7 @@ export async function getCreatorRevenue(creatorId: string): Promise<RevenueSumma
       last_month_revenue: lastMonthTotal,
     };
   } catch (error) {
-    console.error('Error fetching revenue:', error);
+    subscriptionServiceLogger.error('Error fetching revenue:', error);
     return {
       total_earnings: 0,
       pending_earnings: 0,
@@ -365,7 +368,7 @@ export async function getCreatorEarnings(
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching earnings:', error);
+    subscriptionServiceLogger.error('Error fetching earnings:', error);
     return [];
   }
 }
@@ -425,7 +428,7 @@ export async function requestPayout(
     toast.success(`Demande de paiement de ${amount}$ CAD envoyée!`);
     return true;
   } catch (error) {
-    console.error('Error requesting payout:', error);
+    subscriptionServiceLogger.error('Error requesting payout:', error);
     toast.error('Erreur lors de la demande');
     return false;
   }
@@ -453,7 +456,7 @@ export async function markPostExclusive(
     toast.success('Post marqué comme exclusif!');
     return true;
   } catch (error) {
-    console.error('Error marking exclusive:', error);
+    subscriptionServiceLogger.error('Error marking exclusive:', error);
     toast.error('Erreur');
     return false;
   }
@@ -488,7 +491,7 @@ export async function canViewExclusiveContent(
     // Check subscription
     return await isSubscribedTo(userId, exclusive.creator_id);
   } catch (error) {
-    console.error('Error checking exclusive access:', error);
+    subscriptionServiceLogger.error('Error checking exclusive access:', error);
     return false;
   }
 }

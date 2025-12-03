@@ -11,6 +11,10 @@ import { supabase } from '../../lib/supabase';
 import { toast } from '../../components/Toast';
 import { formatNumber, getTimeAgo } from '../../lib/utils';
 import type { User } from '../../types';
+import { logger } from '../../lib/logger';
+
+const moderationLogger = logger.withContext('Moderation');
+
 
 interface ModerationLog {
   id: string;
@@ -135,7 +139,7 @@ export const Moderation: React.FC = () => {
       if (error) throw error;
       setLogs(data || []);
     } catch (error) {
-      console.error('Error fetching logs:', error);
+      moderationLogger.error('Error fetching logs:', error);
       toast.error('Erreur lors du chargement des logs');
     } finally {
       setIsLoading(false);
@@ -180,7 +184,7 @@ export const Moderation: React.FC = () => {
         active_bans: bans || 0,
       });
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      moderationLogger.error('Error fetching stats:', error);
     }
   };
 
@@ -201,7 +205,7 @@ export const Moderation: React.FC = () => {
       fetchLogs();
       fetchStats();
     } catch (error) {
-      console.error('Error approving:', error);
+      moderationLogger.error('Error approving:', error);
       toast.error('Erreur lors de l\'approbation');
     }
   };
@@ -231,7 +235,7 @@ export const Moderation: React.FC = () => {
       fetchLogs();
       fetchStats();
     } catch (error) {
-      console.error('Error removing:', error);
+      moderationLogger.error('Error removing:', error);
       toast.error('Erreur lors de la suppression');
     }
   };
@@ -274,7 +278,7 @@ export const Moderation: React.FC = () => {
       fetchLogs();
       fetchStats();
     } catch (error) {
-      console.error('Error banning user:', error);
+      moderationLogger.error('Error banning user:', error);
       toast.error('Erreur lors du bannissement');
     }
   };

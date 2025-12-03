@@ -4,6 +4,10 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
+import { logger } from '../../lib/logger';
+
+const videoPlayerLogger = logger.withContext('VideoPlayer');
+
 
 export interface VideoPlayerProps {
   src: string;
@@ -101,7 +105,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         setIsFullscreen(false);
       }
     } catch (error) {
-      console.error('Fullscreen error:', error);
+      videoPlayerLogger.error('Fullscreen error:', error);
     }
   };
 

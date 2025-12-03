@@ -1,0 +1,17 @@
+# Colony OS Keys - NEVER commit these!
+keys/
+*.key
+*.pem
+
+# Environment files with secrets
+.env
+colonies-server.env
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+

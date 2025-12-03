@@ -16,6 +16,10 @@ import { QUEBEC_REGIONS } from '@/lib/quebecFeatures';
 import { useBorderColor } from '@/contexts/BorderColorContext';
 import { useHaptics } from '@/hooks/useHaptics';
 import type { User } from '@/types';
+import { logger } from '../lib/logger';
+
+const settingsLogger = logger.withContext('Settings');
+
 
 interface SettingItem {
   icon: React.ReactNode;
@@ -55,7 +59,7 @@ export const Settings: React.FC = () => {
           setUser(data);
         }
       } catch (error) {
-        console.error('Error fetching user:', error);
+        settingsLogger.error('Error fetching user:', error);
       } finally {
         setIsLoading(false);
       }
