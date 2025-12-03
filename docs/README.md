@@ -1,10 +1,21 @@
 # Zyeuté Documentation
 
-This directory contains automatically generated API documentation for the Zyeuté codebase.
+This directory contains documentation for the Zyeuté codebase, including API documentation and operational guides.
 
-## 📚 Generated Documentation
+## 📚 Documentation
 
+### Generated API Documentation
 - **[API.md](./API.md)** - Complete API documentation with components, services, hooks, types, and utilities
+
+### GitHub Enterprise & Compliance
+- **[GITHUB_ENTERPRISE_ADMIN_SETUP.md](./GITHUB_ENTERPRISE_ADMIN_SETUP.md)** - GitHub Enterprise admin setup checklist
+- **[GITHUB_ENTERPRISE_ENTERPRISE_FAQ_COMPLIANCE.md](./GITHUB_ENTERPRISE_ENTERPRISE_FAQ_COMPLIANCE.md)** - Comprehensive FAQ and compliance guide for Quebec organizations, covering:
+  - Canada data residency and Law 25 compliance
+  - Self-hosted GPU runner setup for AI workloads
+  - GitHub Actions usage and optimization
+  - Migration support from other platforms
+  - Audit logging and regulatory compliance
+  - Cost optimization for solo developers and small teams
 
 ## 🔄 Regenerating Documentation
 
