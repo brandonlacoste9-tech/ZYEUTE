@@ -1,0 +1,62 @@
+{
+  "totalTests": 6,
+  "passed": 0,
+  "failed": 6,
+  "allPassed": false,
+  "testResults": [
+    {
+      "name": "Health Check",
+      "method": "GET",
+      "url": "http://localhost:3000/v1/test/health",
+      "statusCode": 0,
+      "expectedStatusCode": 200,
+      "pass": false,
+      "errorReason": "Connection failed - server not running on localhost:3000"
+    },
+    {
+      "name": "Create Test Task",
+      "method": "POST",
+      "url": "http://localhost:3000/v1/test/task",
+      "statusCode": 0,
+      "expectedStatusCode": 200,
+      "pass": false,
+      "errorReason": "Connection failed - server not running on localhost:3000"
+    },
+    {
+      "name": "List Test Tasks",
+      "method": "GET",
+      "url": "http://localhost:3000/v1/test/tasks",
+      "statusCode": 0,
+      "expectedStatusCode": 200,
+      "pass": false,
+      "errorReason": "Connection failed - server not running on localhost:3000"
+    },
+    {
+      "name": "System Statistics",
+      "method": "GET",
+      "url": "http://localhost:3000/v1/test/stats",
+      "statusCode": 0,
+      "expectedStatusCode": 200,
+      "pass": false,
+      "errorReason": "Connection failed - server not running on localhost:3000"
+    },
+    {
+      "name": "Save Test Memory",
+      "method": "POST",
+      "url": "http://localhost:3000/v1/test/memory",
+      "statusCode": 0,
+      "expectedStatusCode": 200,
+      "pass": false,
+      "errorReason": "Connection failed - server not running on localhost:3000"
+    },
+    {
+      "name": "Retrieve Test Memory",
+      "method": "GET",
+      "url": "http://localhost:3000/v1/test/memory/comet_test_1764740018",
+      "statusCode": 0,
+      "expectedStatusCode": 200,
+      "pass": false,
+      "errorReason": "Connection failed - server not running on localhost:3000"
+    }
+  ]
+}
