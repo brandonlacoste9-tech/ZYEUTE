@@ -2,7 +2,7 @@
  * Avatar component with gold ring and verified badge
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import { cn } from '../lib/utils';
 
 export interface AvatarProps {
@@ -34,7 +34,7 @@ const badgeSizes = {
   '2xl': 'w-7 h-7',
 };
 
-export const Avatar: React.FC<AvatarProps> = ({
+export const Avatar: React.FC<AvatarProps> = memo(({
   src,
   alt = 'User avatar',
   size = 'md',
@@ -107,7 +107,7 @@ export const Avatar: React.FC<AvatarProps> = ({
       )}
     </div>
   );
-};
+});
 
 /**
  * Avatar Group - Display multiple avatars

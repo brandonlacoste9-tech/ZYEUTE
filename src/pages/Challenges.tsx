@@ -9,6 +9,10 @@ import { BottomNav } from '../components/BottomNav';
 import { Button } from '../components/Button';
 import { supabase } from '../lib/supabase';
 import { toast } from '../components/Toast';
+import { logger } from '../lib/logger';
+
+const challengesLogger = logger.withContext('Challenges');
+
 
 interface Challenge {
   id: string;
@@ -56,7 +60,7 @@ export default function Challenges() {
       if (error) throw error;
       setChallenges(data || []);
     } catch (error) {
-      console.error('Error loading challenges:', error);
+      challengesLogger.error('Error loading challenges:', error);
       toast.error('Erreur de chargement');
     } finally {
       setIsLoading(false);
@@ -88,7 +92,7 @@ export default function Challenges() {
       setUserProgress(progressMap);
       setTotalPoints(points);
     } catch (error) {
-      console.error('Error loading progress:', error);
+      challengesLogger.error('Error loading progress:', error);
     }
   };
 
@@ -115,7 +119,7 @@ export default function Challenges() {
       toast.success(`+${challenge.points} points! 🎉`);
       loadUserProgress();
     } catch (error) {
-      console.error('Error claiming reward:', error);
+      challengesLogger.error('Error claiming reward:', error);
       toast.error('Erreur lors de la réclamation');
     }
   };

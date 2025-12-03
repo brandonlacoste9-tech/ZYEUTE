@@ -9,6 +9,10 @@ import { Avatar } from '../Avatar';
 import { validateSearchQuery, sanitizeText } from '../../lib/validation';
 import { toast } from '../Toast';
 import type { Post, User } from '../../types';
+import { logger } from '../../lib/logger';
+
+const searchBarLogger = logger.withContext('SearchBar');
+
 
 interface SearchBarProps {
   onSearchChange?: (query: string) => void;
@@ -104,7 +108,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
 
         setResults(searchResults);
       } catch (error) {
-        console.error('Error searching:', error);
+        searchBarLogger.error('Error searching:', error);
       } finally {
         setIsLoading(false);
       }

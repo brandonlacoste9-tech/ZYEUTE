@@ -18,6 +18,8 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { AchievementListener } from '@/components/gamification/AchievementModal';
 import { ProtectedAdminRoute } from '@/components/auth/ProtectedAdminRoute';
 
+// Critical pages - loaded immediately
+import Feed from '@/pages/Feed';
 // Core Pages - Eagerly loaded (frequently accessed)
 import Feed from '@/pages/Feed';
 import Profile from '@/pages/Profile';
@@ -26,6 +28,10 @@ import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 import AuthCallback from '@/pages/AuthCallback';
 
+// Lazy-loaded pages for better performance
+const Profile = lazy(() => import('@/pages/Profile'));
+const Upload = lazy(() => import('@/pages/Upload'));
+const Explore = lazy(() => import('@/pages/Explore'));
 // Lazy-loaded Pages - Split into separate bundles (rarely accessed)
 const Upload = lazy(() => import('@/pages/Upload'));
 const PostDetail = lazy(() => import('@/pages/PostDetail'));
@@ -36,6 +42,37 @@ const Analytics = lazy(() => import('@/pages/Analytics'));
 const StoryCreator = lazy(() => import('@/components/features/StoryCreator'));
 const Achievements = lazy(() => import('@/pages/Achievements'));
 const CreatorRevenue = lazy(() => import('@/pages/CreatorRevenue'));
+const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
+const EmailCampaigns = lazy(() => import('@/pages/admin/EmailCampaigns'));
+
+// Phase 2 Pages - Lazy loaded
+const Artiste = lazy(() => import('@/pages/Artiste'));
+const Studio = lazy(() => import('@/pages/Studio'));
+const Marketplace = lazy(() => import('@/pages/Marketplace'));
+const Premium = lazy(() => import('@/pages/Premium'));
+const Challenges = lazy(() => import('@/pages/Challenges'));
+const VoiceSettingsPage = lazy(() => import('@/pages/VoiceSettingsPage'));
+const GoLive = lazy(() => import('@/pages/GoLive'));
+const WatchLive = lazy(() => import('@/pages/WatchLive'));
+const LiveDiscover = lazy(() => import('@/pages/LiveDiscover'));
+
+// Settings Pages - Lazy loaded
+const TagsSettings = lazy(() => import('@/pages/settings/TagsSettings'));
+const CommentsSettings = lazy(() => import('@/pages/settings/CommentsSettings'));
+const SharingSettings = lazy(() => import('@/pages/settings/SharingSettings'));
+const RestrictedAccountsSettings = lazy(() => import('@/pages/settings/RestrictedAccountsSettings'));
+const FavoritesSettings = lazy(() => import('@/pages/settings/FavoritesSettings'));
+const MutedAccountsSettings = lazy(() => import('@/pages/settings/MutedAccountsSettings'));
+const ContentPreferencesSettings = lazy(() => import('@/pages/settings/ContentPreferencesSettings'));
+const MediaSettings = lazy(() => import('@/pages/settings/MediaSettings'));
+const AudioSettings = lazy(() => import('@/pages/settings/AudioSettings'));
+const StorageSettings = lazy(() => import('@/pages/settings/StorageSettings'));
+import AppSettings from '@/pages/settings/AppSettings';
+import RegionSettings from '@/pages/settings/RegionSettings';
+import LanguageSettings from '@/pages/settings/LanguageSettings';
+import ProfileEditSettings from '@/pages/settings/ProfileEditSettings';
+import PrivacySettings from '@/pages/settings/PrivacySettings';
+import NotificationSettings from '@/pages/settings/NotificationSettings';
 
 // Admin Pages - Lazy loaded (admin only)
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
@@ -125,6 +162,17 @@ function App() {
               {/* Achievement Listener (Global) */}
               <AchievementListener />
 
+              <Suspense fallback={<LoadingScreen />}>
+                <Routes>
+                  {/* Full-screen routes (outside MainLayout) */}
+                  <Route
+                    path="/video/:videoId"
+                    element={
+                      <ProtectedRoute>
+                        <Player />
+                      </ProtectedRoute>
+                    }
+                  />
               <Routes>
                 {/* Full-screen routes (outside MainLayout) - Lazy loaded */}
                 <Route
@@ -138,13 +186,13 @@ function App() {
                   }
                 />
 
-                {/* Main App Content (inside MainLayout) */}
-                <Route
-                  path="*"
-                  element={
-                    <MainLayout>
-                      <PageTransition>
-                        <Routes>
+                  {/* Main App Content (inside MainLayout) */}
+                  <Route
+                    path="*"
+                    element={
+                      <MainLayout>
+                        <PageTransition>
+                          <Routes>
                         {/* Public Routes */}
                         <Route path="/login" element={<Login />} />
                         <Route path="/signup" element={<Signup />} />
@@ -526,6 +574,7 @@ function App() {
                   }
                 />
               </Routes>
+              </Suspense>
             </BrowserRouter>
           </BorderColorProvider>
         </NotificationProvider>

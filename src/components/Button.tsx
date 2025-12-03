@@ -2,7 +2,7 @@
  * Gold-themed Button component for Zyeuté
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import { cn } from '../lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,7 +13,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   rightIcon?: React.ReactNode;
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = memo(React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       className,
@@ -86,7 +86,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </button>
     );
   }
-);
+));
 
 Button.displayName = 'Button';
 

@@ -10,6 +10,10 @@ import { QUEBEC_REGIONS } from '@/lib/quebecFeatures';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/Toast';
 import { useHaptics } from '@/hooks/useHaptics';
+import { logger } from '../../lib/logger';
+
+const regionSettingsLogger = logger.withContext('RegionSettings');
+
 
 export const RegionSettings: React.FC = () => {
   const { preferences, setPreference } = useSettingsPreferences();
@@ -32,7 +36,7 @@ export const RegionSettings: React.FC = () => {
         toast.success(`Région mise à jour: ${region?.name || regionId}! ⚜️`);
       }
     } catch (error) {
-      console.error('Error updating region:', error);
+      regionSettingsLogger.error('Error updating region:', error);
       toast.error('Erreur lors de la mise à jour');
     }
   };

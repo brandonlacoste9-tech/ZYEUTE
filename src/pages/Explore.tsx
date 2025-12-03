@@ -14,6 +14,10 @@ import { formatNumber } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
 import { toast } from '@/components/Toast';
 import type { Post } from '@/types';
+import { logger } from '../lib/logger';
+
+const exploreLogger = logger.withContext('Explore');
+
 
 export const Explore: React.FC = () => {
   const [posts, setPosts] = React.useState<Post[]>([]);
@@ -63,7 +67,7 @@ export const Explore: React.FC = () => {
       
       setPosts(filtered);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      exploreLogger.error('Error fetching posts:', error);
     } finally {
       setIsLoading(false);
     }

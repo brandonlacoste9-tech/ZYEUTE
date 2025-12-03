@@ -3,6 +3,10 @@
  * Ti-Guy Studio - Smart video processing
  */
 
+import { logger } from '@/lib/logger';
+
+const videoServiceLogger = logger.withContext('VideoService');
+
 export interface VideoProcessResult {
   url: string;
   duration: number;
@@ -98,7 +102,7 @@ export async function addBackgroundMusic(
   // Mock implementation
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  console.log(`Adding ${musicTrack} music to video...`);
+  videoServiceLogger.debug(`Adding ${musicTrack} music to video...`);
   return URL.createObjectURL(videoFile);
 }
 

@@ -1,44 +1,25 @@
 {
-  "name": "zyeute",
-  "private": true,
+  "name": "colony-os",
   "version": "1.0.0",
-  "type": "module",
-  "description": "L'app sociale du Québec - Fait au Québec, pour le Québec 🇨🇦⚜️",
-  "engines": {
-    "node": ">=20.19.0"
-  },
+  "description": "Colony OS - The First AI Civilization Operating System",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "type-check": "tsc --noEmit",
-    "health-check": "npm run type-check || true && npm run build",
-    "setup:preview-branch": "bash scripts/setup-preview-branch.sh",
-    "db:migrate": "node scripts/setup-database.js"
-  },
-  "dependencies": {
-    "@ai-sdk/openai": "^2.0.74",
-    "@stripe/react-stripe-js": "^2.8.0",
-    "@stripe/stripe-js": "^4.0.0",
-    "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.45.0",
-    "@types/dompurify": "^3.2.0",
-    "ai": "^5.0.104",
-    "clsx": "^2.1.1",
-    "dompurify": "^3.3.0",
-    "framer-motion": "^12.23.24",
-    "next": "^16.0.5",
-    "openai": "^4.67.0",
-    "qrcode.react": "^4.2.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-icons": "^5.5.0",
-    "react-router-dom": "^6.26.0",
-    "stripe": "^20.0.0",
-    "tailwind-merge": "^2.5.0"
+    "generate": "buf generate",
+    "install:all": "npm install && npm run install:packages",
+    "install:packages": "npm install --workspace=packages/kernel-node && npm install --workspace=packages/bee-node",
+    "dev:kernel": "npm run dev --workspace=packages/kernel-node",
+    "dev:bee": "npm run dev --workspace=packages/bee-node",
+    "build:all": "npm run build --workspace=packages/kernel-node && npm run build --workspace=packages/bee-node",
+    "docs": "npx tsx scripts/generate-docs.ts",
+    "docs:generate": "npm run docs",
+    "build": "npm run build:all",
+    "build:all": "npm run build --workspace=packages/kernel-node && npm run build --workspace=packages/bee-node"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.28.1",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^20.10.0",
     "@types/react": "^18.3.5",
@@ -54,5 +35,8 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.5.4",
     "vite": "^7.2.4"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

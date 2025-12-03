@@ -14,6 +14,10 @@ import { StoryCarousel } from '@/components/features/StoryCircle';
 import { VideoCard } from '@/components/features/VideoCard';
 import { getCurrentUser, getFeedPosts, getStories, togglePostFire } from '@/services/api';
 import type { Post, User, Story } from '@/types';
+import { logger } from '../lib/logger';
+
+const feedLogger = logger.withContext('Feed');
+
 
 export const Feed: React.FC = () => {
   const location = useLocation();
@@ -38,9 +42,9 @@ export const Feed: React.FC = () => {
   const fetchPosts = React.useCallback(async (pageNum: number) => {
     setIsLoading(true);
     try {
-      console.log('[Feed] Fetching posts, page:', pageNum);
+      feedLogger.debug('[Feed] Fetching posts, page:', pageNum);
       const data = await getFeedPosts(pageNum, 20);
-      console.log('[Feed] Received posts data:', { 
+      feedLogger.debug('[Feed] Received posts data:', { 
         count: data?.length || 0, 
         posts: data,
         firstPost: data?.[0] 
@@ -48,24 +52,24 @@ export const Feed: React.FC = () => {
 
       if (pageNum === 0) {
         setPosts(data || []);
-        console.log('[Feed] Set posts (page 0):', data?.length || 0);
+        feedLogger.debug('[Feed] Set posts (page 0):', data?.length || 0);
       } else {
         setPosts(prev => {
           const updated = [...prev, ...(data || [])];
-          console.log('[Feed] Appended posts (page > 0):', updated.length);
+          feedLogger.debug('[Feed] Appended posts (page > 0):', updated.length);
           return updated;
         });
       }
       setHasMore((data?.length || 0) === 20);
     } catch (error) {
-      console.error('[Feed] Error fetching posts:', error);
+      feedLogger.error('[Feed] Error fetching posts:', error);
       // Set empty array on error to show empty state
       if (pageNum === 0) {
         setPosts([]);
       }
     } finally {
       setIsLoading(false);
-      console.log('[Feed] Fetch complete, isLoading set to false');
+      feedLogger.debug('[Feed] Fetch complete, isLoading set to false');
     }
   }, []);
 
@@ -76,7 +80,7 @@ export const Feed: React.FC = () => {
         const storyList = await getStories(currentUser?.id);
         setStories(storyList);
       } catch (error) {
-        console.error('Error fetching stories:', error);
+        feedLogger.error('Error fetching stories:', error);
       }
     };
 
@@ -112,7 +116,7 @@ export const Feed: React.FC = () => {
   }, [isLoading, hasMore, page, fetchPosts]);
 
   // Handle fire toggle - memoized to prevent VideoCard re-renders
-  const handleFireToggle = React.useCallback(async (postId: string, currentFire: number) => {
+  const handleFireToggle = React.useCallback(async (postId: string, _currentFire: number) => {
     if (!currentUser) return;
     
     try {
@@ -126,7 +130,7 @@ export const Feed: React.FC = () => {
         ));
       }
     } catch (error) {
-      console.error('Error toggling fire:', error);
+      feedLogger.error('Error toggling fire:', error);
     }
   }, [currentUser]);
 
@@ -151,7 +155,7 @@ export const Feed: React.FC = () => {
         alert('Lien copié dans le presse-papiers! 📋');
       }
     } catch (error) {
-      console.error('Error sharing:', error);
+      feedLogger.error('Error sharing:', error);
     }
   }, []);
 
@@ -248,7 +252,7 @@ export const Feed: React.FC = () => {
       <SectionHeader title="Latest Hitants" />
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {/* Debug info - remove in production */}
-        {process.env.NODE_ENV === 'development' && (
+        {import.meta.env.DEV && (
           <div className="mb-4 p-2 bg-black/50 rounded text-xs text-white/60">
             <div>Posts count: {posts.length}</div>
             <div>Is loading: {isLoading ? 'true' : 'false'}</div>

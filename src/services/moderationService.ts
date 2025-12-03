@@ -4,6 +4,9 @@
  */
 
 import OpenAI from 'openai';
+import { logger } from '@/lib/logger';
+
+const moderationServiceLogger = logger.withContext('ModerationService');
 import { supabase } from '../lib/supabase';
 
 // Initialize OpenAI
@@ -122,7 +125,7 @@ export async function analyzeText(text: string): Promise<ModerationResult> {
     }
 
     if (!openai) {
-      console.warn('⚠️ No OpenAI API Key. Skipping moderation.');
+      moderationServiceLogger.warn('⚠️ No OpenAI API Key. Skipping moderation.');
       return { is_safe: true, severity: 'safe', categories: [], confidence: 0, reason: 'Modération inactive', action: 'allow' };
     }
 
@@ -142,7 +145,7 @@ export async function analyzeText(text: string): Promise<ModerationResult> {
     return moderationResult;
 
   } catch (error) {
-    console.error('Error in analyzeText:', error);
+    moderationServiceLogger.error('Error in analyzeText:', error);
     // Fail open - allow content if moderation fails
     return {
       is_safe: true,
@@ -188,12 +191,12 @@ export async function analyzeImage(imageUrl: string): Promise<ModerationResult> 
       const moderationResult: ModerationResult = JSON.parse(cleanJson);
       return moderationResult;
     } catch (e) {
-      console.error("Failed to parse JSON from vision response", resultText);
+      moderationServiceLogger.error("Failed to parse JSON from vision response", resultText);
       return { is_safe: true, severity: 'safe', categories: [], confidence: 50, reason: 'Analyse incertaine', action: 'allow' };
     }
 
   } catch (error) {
-    console.error('Error in analyzeImage:', error);
+    moderationServiceLogger.error('Error in analyzeImage:', error);
     return {
       is_safe: true,
       severity: 'safe',
@@ -212,7 +215,7 @@ export async function analyzeVideo(videoUrl: string): Promise<ModerationResult> 
   try {
     // For now, return safe (video analysis requires frame extraction)
     // TODO: Implement frame extraction and analysis
-    console.log('Video analysis not yet implemented:', videoUrl);
+    moderationServiceLogger.debug('Video analysis not yet implemented:', videoUrl);
     
     return {
       is_safe: true,
@@ -224,7 +227,7 @@ export async function analyzeVideo(videoUrl: string): Promise<ModerationResult> 
       context_note: 'L\'analyse complète des vidéos arrive bientôt',
     };
   } catch (error) {
-    console.error('Error in analyzeVideo:', error);
+    moderationServiceLogger.error('Error in analyzeVideo:', error);
     return {
       is_safe: true,
       severity: 'safe',
@@ -278,7 +281,7 @@ export async function moderateContent(
 
     return result;
   } catch (error) {
-    console.error('Error in moderateContent:', error);
+    moderationServiceLogger.error('Error in moderateContent:', error);
     return {
       is_safe: true,
       severity: 'safe',
@@ -312,7 +315,7 @@ async function logModeration(
       status: result.action === 'allow' ? 'approved' : 'pending',
     });
   } catch (error) {
-    console.error('Error logging moderation:', error);
+    moderationServiceLogger.error('Error logging moderation:', error);
   }
 }
 
@@ -402,7 +405,7 @@ async function handleViolation(
       message: notificationMessage,
     });
   } catch (error) {
-    console.error('Error handling violation:', error);
+    moderationServiceLogger.error('Error handling violation:', error);
   }
 }
 
@@ -445,7 +448,7 @@ export async function isUserBanned(userId: string): Promise<{
 
     return { isBanned: false };
   } catch (error) {
-    console.error('Error checking ban status:', error);
+    moderationServiceLogger.error('Error checking ban status:', error);
     return { isBanned: false };
   }
 }

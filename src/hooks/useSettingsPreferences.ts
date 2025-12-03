@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
+import { logger } from '../lib/logger';
+
+const useSettingsPreferencesLogger = logger.withContext('UseSettingsPreferences');
+
 
 type MentionScope = 'everyone' | 'followers' | 'no_one';
 type ContentFilterLevel = 'strict' | 'medium' | 'off';
@@ -257,7 +261,7 @@ export function useSettingsPreferences() {
       const parsed = JSON.parse(storedValue) as Partial<SettingsPreferences>;
       return mergeWithDefaults(clonePreferences(), parsed);
     } catch (error) {
-      console.warn('Failed to parse stored settings, using defaults', error);
+      useSettingsPreferencesLogger.warn('Failed to parse stored settings, using defaults', error);
       return clonePreferences();
     }
   });

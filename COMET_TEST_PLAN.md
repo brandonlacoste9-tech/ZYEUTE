@@ -1,334 +1,332 @@
-# 🧪 Comet Test Plan: Golden Path Validation
+# 🧪 Comet Test Plan - Colony OS Validation
 
-## 📋 Pre-Test Information
-
-### **Environment URLs**
-
-**Primary (Production):**
-- **Live URL:** `https://zyeute.netlify.app`
-- **Status:** ✅ Confirmed live (Netlify deployment)
-- **Custom Domain:** `https://zyeuté.com` (still propagating DNS)
-
-**Note:** Use `zyeute.netlify.app` for testing. Custom domain will be available once DNS propagation completes.
-
-**Staging (if available):**
-- Check Netlify dashboard for staging URL
+**Date:** December 3, 2025  
+**Tester:** Comet (Perplexity Browser Automation)  
+**Target:** Colony OS Kernel API  
+**Status:** Ready for Execution  
 
 ---
 
-### **Test Account Setup**
+## 🎯 **MISSION: Validate Colony OS End-to-End**
 
-**Option 1: Create Fresh Test Accounts** (Recommended)
-- Use signup flow to create new accounts
-- This tests the full new-user journey
-- **Email domains:** Use disposable emails or your test domain
-
-**Option 2: Use Existing Test Accounts** (If available)
-- Admin account: [To be provided by user]
-- Non-admin account: [To be provided by user]
-
-**Option 3: Create via Supabase Dashboard**
-1. Go to Supabase Dashboard → Authentication → Users
-2. Click "Add user" → "Create new user"
-3. Enter email/password
-4. ✅ Check "Auto Confirm User" (for testing)
-5. For admin: Run SQL: `UPDATE user_profiles SET is_admin = true WHERE id = 'user-id';`
-
-**Note:** Creating fresh accounts via signup is recommended to test the full journey.
+Comet, you're going to test the Colony OS Kernel API to ensure everything works correctly. I've created special test endpoints just for you!
 
 ---
 
-### **Known Issues to Watch For**
+## 📋 **TEST SUITE**
 
-#### **1. Auth Redirect Issues**
-- **Potential:** Email confirmation might redirect to wrong page
-- **Watch for:** Redirect loops, blank screens, wrong route
-- **Expected:** 
-  - After signup: Redirects to `/login` with alert message
-  - After email confirmation: Redirects to `/` (feed) via `/auth/callback`
-  - After login: Redirects to `/` (feed)
-- **Known Behavior:** `AuthCallback.tsx` handles OAuth and email confirmation, redirects to `/` on success
+### **Test 1: Health Check** ✅
 
-#### **2. Feed Refresh Timing**
-- **Potential:** Feed might not refresh immediately after post
-- **Watch for:** Post doesn't appear, need manual refresh
-- **Expected:** Post appears instantly via `refreshFeed` state
+**Endpoint:** `GET http://localhost:3000/v1/test/health`
 
-#### **3. Comment Optimistic Updates**
-- **Potential:** Comment might not appear immediately
-- **Watch for:** Comment missing until refresh, no toast feedback
-- **Expected:** Comment appears instantly + toast shows
+**Expected Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-12-03T...",
+  "services": {
+    "kernel": "online",
+    "mind": "connected" | "not connected",
+    "guardian": "connected" | "not connected"
+  }
+}
+```
 
-#### **4. Admin Route Protection**
-- **Potential:** Non-admin might see error instead of redirect
-- **Watch for:** 404 errors, blank pages, error messages
-- **Expected:** Smooth redirect to `/` (home) - `ProtectedAdminRoute` redirects non-admins to home
-- **Known Behavior:** Shows loading spinner while checking, then redirects if not admin
+**Validation:**
+- ✅ Status is "healthy"
+- ✅ Timestamp is valid ISO format
+- ✅ Kernel is "online"
 
-#### **5. Hard Refresh Persistence**
-- **Potential:** Data might not persist after refresh
-- **Watch for:** Posts/comments disappear
-- **Expected:** All data persists correctly
+**Action:** Navigate to `http://localhost:3000/v1/test/health` and verify response.
 
 ---
 
-## 🎯 Test Execution Plan
+### **Test 2: Create Test Task** ✅
 
-### **Test 1: Post Creation → Feed Refresh**
+**Endpoint:** `POST http://localhost:3000/v1/test/task`
 
-**Duration:** ~10 minutes  
-**Priority:** 🔴 Critical
+**Request Body:**
+```json
+{
+  "description": "Test task from Comet - " + timestamp,
+  "priority": "high"
+}
+```
 
-**Steps:**
-1. ✅ Navigate to `https://zyeute.netlify.app`
-2. ✅ Login as test user (or create new account)
-3. ✅ Navigate to home/feed (`/`)
-4. ✅ Look for upload button or "Écris ton premier post" CTA
-5. ✅ Click upload/CTA → Should navigate to `/upload`
-6. ✅ Upload image/video (use test media)
-7. ✅ Add caption: `"Test post from Comet - [TIMESTAMP]"`
-8. ✅ Add hashtag if prompted: `#TestComet`
-9. ✅ Click submit/publish
-10. ✅ **VERIFY:** Toast shows "Post publié! 🔥"
-11. ✅ **VERIFY:** Redirects to `/` (feed)
-12. ✅ **VERIFY:** Post appears IMMEDIATELY in feed (no refresh needed)
-13. ✅ **VERIFY:** Post shows correct caption, timestamp, user info
-14. ✅ Hard refresh (Ctrl+Shift+R / Cmd+Shift+R)
-15. ✅ **VERIFY:** Post STILL appears in feed after refresh
-16. ✅ Screenshot: Post in feed
-17. ✅ Screenshot: Post detail view (click post)
+**Expected Response:**
+```json
+{
+  "success": true,
+  "task": {
+    "id": "uuid",
+    "type": "test",
+    "status": "pending",
+    "priority": "high",
+    "createdAt": "2025-12-03T..."
+  },
+  "message": "Test task created successfully"
+}
+```
 
-**Success Criteria:**
-- ✅ Post appears immediately (optimistic update)
-- ✅ Post persists after hard refresh
+**Validation:**
+- ✅ `success` is `true`
+- ✅ Task has valid UUID `id`
+- ✅ Status is `"pending"`
+- ✅ Priority matches request
+- ✅ CreatedAt is valid timestamp
+
+**Action:** Submit POST request and verify response.
+
+---
+
+### **Test 3: List Test Tasks** ✅
+
+**Endpoint:** `GET http://localhost:3000/v1/test/tasks`
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "count": 1,
+  "tasks": [
+    {
+      "id": "uuid",
+      "status": "pending",
+      "priority": "high",
+      "semanticCategory": "GeneralBee",
+      "createdAt": "2025-12-03T...",
+      "assignedTo": null
+    }
+  ]
+}
+```
+
+**Validation:**
+- ✅ `success` is `true`
+- ✅ `count` matches number of test tasks
+- ✅ Task from Test 2 appears in list
+- ✅ Tasks are sorted by createdAt (newest first)
+
+**Action:** Navigate to endpoint and verify your test task appears.
+
+---
+
+### **Test 4: System Statistics** ✅
+
+**Endpoint:** `GET http://localhost:3000/v1/test/stats`
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "stats": {
+    "tasks": {
+      "total": 1,
+      "pending": 1,
+      "completed": 0,
+      "failed": 0
+    },
+    "agents": {
+      "active": 0
+    },
+    "timestamp": "2025-12-03T..."
+  }
+}
+```
+
+**Validation:**
+- ✅ `success` is `true`
+- ✅ Task counts match reality
+- ✅ Timestamp is valid
+
+**Action:** Navigate to endpoint and verify stats match Test 2 & 3.
+
+---
+
+### **Test 5: Save Test Memory** ✅
+
+**Endpoint:** `POST http://localhost:3000/v1/test/memory`
+
+**Request Body:**
+```json
+{
+  "key": "comet_test_" + timestamp,
+  "value": {
+    "test": true,
+    "message": "Hello from Comet!",
+    "timestamp": "2025-12-03T..."
+  }
+}
+```
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "memory": {
+    "id": "uuid",
+    "scope": "global",
+    "key": "comet_test_...",
+    "createdAt": "2025-12-03T..."
+  },
+  "message": "Test memory saved successfully"
+}
+```
+
+**Validation:**
+- ✅ `success` is `true`
+- ✅ Memory has valid UUID `id`
+- ✅ Key matches request
+- ✅ Scope is `"global"`
+
+**Action:** Submit POST request and save the `key` for Test 6.
+
+---
+
+### **Test 6: Retrieve Test Memory** ✅
+
+**Endpoint:** `GET http://localhost:3000/v1/test/memory/{key}`
+
+**Replace `{key}` with the key from Test 5.**
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "memory": {
+    "id": "uuid",
+    "key": "comet_test_...",
+    "value": {
+      "test": true,
+      "message": "Hello from Comet!",
+      "timestamp": "2025-12-03T..."
+    },
+    "createdAt": "2025-12-03T..."
+  }
+}
+```
+
+**Validation:**
+- ✅ `success` is `true`
+- ✅ Value matches what was saved in Test 5
+- ✅ All fields are present
+
+**Action:** Navigate to endpoint with your saved key and verify data persistence.
+
+---
+
+## 🎯 **EXECUTION INSTRUCTIONS FOR COMET**
+
+### **Step 1: Start Colony OS**
+
+**If not already running:**
+```bash
+cd C:\Users\north\.cursor\extensions\Zyeute-app
+docker-compose -f colony-os-hybrid-stack.yml up -d
+```
+
+**Wait for services to be healthy:**
+```bash
+# Check health
+curl http://localhost:3000/v1/test/health
+```
+
+---
+
+### **Step 2: Execute Test Suite**
+
+**Run tests in order (Test 1 → Test 6):**
+
+1. **Test 1:** Navigate to `http://localhost:3000/v1/test/health`
+2. **Test 2:** POST to `http://localhost:3000/v1/test/task` with JSON body
+3. **Test 3:** Navigate to `http://localhost:3000/v1/test/tasks`
+4. **Test 4:** Navigate to `http://localhost:3000/v1/test/stats`
+5. **Test 5:** POST to `http://localhost:3000/v1/test/memory` with JSON body
+6. **Test 6:** Navigate to `http://localhost:3000/v1/test/memory/{key}`
+
+---
+
+### **Step 3: Document Results**
+
+**For each test, report:**
+- ✅ **PASS** or ❌ **FAIL**
+- Actual response received
+- Any errors or unexpected behavior
+- Screenshots (if helpful)
+
+---
+
+## 🔍 **WHAT TO LOOK FOR**
+
+### **Success Indicators:**
+- ✅ All endpoints return `200 OK`
+- ✅ JSON responses are valid
+- ✅ UUIDs are properly formatted
+- ✅ Timestamps are ISO 8601
+- ✅ Data persists between requests
 - ✅ No console errors
-- ✅ Toast feedback shows
 
-**Failure Indicators:**
-- ❌ Post doesn't appear until manual refresh
-- ❌ Post disappears after hard refresh
-- ❌ No toast feedback
-- ❌ Redirect doesn't happen
-- ❌ Console errors
-
----
-
-### **Test 2: Comment Persistence**
-
-**Duration:** ~10 minutes  
-**Priority:** 🔴 Critical
-
-**Steps:**
-1. ✅ Use post from Test 1 (or find any existing post)
-2. ✅ Click on post to open detail view (`/p/[post-id]`)
-3. ✅ Scroll to comments section
-4. ✅ Click comment input field
-5. ✅ Type: `"Test comment from Comet - [TIMESTAMP]"`
-6. ✅ Click submit/send button
-7. ✅ **VERIFY:** Comment appears IMMEDIATELY (optimistic update)
-8. ✅ **VERIFY:** Toast shows "Commentaire publié! 💬"
-9. ✅ **VERIFY:** Comment count increments
-10. ✅ **VERIFY:** Comment shows correct text, user info, timestamp
-11. ✅ Hard refresh (Ctrl+Shift+R)
-12. ✅ **VERIFY:** Comment PERSISTS after refresh
-13. ✅ **VERIFY:** Comment still shows correct data
-14. ✅ Screenshot: Comment in thread
-15. ✅ Screenshot: Comment after refresh
-
-**Success Criteria:**
-- ✅ Comment appears instantly (optimistic update)
-- ✅ Toast feedback shows
-- ✅ Comment persists after hard refresh
-- ✅ No console errors
-
-**Failure Indicators:**
-- ❌ Comment doesn't appear until refresh
-- ❌ Comment disappears after hard refresh
-- ❌ No toast feedback
-- ❌ Comment count doesn't update
-- ❌ Console errors
+### **Failure Indicators:**
+- ❌ `500 Internal Server Error`
+- ❌ `404 Not Found`
+- ❌ Invalid JSON responses
+- ❌ Missing required fields
+- ❌ Data not persisting
+- ❌ Database connection errors
 
 ---
 
-### **Test 3: Admin Security**
+## 📊 **EXPECTED RESULTS**
 
-**Duration:** ~10 minutes  
-**Priority:** 🟡 High (Security)
+**All 6 tests should PASS:**
 
-**Steps:**
+```
+✅ Test 1: Health Check          → PASS
+✅ Test 2: Create Test Task      → PASS
+✅ Test 3: List Test Tasks       → PASS
+✅ Test 4: System Statistics     → PASS
+✅ Test 5: Save Test Memory      → PASS
+✅ Test 6: Retrieve Test Memory  → PASS
 
-**Part A: Non-Admin Access Test**
-1. ✅ Logout (if logged in)
-2. ✅ Login as NON-ADMIN user
-3. ✅ Verify logged in successfully
-4. ✅ Navigate directly to: `https://zyeute.netlify.app/moderation`
-5. ✅ **VERIFY:** Redirects (not error page)
-6. ✅ **VERIFY:** Redirects to `/` or `/login` (not 404)
-7. ✅ **VERIFY:** No error messages shown
-8. ✅ **VERIFY:** Console shows security log (if visible)
-9. ✅ Screenshot: Redirect result
-
-**Part B: Admin Access Test**
-10. ✅ Logout
-11. ✅ Login as ADMIN user
-12. ✅ Navigate to: `https://zyeute.netlify.app/moderation`
-13. ✅ **VERIFY:** Access GRANTED (no redirect)
-14. ✅ **VERIFY:** Moderation dashboard loads
-15. ✅ **VERIFY:** Can see moderation tools/content
-16. ✅ Screenshot: Moderation dashboard
-
-**Success Criteria:**
-- ✅ Non-admin redirected smoothly
-- ✅ Admin granted access
-- ✅ No error pages
-- ✅ Security logging works
-
-**Failure Indicators:**
-- ❌ Non-admin sees error page (should redirect)
-- ❌ Admin redirected (should have access)
-- ❌ 404 errors
-- ❌ Blank pages
+Total: 6/6 PASSED ✅
+```
 
 ---
 
-## 📊 Test Results Template
+## 🐛 **IF TESTS FAIL**
 
-### **Test Run: [Date/Time]**
+**Report failures to Cursor (me) with:**
+1. Test number and name
+2. Expected vs. actual response
+3. Error message (if any)
+4. Screenshot (if helpful)
 
-**Tester:** Comet  
-**Environment:** Production (`https://zyeute.netlify.app`)  
-**Browser:** [Chrome/Firefox/Safari]  
-**Device:** [Desktop/Mobile]
-
----
-
-### **Test 1 Results: Post Creation → Feed Refresh**
-
-**Status:** ✅ Pass / ❌ Fail / ⚠️ Partial
-
-**Issues Found:**
-1. [Issue description]
-   - **Step:** [Which step]
-   - **Expected:** [What should happen]
-   - **Actual:** [What happened]
-   - **Screenshot:** [Link/attachment]
-   - **Severity:** Critical/High/Medium/Low
-
-**Screenshots:**
-- [ ] Post upload form
-- [ ] Post in feed (immediate)
-- [ ] Post in feed (after refresh)
-- [ ] Post detail view
-
-**Console Errors:** [List any errors]
+**I'll fix immediately and you can re-test!**
 
 ---
 
-### **Test 2 Results: Comment Persistence**
+## 🎉 **SUCCESS CRITERIA**
 
-**Status:** ✅ Pass / ❌ Fail / ⚠️ Partial
-
-**Issues Found:**
-1. [Issue description]
-   - **Step:** [Which step]
-   - **Expected:** [What should happen]
-   - **Actual:** [What happened]
-   - **Screenshot:** [Link/attachment]
-   - **Severity:** Critical/High/Medium/Low
-
-**Screenshots:**
-- [ ] Comment input
-- [ ] Comment in thread (immediate)
-- [ ] Comment in thread (after refresh)
-- [ ] Toast notification
-
-**Console Errors:** [List any errors]
+**Colony OS is validated when:**
+- ✅ All 6 tests pass
+- ✅ No errors in logs
+- ✅ Data persists correctly
+- ✅ API responses are correct
 
 ---
 
-### **Test 3 Results: Admin Security**
+## 🚀 **READY TO START?**
 
-**Status:** ✅ Pass / ❌ Fail / ⚠️ Partial
+**Comet, you're cleared for testing!**
 
-**Non-Admin Test:**
-- [ ] Redirected correctly
-- [ ] No error page
-- [ ] Security log visible
+**Start with Test 1 and work through all 6 tests.**
 
-**Admin Test:**
-- [ ] Access granted
-- [ ] Dashboard loads
-- [ ] Tools functional
+**Report results back here and I'll fix any issues immediately.**
 
-**Issues Found:**
-1. [Issue description]
-   - **Step:** [Which step]
-   - **Expected:** [What should happen]
-   - **Actual:** [What happened]
-   - **Screenshot:** [Link/attachment]
-   - **Severity:** Critical/High/Medium/Low
-
-**Screenshots:**
-- [ ] Non-admin redirect
-- [ ] Admin dashboard
-- [ ] Access denied message (if any)
-
-**Console Errors:** [List any errors]
+**Let's prove Colony OS works!** 🐝⚡
 
 ---
 
-## 🔧 Quick Fixes Reference
-
-### **If Post Doesn't Appear Immediately:**
-- Check `Feed.tsx` line 75-80 (refreshFeed listener)
-- Check `Upload.tsx` line 98 (refreshFeed state)
-
-### **If Comment Doesn't Appear:**
-- Check `PostDetail.tsx` line 143-163 (optimistic update)
-- Check realtime subscription (line 96-115)
-
-### **If Admin Redirect Fails:**
-- Check `ProtectedAdminRoute.tsx` (admin check logic)
-- Check `App.tsx` line 415 (route protection)
-
----
-
-## 📝 Notes for Comet
-
-**Browser Console:**
-- Open DevTools (F12)
-- Check Console tab for errors
-- Check Network tab for failed requests
-
-**Screenshot Tips:**
-- Capture full page (not just viewport)
-- Include URL bar in screenshots
-- Show toast notifications if visible
-- Capture console errors if any
-
-**Timing:**
-- Note delays between actions
-- Note if optimistic updates are instant
-- Note if refreshes are slow
-
----
-
-## ✅ Ready to Execute
-
-**Once you have:**
-1. ✅ Test account credentials (or created new ones)
-2. ✅ Confirmed URL is live
-3. ✅ Browser DevTools ready
-
-**Execute all 3 tests and provide:**
-- ✅ Screenshots of each step
-- ✅ List of issues found
-- ✅ Console errors (if any)
-- ✅ Recommendations for fixes
-
-**Timeline:** ~30-40 minutes
-
----
-
-**Let's lock the golden path! 🔥⚜️**
-
+**Test Plan Version:** 1.0  
+**Last Updated:** December 3, 2025  
+**Status:** Ready for Execution ✅

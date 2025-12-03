@@ -8,6 +8,10 @@ import { BottomNav } from '../components/BottomNav';
 import { supabase } from '../lib/supabase';
 import { formatNumber } from '../lib/utils';
 import type { User } from '../types';
+import { logger } from '../lib/logger';
+
+const analyticsLogger = logger.withContext('Analytics');
+
 
 interface AnalyticsData {
   totalPosts: number;
@@ -126,7 +130,7 @@ export const Analytics: React.FC = () => {
           engagementRate,
         });
       } catch (error) {
-        console.error('Error fetching analytics:', error);
+        analyticsLogger.error('Error fetching analytics:', error);
       } finally {
         setIsLoading(false);
       }

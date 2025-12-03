@@ -4,6 +4,9 @@
  */
 
 import OpenAI from 'openai';
+import { logger } from '@/lib/logger';
+
+const openaiServiceLogger = logger.withContext('OpenAIService');
 
 // Initialize OpenAI
 const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
@@ -17,7 +20,7 @@ const openai = apiKey ? new OpenAI({
  */
 export async function generateCaption(topic: string, tone: string = 'fun'): Promise<string> {
   if (!openai) {
-    console.warn('⚠️ No OpenAI API Key found. Using mock response.');
+    openaiServiceLogger.warn('⚠️ No OpenAI API Key found. Using mock response.');
     return "Wow! C'est vraiment malade! 🔥 #Quebec #Fun";
   }
 
@@ -39,7 +42,7 @@ export async function generateCaption(topic: string, tone: string = 'fun'): Prom
 
     return response.choices[0].message.content || "Impossible de générer la légende.";
   } catch (error) {
-    console.error('Caption generation error:', error);
+    openaiServiceLogger.error('Caption generation error:', error);
     return "Impossible de générer la légende pour le moment. 😅";
   }
 }
@@ -67,7 +70,7 @@ export async function generateHashtags(topic: string): Promise<string[]> {
     const text = response.choices[0].message.content || "";
     return text.split(' ').filter(tag => tag.startsWith('#'));
   } catch (error) {
-    console.error('Hashtag generation error:', error);
+    openaiServiceLogger.error('Hashtag generation error:', error);
     return ['#Quebec', '#Zyeute'];
   }
 }

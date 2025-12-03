@@ -6,6 +6,9 @@
 import React from 'react';
 import { logger } from '../lib/logger';
 
+const errorBoundaryLogger = logger.withContext('ErrorBoundary');
+
+
 interface Props {
   children: React.ReactNode;
   fallback?: React.ReactNode;
@@ -81,6 +84,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    errorBoundaryLogger.error('❌ Error caught by boundary:', error, errorInfo);
     // Enhanced error logging with context
     logger.error('React error boundary caught error', {
       error: error.message,

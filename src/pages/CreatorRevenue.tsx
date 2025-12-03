@@ -8,7 +8,7 @@ import { Header } from '../components/Header';
 import { BottomNav } from '../components/BottomNav';
 import { Button } from '../components/Button';
 import { supabase } from '../lib/supabase';
-import { cn, formatNumber } from '../lib/utils';
+import { logger } from '../lib/logger';
 import {
   getCreatorRevenue,
   getCreatorEarnings,
@@ -17,6 +17,8 @@ import {
   type RevenueSummary,
   type CreatorEarnings as EarningsType,
 } from '../services/subscriptionService';
+
+const creatorRevenueLogger = logger.withContext('CreatorRevenue');
 
 export const CreatorRevenue: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -48,7 +50,7 @@ export const CreatorRevenue: React.FC = () => {
       setEarnings(earningsData);
       setSubscribers(subscribersData);
     } catch (error) {
-      console.error('Error loading revenue data:', error);
+      creatorRevenueLogger.error('Error loading revenue data:', error);
     } finally {
       setIsLoading(false);
     }

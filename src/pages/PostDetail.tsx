@@ -16,6 +16,10 @@ import { getPostById } from '../services/api';
 import { formatNumber, getTimeAgo } from '../lib/utils';
 import { toast } from '../components/Toast';
 import type { Post, Comment as CommentType, User } from '../types';
+import { logger } from '../lib/logger';
+
+const postDetailLogger = logger.withContext('PostDetail');
+
 
 export const PostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -71,7 +75,7 @@ export const PostDetail: React.FC = () => {
           });
         }
       } catch (error) {
-        console.error('Error fetching post:', error);
+        postDetailLogger.error('Error fetching post:', error);
         navigate('/');
       } finally {
         setIsLoading(false);
@@ -168,7 +172,7 @@ export const PostDetail: React.FC = () => {
         toast.success('Commentaire publié! 💬');
       }
     } catch (error) {
-      console.error('Error posting comment:', error);
+      postDetailLogger.error('Error posting comment:', error);
       toast.error('Erreur lors de la publication du commentaire');
     } finally {
       setIsSubmitting(false);

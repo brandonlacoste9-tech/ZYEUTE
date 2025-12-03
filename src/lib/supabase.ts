@@ -13,44 +13,36 @@ const supabaseLogger = logger.withContext('Supabase');
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://demo.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'demo-key';
 
-// Enhanced debug logging for Supabase configuration
-console.log('[Supabase] Configuration Details:');
-console.log('  - Full URL:', supabaseUrl);
-console.log('  - URL is set:', !!import.meta.env.VITE_SUPABASE_URL);
-console.log('  - Anon key is set:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
-console.log('  - Expected project ref: vuanulvyqkfefmjcikfk');
-
-// Extract and validate project reference (inline to avoid import dependencies at startup)
-const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'unknown';
-console.log('  - Detected project ref:', projectRef);
-
-// Check for wrong project
-if (supabaseUrl.includes('kihxqurnmyxnsyqgpdaw')) {
-  console.error('❌ WRONG SUPABASE PROJECT DETECTED!');
-  console.error('   Current: kihxqurnmyxnsyqgpdaw');
-  console.error('   Expected: vuanulvyqkfefmjcikfk');
-  console.error('   Action: Update VITE_SUPABASE_URL to: https://vuanulvyqkfefmjcikfk.supabase.co');
-  console.error('   Platforms: Check Netlify and Vercel environment variables');
-} else if (projectRef === 'vuanulvyqkfefmjcikfk') {
-  console.log('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
-} else if (supabaseUrl.includes('demo.supabase.co')) {
-  console.warn('⚠️ Using demo Supabase URL - features will be limited');
-} else {
-  console.warn('⚠️ Using unexpected Supabase project:', projectRef);
-  console.warn('   Expected: vuanulvyqkfefmjcikfk');
-}
-
 const EXPECTED_PROJECT_REF = 'vuanulvyqkfefmjcikfk';
 
 // Enhanced logging with actual URL values
 supabaseLogger.info('Initializing...');
 supabaseLogger.info('URL:', supabaseUrl);
+supabaseLogger.info('URL is set:', !!import.meta.env.VITE_SUPABASE_URL);
+supabaseLogger.info('Anon key is set:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
 supabaseLogger.info('Expected project:', EXPECTED_PROJECT_REF);
 
 // Extract and validate project reference
 const detectedProjectRef = extractSupabaseProjectRef(supabaseUrl);
 if (detectedProjectRef) {
   supabaseLogger.info('Detected project:', detectedProjectRef);
+  
+  // Check for wrong project
+  if (supabaseUrl.includes('kihxqurnmyxnsyqgpdaw')) {
+    supabaseLogger.error('❌ WRONG SUPABASE PROJECT DETECTED!');
+    supabaseLogger.error('   Current: kihxqurnmyxnsyqgpdaw');
+    supabaseLogger.error('   Expected: vuanulvyqkfefmjcikfk');
+    supabaseLogger.error('   Action: Update VITE_SUPABASE_URL to: https://vuanulvyqkfefmjcikfk.supabase.co');
+    supabaseLogger.error('   Platforms: Check Netlify and Vercel environment variables');
+  } else if (detectedProjectRef === 'vuanulvyqkfefmjcikfk') {
+    supabaseLogger.info('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
+  } else if (supabaseUrl.includes('demo.supabase.co')) {
+    supabaseLogger.warn('⚠️ Using demo Supabase URL - features will be limited');
+  } else {
+    supabaseLogger.warn('⚠️ Using unexpected Supabase project:', detectedProjectRef);
+    supabaseLogger.warn('   Expected: vuanulvyqkfefmjcikfk');
+  }
+  
   validateSupabaseUrl(supabaseUrl, EXPECTED_PROJECT_REF);
 } else {
   supabaseLogger.warn('Could not extract project reference from URL:', supabaseUrl);
@@ -58,11 +50,8 @@ if (detectedProjectRef) {
 
 // Warn about missing credentials but don't crash
 if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  console.warn('⚠️ Missing Supabase credentials! Using demo mode.');
-  console.warn('   Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local');
-  console.warn('⚠️ Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Netlify environment variables');
-  supabaseLogger.warn('Missing Supabase credentials! Using demo mode.');
-  supabaseLogger.warn('Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Netlify environment variables');
+  supabaseLogger.warn('⚠️ Missing Supabase credentials! Using demo mode.');
+  supabaseLogger.warn('   Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local or Netlify environment variables');
 } else {
   // Show that key is set (but don't expose the actual key)
   supabaseLogger.info('Anon key:', supabaseAnonKey.substring(0, 20) + '...' + ' ✅ Set');

@@ -11,6 +11,10 @@ import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { logger } from '../lib/logger';
+
+const authCallbackLogger = logger.withContext('AuthCallback');
+
 
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -18,12 +22,12 @@ const AuthCallback: React.FC = () => {
 
   useEffect(() => {
     // Log current URL state immediately for debugging
-    console.log('🔍 AuthCallback mounted');
-    console.log('Current URL:', window.location.href);
-    console.log('Hash:', window.location.hash);
-    console.log('Search params:', window.location.search);
+    authCallbackLogger.debug('🔍 AuthCallback mounted');
+    authCallbackLogger.debug('Current URL:', window.location.href);
+    authCallbackLogger.debug('Hash:', window.location.hash);
+    authCallbackLogger.debug('Search params:', window.location.search);
     
-    let timeoutId: NodeJS.Timeout | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     let hasNavigated = false;
 
     const exchangeCode = async () => {
@@ -31,10 +35,10 @@ const AuthCallback: React.FC = () => {
       const error = searchParams.get('error');
       const errorDescription = searchParams.get('error_description');
       
-      console.log('Checking for OAuth error:', error);
+      authCallbackLogger.debug('Checking for OAuth error:', error);
       
       if (error) {
-        console.error('❌ OAuth error:', error, errorDescription);
+        authCallbackLogger.error('❌ OAuth error:', error, errorDescription);
         hasNavigated = true;
         navigate(`/login?error=${encodeURIComponent(error || 'oauth_failed')}`, { replace: true });
         return;
@@ -44,25 +48,25 @@ const AuthCallback: React.FC = () => {
       const code = searchParams.get('code');
       const provider = searchParams.get('provider') || 'google'; // Default to google if not specified
 
-      console.log('Code param:', code);
-      console.log('Provider param:', provider);
+      authCallbackLogger.debug('Code param:', code);
+      authCallbackLogger.debug('Provider param:', provider);
 
       if (code) {
         // Explicit code exchange flow
-        console.log('Exchanging OAuth code for session...', { code, provider });
+        authCallbackLogger.debug('Exchanging OAuth code for session...', { code, provider });
         
         try {
           const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           
           if (exchangeError) {
-            console.error('OAuth exchange error:', exchangeError);
+            authCallbackLogger.error('OAuth exchange error:', exchangeError);
             hasNavigated = true;
             navigate(`/login?error=${encodeURIComponent(exchangeError.message || 'exchange_failed')}`, { replace: true });
             return;
           }
 
           if (data?.session) {
-            console.log('✅ Session established:', {
+            authCallbackLogger.debug('✅ Session established:', {
               user: data.session.user?.email,
               expiresAt: data.session.expires_at,
             });
@@ -70,13 +74,13 @@ const AuthCallback: React.FC = () => {
             navigate('/', { replace: true });
             return;
           } else {
-            console.warn('No session in exchange response');
+            authCallbackLogger.warn('No session in exchange response');
             hasNavigated = true;
             navigate('/login?error=no_session', { replace: true });
             return;
           }
         } catch (error: any) {
-          console.error('OAuth exchange exception:', error);
+          authCallbackLogger.error('OAuth exchange exception:', error);
           hasNavigated = true;
           navigate(`/login?error=${encodeURIComponent(error?.message || 'exchange_exception')}`, { replace: true });
           return;
@@ -84,16 +88,16 @@ const AuthCallback: React.FC = () => {
       }
 
       // Hash-based OAuth flow (detectSessionInUrl handles this automatically)
-      console.log('No code param found, checking for hash-based OAuth...');
-      console.log('Hash contains access_token:', window.location.hash.includes('access_token'));
-      console.log('Hash contains type:', window.location.hash.includes('type='));
+      authCallbackLogger.debug('No code param found, checking for hash-based OAuth...');
+      authCallbackLogger.debug('Hash contains access_token:', window.location.hash.includes('access_token'));
+      authCallbackLogger.debug('Hash contains type:', window.location.hash.includes('type='));
       
       // Listen for auth state changes to know when session is ready
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log('🔔 Auth state change:', event, session ? 'has session' : 'no session');
+        authCallbackLogger.debug('🔔 Auth state change:', event, session ? 'has session' : 'no session');
         
         if (event === 'SIGNED_IN' && session) {
-          console.log('✅ Signed in via hash-based OAuth:', {
+          authCallbackLogger.debug('✅ Signed in via hash-based OAuth:', {
             user: session.user?.email,
             expiresAt: session.expires_at,
           });
@@ -102,13 +106,13 @@ const AuthCallback: React.FC = () => {
           subscription.unsubscribe();
           navigate('/', { replace: true });
         } else if (event === 'SIGNED_OUT') {
-          console.log('Signed out');
+          authCallbackLogger.debug('Signed out');
           hasNavigated = true;
           if (timeoutId) clearTimeout(timeoutId);
           subscription.unsubscribe();
           navigate('/login', { replace: true });
         } else if (event === 'TOKEN_REFRESHED' && session) {
-          console.log('Token refreshed');
+          authCallbackLogger.debug('Token refreshed');
           hasNavigated = true;
           if (timeoutId) clearTimeout(timeoutId);
           subscription.unsubscribe();
@@ -119,16 +123,16 @@ const AuthCallback: React.FC = () => {
       // Also check current session immediately in case auth already completed
       const checkSession = async () => {
         try {
-          console.log('🔍 Checking for existing session...');
+          authCallbackLogger.debug('🔍 Checking for existing session...');
           // Supabase's detectSessionInUrl should have processed hash-based OAuth already
           const { data: { session }, error: sessionError } = await supabase.auth.getSession();
           
           if (sessionError) {
-            console.error('❌ Session error:', sessionError);
+            authCallbackLogger.error('❌ Session error:', sessionError);
           }
           
           if (session) {
-            console.log('✅ Session found immediately:', {
+            authCallbackLogger.debug('✅ Session found immediately:', {
               user: session.user?.email,
               expiresAt: session.expires_at,
             });
@@ -139,25 +143,25 @@ const AuthCallback: React.FC = () => {
             return;
           }
           
-          console.log('⏳ No session yet, waiting for OAuth token exchange...');
+          authCallbackLogger.debug('⏳ No session yet, waiting for OAuth token exchange...');
           
           // If no session yet, wait a bit for OAuth token exchange to complete
           timeoutId = setTimeout(async () => {
             if (hasNavigated) {
-              console.log('Already navigated, skipping retry');
+              authCallbackLogger.debug('Already navigated, skipping retry');
               return;
             }
             
-            console.log('🔄 Retrying session check...');
+            authCallbackLogger.debug('🔄 Retrying session check...');
             try {
               const { data: { session: retrySession }, error: retryError } = await supabase.auth.getSession();
               
               if (retryError) {
-                console.error('❌ Retry session error:', retryError);
+                authCallbackLogger.error('❌ Retry session error:', retryError);
               }
               
               if (retrySession) {
-                console.log('✅ Session found on retry:', {
+                authCallbackLogger.debug('✅ Session found on retry:', {
                   user: retrySession.user?.email,
                 });
                 hasNavigated = true;
@@ -165,27 +169,27 @@ const AuthCallback: React.FC = () => {
                 navigate('/', { replace: true });
               } else {
                 // Still no session after delay - likely a failed OAuth flow
-                console.warn('❌ No session established after OAuth callback');
-                console.warn('Current URL:', window.location.href);
-                console.warn('Hash:', window.location.hash);
-                console.warn('Search:', window.location.search);
-                console.warn('This usually means:');
-                console.warn('  1. OAuth callback URL not in Supabase Redirect URLs');
-                console.warn('  2. Google OAuth redirect URI mismatch');
-                console.warn('  3. Session not being stored properly');
+                authCallbackLogger.warn('❌ No session established after OAuth callback');
+                authCallbackLogger.warn('Current URL:', window.location.href);
+                authCallbackLogger.warn('Hash:', window.location.hash);
+                authCallbackLogger.warn('Search:', window.location.search);
+                authCallbackLogger.warn('This usually means:');
+                authCallbackLogger.warn('  1. OAuth callback URL not in Supabase Redirect URLs');
+                authCallbackLogger.warn('  2. Google OAuth redirect URI mismatch');
+                authCallbackLogger.warn('  3. Session not being stored properly');
                 hasNavigated = true;
                 subscription.unsubscribe();
                 navigate('/login?error=no_session', { replace: true });
               }
             } catch (error) {
-              console.error('❌ Auth callback retry error:', error);
+              authCallbackLogger.error('❌ Auth callback retry error:', error);
               hasNavigated = true;
               subscription.unsubscribe();
               navigate('/login?error=callback_failed', { replace: true });
             }
           }, 3000); // Wait 3 seconds for OAuth token exchange
         } catch (error) {
-          console.error('❌ Auth callback error:', error);
+          authCallbackLogger.error('❌ Auth callback error:', error);
           hasNavigated = true;
           if (timeoutId) clearTimeout(timeoutId);
           subscription.unsubscribe();

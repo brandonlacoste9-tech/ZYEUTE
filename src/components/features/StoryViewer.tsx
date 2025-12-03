@@ -9,6 +9,10 @@ import { VideoPlayer } from './VideoPlayer';
 import { supabase } from '../../lib/supabase';
 import { getTimeAgo } from '../../lib/utils';
 import type { Story, User } from '../../types';
+import { logger } from '../../lib/logger';
+
+const storyViewerLogger = logger.withContext('StoryViewer');
+
 
 interface StoryViewerProps {
   stories: Story[];
@@ -69,7 +73,7 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
 
       // TODO: Create story_views table and insert view
       // For now, just log
-      console.log('Story viewed:', currentStory.id);
+      storyViewerLogger.debug('Story viewed:', currentStory.id);
     };
 
     markAsViewed();
@@ -145,7 +149,7 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
       setReplyText('');
       setShowReplyInput(false);
     } catch (error) {
-      console.error('Error sending reply:', error);
+      storyViewerLogger.error('Error sending reply:', error);
       toast.error('Erreur lors de l\'envoi');
     }
   };

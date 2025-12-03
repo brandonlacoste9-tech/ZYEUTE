@@ -11,6 +11,10 @@ import { supabase } from '../lib/supabase';
 import { extractHashtags, generateId } from '../lib/utils';
 import { QUEBEC_REGIONS } from '../lib/quebecFeatures';
 import { toast } from '../components/Toast';
+import { logger } from '../lib/logger';
+
+const uploadLogger = logger.withContext('Upload');
+
 
 export const Upload: React.FC = () => {
   const navigate = useNavigate();
@@ -97,7 +101,7 @@ export const Upload: React.FC = () => {
       toast.success('Post publié! 🔥');
       navigate('/');
     } catch (error) {
-      console.error('Upload error:', error);
+      uploadLogger.error('Upload error:', error);
       toast.error('Erreur lors de l\'upload');
     } finally {
       setIsUploading(false);

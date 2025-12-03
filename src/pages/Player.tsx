@@ -9,6 +9,10 @@ import { SingleVideoView } from '@/components/features/SingleVideoView';
 import { supabase } from '@/lib/supabase';
 import { useHaptics } from '@/hooks/useHaptics';
 import type { Post, User } from '@/types';
+import { logger } from '../lib/logger';
+
+const playerLogger = logger.withContext('Player');
+
 
 export const Player: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
@@ -101,7 +105,7 @@ export const Player: React.FC = () => {
         setHasMore(data.length === 30);
       }
     } catch (error) {
-      console.error('Error fetching video feed:', error);
+      playerLogger.error('Error fetching video feed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +142,7 @@ export const Player: React.FC = () => {
         setHasMore(false);
       }
     } catch (error) {
-      console.error('Error loading more videos:', error);
+      playerLogger.error('Error loading more videos:', error);
     } finally {
       setLoadingMore(false);
     }
@@ -205,7 +209,7 @@ export const Player: React.FC = () => {
           if (videoElement) {
             if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
               // Video is mostly visible, play it
-              videoElement.play().catch(console.error);
+              videoElement.play().catch((error) => playerLogger.error('Video playback error:', error));
             } else {
               // Video is not visible, pause it
               videoElement.pause();
@@ -234,16 +238,16 @@ export const Player: React.FC = () => {
   };
 
   // Handle fire toggle
-  const handleFireToggle = async (postId: string, currentFire: number) => {
+  const handleFireToggle = async (postId: string, _currentFire: number) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       // Toggle fire logic here (similar to Feed.tsx)
       // This is a placeholder - implement actual fire toggle logic
-      console.log('Fire toggle for post:', postId);
+      playerLogger.debug('Fire toggle for post:', postId);
     } catch (error) {
-      console.error('Error toggling fire:', error);
+      playerLogger.error('Error toggling fire:', error);
     }
   };
 
@@ -267,10 +271,10 @@ export const Player: React.FC = () => {
           `${window.location.origin}/video/${postId}`
         );
         // Show toast notification (you may need to import toast)
-        console.log('Link copied to clipboard');
+        playerLogger.debug('Link copied to clipboard');
       }
     } catch (error) {
-      console.error('Error sharing:', error);
+      playerLogger.error('Error sharing:', error);
     }
   };
 

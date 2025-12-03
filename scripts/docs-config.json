@@ -1,0 +1,32 @@
+{
+  "sourceDir": "./src",
+  "outputDir": "./docs",
+  "includePatterns": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "excludePatterns": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/node_modules/**",
+    "**/*.d.ts"
+  ],
+  "title": "Zyeuté API Documentation",
+  "description": "Comprehensive documentation for Zyeuté components, services, hooks, and utilities. Generated automatically from JSDoc comments and TypeScript type definitions.",
+  "sections": {
+    "components": true,
+    "services": true,
+    "hooks": true,
+    "types": true,
+    "utils": true
+  },
+  "options": {
+    "includeExamples": true,
+    "includeDependencies": true,
+    "includeSourcePaths": true,
+    "groupByCategory": true,
+    "sortAlphabetically": true
+  }
+}
