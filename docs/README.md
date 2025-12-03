@@ -2,9 +2,16 @@
 
 This directory contains automatically generated API documentation for the Zyeuté codebase.
 
-## 📚 Generated Documentation
+## 📚 Documentation Index
+
+### API Documentation
 
 - **[API.md](./API.md)** - Complete API documentation with components, services, hooks, types, and utilities
+
+### Enterprise & Operations
+
+- **[GITHUB_ENTERPRISE_FEATURES_AND_COMPLIANCE.md](./GITHUB_ENTERPRISE_FEATURES_AND_COMPLIANCE.md)** - Comprehensive FAQ and readiness checklist for GitHub Enterprise features, Law 25 compliance, data residency, and scaling considerations for Quebec teams
+- **[GITHUB_ENTERPRISE_ADMIN_SETUP.md](./GITHUB_ENTERPRISE_ADMIN_SETUP.md)** - Detailed admin setup checklist for GitHub Enterprise Cloud configuration
 
 ## 🔄 Regenerating Documentation
 
@@ -48,9 +55,9 @@ To ensure your code is properly documented:
 ```typescript
 /**
  * Button component for Zyeuté
- * 
+ *
  * A gold-themed button with multiple variants.
- * 
+ *
  * @example
  * <Button variant="primary">Click me</Button>
  */
@@ -138,4 +145,4 @@ git add docs/API.md
 
 ---
 
-*Last generated: See timestamp in [API.md](./API.md)*
+_Last generated: See timestamp in [API.md](./API.md)_
