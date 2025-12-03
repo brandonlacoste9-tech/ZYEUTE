@@ -46,7 +46,7 @@ export const StorageSettings: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <h3 className="text-white font-semibold mb-1">Économiseur de données</h3>
-              <p className="text-leather-300 text-sm">Réduire l'utilisation des données mobiles</p>
+              <p className="text-leather-300 text-sm">Réduire l&apos;utilisation des données mobiles</p>
             </div>
             <button
               onClick={() => handleToggle('storage.dataSaver', !preferences.storage.dataSaver)}

@@ -97,8 +97,8 @@ export const SharingSettings: React.FC = () => {
         <div className="leather-card rounded-xl p-4 stitched">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h3 className="text-white font-semibold mb-1">Autoriser l'intégration</h3>
-              <p className="text-leather-300 text-sm">Permettre l'intégration de tes posts sur d'autres sites</p>
+              <h3 className="text-white font-semibold mb-1">Autoriser l&apos;intégration</h3>
+              <p className="text-leather-300 text-sm">Permettre l&apos;intégration de tes posts sur d&apos;autres sites</p>
             </div>
             <button
               onClick={() => handleToggle('sharing.allowEmbed', !preferences.sharing.allowEmbed)}

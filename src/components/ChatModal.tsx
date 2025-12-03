@@ -263,7 +263,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
         <div className="px-4 py-2 bg-neutral-950 border-t border-gold-500/20">
           <p className="text-center text-stone-500 text-xs embossed flex items-center justify-center gap-1">
             <span className="text-gold-500">⚜️</span>
-            <span>Propulsé par l'IA québécoise</span>
+            <span>Propulsé par l&apos;IA québécoise</span>
             <span className="text-gold-500">🦫</span>
           </p>
         </div>

@@ -60,7 +60,7 @@ export const TagsSettings: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <h3 className="text-white font-semibold mb-1">Approbation requise</h3>
-                <p className="text-leather-300 text-sm">Approuver les tags avant qu'ils apparaissent</p>
+                <p className="text-leather-300 text-sm">Approuver les tags avant qu&apos;ils apparaissent</p>
               </div>
               <button
                 onClick={() => handleToggle('tags.requireApproval', !preferences.tags.requireApproval)}

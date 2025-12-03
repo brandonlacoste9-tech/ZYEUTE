@@ -312,7 +312,7 @@ export const Upload: React.FC = () => {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-gold-500 mt-0.5">🔥</span>
-              <span>Poste entre 18h-21h pour plus d'engagement</span>
+              <span>Poste entre 18h-21h pour plus d&apos;engagement</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-gold-500 mt-0.5">🎬</span>

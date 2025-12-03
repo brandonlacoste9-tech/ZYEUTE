@@ -167,7 +167,7 @@ export const ProfileEditSettings: React.FC = () => {
         {/* Username */}
         <div className="leather-card rounded-xl p-4 stitched">
           <label className="block text-gold-400 font-semibold mb-2 text-sm">
-            Nom d'utilisateur
+            Nom d&apos;utilisateur
           </label>
           <input
             type="text"
@@ -182,7 +182,7 @@ export const ProfileEditSettings: React.FC = () => {
         {/* Display Name */}
         <div className="leather-card rounded-xl p-4 stitched">
           <label className="block text-gold-400 font-semibold mb-2 text-sm">
-            Nom d'affichage
+            Nom d&apos;affichage
           </label>
           <input
             type="text"

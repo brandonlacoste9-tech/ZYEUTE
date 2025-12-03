@@ -48,7 +48,7 @@ export default function Artiste() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">Ti-Guy Artiste</h1>
-            <p className="text-white/60">Crée des images uniques avec l'IA</p>
+            <p className="text-white/60">Crée des images uniques avec l&apos;IA</p>
           </div>
         </div>
 
@@ -91,7 +91,7 @@ export default function Artiste() {
         {/* Result Section */}
         {result && (
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 animate-fade-in">
-            <h2 className="text-xl font-bold text-white mb-4">Ton Chef-d'œuvre</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Ton Chef-d&apos;œuvre</h2>
             <div className="aspect-square rounded-xl overflow-hidden bg-black mb-4 border border-white/10">
               <img 
                 src={result.url} 
@@ -99,13 +99,13 @@ export default function Artiste() {
                 className="w-full h-full object-cover"
               />
             </div>
-            <p className="text-white/60 text-sm mb-6 italic">"{result.revised_prompt || result.prompt}"</p>
+            <p className="text-white/60 text-sm mb-6 italic">&quot;{result.revised_prompt || result.prompt}&quot;</p>
             
             <div className="flex gap-3">
               <Button onClick={handlePost} className="flex-1">
                 🚀 Publier
               </Button>
-              <Button variant="outline" onClick={() => setResult(null)} className="flex-1">
+              <Button variant="outline" onClick={() => setResult(null)} className=&quot;flex-1&quot;>
                 🗑️ Ignorer
               </Button>
             </div>

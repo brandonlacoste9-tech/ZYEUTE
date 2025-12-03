@@ -442,7 +442,7 @@ export const TiGuy: React.FC = () => {
               style={{ color: '#8B7355' }}
             >
               <span style={{ color: '#B38600' }}>⚜️</span>
-              <span>Propulsé par l'IA québécoise</span>
+              <span>Propulsé par l&apos;IA québécoise</span>
               <span style={{ color: '#B38600' }}>🦫</span>
             </p>
           </div>
