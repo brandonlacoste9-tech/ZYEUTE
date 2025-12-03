@@ -156,7 +156,7 @@ export const Logo: React.FC<LogoProps> = ({
               className="text-[0.6em] font-bold tracking-[0.25em] uppercase"
               style={{ color: '#B8860B' }}
             >
-              L'app sociale du Québec
+              L&apos;app sociale du Québec
             </span>
           )}
         </div>

@@ -27,13 +27,13 @@ export const LanguageSettings: React.FC = () => {
         {/* Info */}
         <div className="leather-card rounded-xl p-4 stitched bg-gold-500/10 border border-gold-500/30">
           <p className="text-white text-sm">
-            Choisis la langue d'affichage de l'application. 🇨🇦⚜️
+            Choisis la langue d&apos;affichage de l&apos;application. 🇨🇦⚜️
           </p>
         </div>
 
         {/* Language Selection */}
         <div className="leather-card rounded-xl p-4 stitched">
-          <h3 className="text-white font-semibold mb-4">Langue d'affichage</h3>
+          <h3 className="text-white font-semibold mb-4">Langue d&apos;affichage</h3>
           <div className="space-y-2">
             {([
               { code: 'fr' as const, name: 'Français', flag: '🇨🇦', description: 'Langue principale du Québec' },
@@ -72,7 +72,7 @@ export const LanguageSettings: React.FC = () => {
         {/* Note */}
         <div className="leather-card rounded-xl p-4 stitched">
           <p className="text-leather-400 text-xs">
-            Note: La plupart du contenu sur Zyeuté est en français québécois (joual). Le changement de langue affecte principalement l'interface.
+            Note: La plupart du contenu sur Zyeuté est en français québécois (joual). Le changement de langue affecte principalement l&apos;interface.
           </p>
         </div>
       </div>

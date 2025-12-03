@@ -26,7 +26,7 @@ export const CommunityGuidelines: React.FC = () => {
           </h1>
           <p className="text-white/80 text-lg mb-8 leading-relaxed">
             Zyeuté est une plateforme inclusive pour tous les Québécois et francophones. Nous voulons
-            que chacun se sente en sécurité, respecté et libre de s'exprimer dans notre culture unique.
+            que chacun se sente en sécurité, respecté et libre de s&apos;exprimer dans notre culture unique.
           </p>
 
           {/* Section 1: Prohibited Content */}
@@ -39,8 +39,8 @@ export const CommunityGuidelines: React.FC = () => {
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
                 <h3 className="text-red-400 font-bold mb-2">🚫 Intimidation et Harcèlement</h3>
                 <p className="text-white/70 mb-2">
-                  Attaques personnelles répétées, moqueries sur l'apparence physique, le poids,
-                  l'orientation sexuelle ou l'identité de genre.
+                  Attaques personnelles répétées, moqueries sur l&apos;apparence physique, le poids,
+                  l&apos;orientation sexuelle ou l&apos;identité de genre.
                 </p>
                 <p className="text-white/50 text-sm italic">
                   Note: Les taquineries amicales entre amis sont acceptables.
@@ -61,7 +61,7 @@ export const CommunityGuidelines: React.FC = () => {
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
                 <h3 className="text-red-400 font-bold mb-2">🚫 Violence et Menaces</h3>
                 <p className="text-white/70 mb-2">
-                  Menaces de violence physique, incitation à l'automutilation ou au suicide,
+                  Menaces de violence physique, incitation à l&apos;automutilation ou au suicide,
                   glorification de violence, instructions pour armes ou explosifs.
                 </p>
               </div>
@@ -70,14 +70,14 @@ export const CommunityGuidelines: React.FC = () => {
                 <h3 className="text-red-400 font-bold mb-2">🚫 Harcèlement Sexuel</h3>
                 <p className="text-white/70 mb-2">
                   Messages sexuels non sollicités, commentaires déplacés sur le corps, demandes
-                  inappropriées, partage d'images intimes sans consentement.
+                  inappropriées, partage d&apos;images intimes sans consentement.
                 </p>
               </div>
 
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
                 <h3 className="text-red-400 font-bold mb-2">🚫 Exploitation de Mineurs</h3>
                 <p className="text-white/70 mb-2">
-                  TOLÉRANCE ZÉRO. Tout contenu d'exploitation de mineurs entraîne un bannissement
+                  TOLÉRANCE ZÉRO. Tout contenu d&apos;exploitation de mineurs entraîne un bannissement
                   permanent immédiat et signalement aux autorités.
                 </p>
               </div>
@@ -93,7 +93,7 @@ export const CommunityGuidelines: React.FC = () => {
                 <h3 className="text-red-400 font-bold mb-2">🚫 Spam et Fraude</h3>
                 <p className="text-white/70 mb-2">
                   Liens malveillants répétés, publicité excessive non sollicitée, chaînes de lettres,
-                  comportement de bot, usurpation d'identité.
+                  comportement de bot, usurpation d&apos;identité.
                 </p>
               </div>
             </div>
@@ -145,11 +145,11 @@ export const CommunityGuidelines: React.FC = () => {
                   </li>
                   <li className="flex gap-3">
                     <span className="text-green-400 font-bold">✅</span>
-                    <span><strong>Être authentique:</strong> Sois toi-même, pas quelqu'un d'autre</span>
+                    <span><strong>Être authentique:</strong> Sois toi-même, pas quelqu&apos;un d&apos;autre</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="text-green-400 font-bold">✅</span>
-                    <span><strong>Penser avant de publier:</strong> Réfléchis à l'impact de tes mots</span>
+                    <span><strong>Penser avant de publier:</strong> Réfléchis à l&apos;impact de tes mots</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="text-green-400 font-bold">✅</span>
@@ -180,9 +180,9 @@ export const CommunityGuidelines: React.FC = () => {
                 <li>✅ Débats politiques passionnés (souveraineté, langue française, identité)</li>
                 <li>✅ Humour grinçant et sarcasme québécois</li>
                 <li>✅ Critique sociale constructive</li>
-                <li>✅ Références culturelles locales (Ti-Guy, poutine, sirop d'érable)</li>
+                <li>✅ Références culturelles locales (Ti-Guy, poutine, sirop d&apos;érable)</li>
                 <li>✅ Blagues entre amis et taquineries amicales</li>
-                <li>✅ Expressions positives ("malade!", "sick!", "en feu!")</li>
+                <li>✅ Expressions positives (&quot;malade!&quot;, &quot;sick!&quot;, &quot;en feu!&quot;)</li>
               </ul>
               <p className="text-white/50 text-sm mt-4 italic">
                 Note: Ces exceptions ne couvrent PAS le harcèlement, la haine ou les menaces.
@@ -263,16 +263,16 @@ export const CommunityGuidelines: React.FC = () => {
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
               <span className="text-3xl">📝</span>
-              Processus d'Appel
+              Processus d&apos;Appel
             </h2>
             <div className="bg-white/5 rounded-xl p-6">
               <p className="text-white/80 mb-4">
-                Si tu penses qu'une décision a été prise par erreur, tu peux la contester:
+                Si tu penses qu&apos;une décision a été prise par erreur, tu peux la contester:
               </p>
               <ol className="space-y-3 text-white/70 list-decimal list-inside">
-                <li>Tu reçois une notification de l'avertissement ou suspension</li>
-                <li>Clique sur "Contester cette décision" dans la notification</li>
-                <li>Explique pourquoi tu penses que c'est une erreur (max 500 caractères)</li>
+                <li>Tu reçois une notification de l&apos;avertissement ou suspension</li>
+                <li>Clique sur &quot;Contester cette décision&quot; dans la notification</li>
+                <li>Explique pourquoi tu penses que c&apos;est une erreur (max 500 caractères)</li>
                 <li>Un modérateur humain révise ton cas sous 48 heures</li>
                 <li>Tu reçois une décision finale par notification</li>
               </ol>
@@ -299,13 +299,13 @@ export const CommunityGuidelines: React.FC = () => {
                 <div className="flex gap-3">
                   <span className="text-gold-400 font-bold">1.</span>
                   <p className="text-white/70">
-                    Clique sur les trois points (⋯) sur n'importe quel post ou commentaire
+                    Clique sur les trois points (⋯) sur n&apos;importe quel post ou commentaire
                   </p>
                 </div>
                 <div className="flex gap-3">
                   <span className="text-gold-400 font-bold">2.</span>
                   <p className="text-white/70">
-                    Sélectionne "Signaler"
+                    Sélectionne &quot;Signaler&quot;
                   </p>
                 </div>
                 <div className="flex gap-3">
@@ -345,7 +345,7 @@ export const CommunityGuidelines: React.FC = () => {
             <ul className="space-y-2 text-white/60">
               <li>📧 Email: <a href="mailto:support@zyeute.com" className="text-gold-400 hover:underline">support@zyeute.com</a></li>
               <li>🛡️ Modération: <a href="mailto:moderation@zyeute.com" className="text-gold-400 hover:underline">moderation@zyeute.com</a></li>
-              <li>📖 Centre d'aide: <a href="/help" className="text-gold-400 hover:underline">zyeute.com/help</a></li>
+              <li>📖 Centre d&apos;aide: <a href="/help" className="text-gold-400 hover:underline">zyeute.com/help</a></li>
             </ul>
           </section>
 

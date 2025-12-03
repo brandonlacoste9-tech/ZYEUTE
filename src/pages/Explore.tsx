@@ -204,7 +204,7 @@ export const Explore: React.FC = () => {
             <span className="text-leather-300 text-sm">Filtres actifs:</span>
             {searchQuery && (
               <span className="badge-premium text-xs">
-                🔍 "{searchQuery}"
+                🔍 &quot;{searchQuery}&quot;
               </span>
             )}
             {selectedHashtag && (
@@ -243,7 +243,7 @@ export const Explore: React.FC = () => {
             <div className="text-6xl mb-4">🦫</div>
             <h3 className="text-xl font-bold text-gold-500 mb-2">Aucun post trouvé</h3>
             <p className="text-leather-300 mb-6">
-              Essaye de changer tes filtres ou explore d'autres régions!
+              Essaye de changer tes filtres ou explore d&apos;autres régions!
             </p>
             <button
               onClick={() => {
