@@ -1,0 +1,81 @@
+# Label configuration for pull requests
+# Automatically applies labels based on file paths
+
+# Frontend
+frontend:
+  - changed-files:
+    - any-glob-to-any-file: 'src/**/*.{tsx,ts,jsx,js}'
+
+# Components
+components:
+  - changed-files:
+    - any-glob-to-any-file: 'src/components/**/*'
+
+# Pages
+pages:
+  - changed-files:
+    - any-glob-to-any-file: 'src/pages/**/*'
+
+# Services
+services:
+  - changed-files:
+    - any-glob-to-any-file: 'src/services/**/*'
+
+# Styles
+styles:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.css'
+
+# Documentation
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.md'
+
+# Configuration
+config:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - '*.config.{js,ts,json}'
+      - '.eslintrc.json'
+      - 'tsconfig.json'
+      - 'package.json'
+
+# CI/CD
+ci-cd:
+  - changed-files:
+    - any-glob-to-any-file: '.github/workflows/**/*'
+
+# Database
+database:
+  - changed-files:
+    - any-glob-to-any-file: 'supabase/**/*'
+
+# Netlify Functions
+netlify:
+  - changed-files:
+    - any-glob-to-any-file: 'netlify/**/*'
+
+# Colony OS
+colony:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'colony/**/*'
+      - 'packages/**/*'
+
+# Tests
+tests:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - '**/*.test.{ts,tsx,js,jsx}'
+      - '**/*.spec.{ts,tsx,js,jsx}'
+      - 'e2e/**/*'
+
+# Legal
+legal:
+  - changed-files:
+    - any-glob-to-any-file: 'src/pages/legal/**/*'
+
+# Settings
+settings:
+  - changed-files:
+    - any-glob-to-any-file: 'src/pages/settings/**/*'

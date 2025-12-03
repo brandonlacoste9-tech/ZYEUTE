@@ -61,5 +61,22 @@
     "scripts/",
     "public/",
     "fix-imports.js"
+  ],
+  "overrides": [
+    {
+      "files": ["netlify/functions/**/*.js"],
+      "parserOptions": {
+        "sourceType": "script"
+      },
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    },
+    {
+      "files": ["**/*.test.js", "**/*.spec.js"],
+      "env": {
+        "jest": true
+      }
+    }
   ]
 }
