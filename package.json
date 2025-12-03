@@ -27,7 +27,15 @@
     "test:all": "npm run test:run && npm run test:integration && npm run test:e2e",
     "health-check": "npm run type-check || true && npm run build",
     "setup:preview-branch": "bash scripts/setup-preview-branch.sh",
-    "db:migrate": "node scripts/setup-database.js"
+    "db:migrate": "node scripts/setup-database.js",
+    "generate": "buf generate",
+    "install:all": "npm install && npm run install:packages",
+    "install:packages": "npm install --workspace=packages/kernel-node && npm install --workspace=packages/bee-node",
+    "dev:kernel": "npm run dev --workspace=packages/kernel-node",
+    "dev:bee": "npm run dev --workspace=packages/bee-node",
+    "build:all": "npm run build --workspace=packages/kernel-node && npm run build --workspace=packages/bee-node",
+    "docs": "npx tsx scripts/generate-docs.ts",
+    "docs:generate": "npm run docs"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.74",
@@ -47,24 +55,6 @@
     "react-router-dom": "^6.26.0",
     "stripe": "^20.0.0",
     "tailwind-merge": "^2.5.0"
-  },
-  "devDependencies": {
-    "@lhci/cli": "^0.12.0",
-    "@playwright/test": "^1.48.0",
-    "@tailwindcss/postcss": "^4.0.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.1.0",
-    "@testing-library/user-event": "^14.5.2",
-    "generate": "buf generate",
-    "install:all": "npm install && npm run install:packages",
-    "install:packages": "npm install --workspace=packages/kernel-node && npm install --workspace=packages/bee-node",
-    "dev:kernel": "npm run dev --workspace=packages/kernel-node",
-    "dev:bee": "npm run dev --workspace=packages/bee-node",
-    "build:all": "npm run build --workspace=packages/kernel-node && npm run build --workspace=packages/bee-node",
-    "docs": "npx tsx scripts/generate-docs.ts",
-    "docs:generate": "npm run docs",
-    "build": "npm run build:all",
-    "build:all": "npm run build --workspace=packages/kernel-node && npm run build --workspace=packages/bee-node"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.28.1",
@@ -88,8 +78,9 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.5.4",
     "vite": "^7.2.4",
-    "vitest": "^2.1.8",
-  },  "engines": {
+    "vitest": "^2.1.8"
+  },
+  "engines": {
     "node": ">=20.0.0"
   }
 }
