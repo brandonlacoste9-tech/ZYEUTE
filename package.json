@@ -88,10 +88,8 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.5.4",
     "vite": "^7.2.4",
-    "vitest": "^2.1.8"
-    "vite": "^7.2.4"
-  },
-  "engines": {
+    "vitest": "^2.1.8",
+  },  "engines": {
     "node": ">=20.0.0"
   }
 }
