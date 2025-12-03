@@ -197,7 +197,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 onClick={() => (window.location.href = '/')}
                 className="w-full px-6 py-3 bg-white/5 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors"
               >
-                🏠 Retour à l'accueil
+                🏠 Retour à l&apos;accueil
               </button>
             </div>
 

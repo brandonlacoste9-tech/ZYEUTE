@@ -106,7 +106,7 @@ export const Signup: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-gold-400 font-semibold mb-2 text-sm embossed">
-                Nom d'utilisateur
+                Nom d&apos;utilisateur
               </label>
               <input
                 type="text"
@@ -165,9 +165,9 @@ export const Signup: React.FC = () => {
 
           {/* Terms */}
           <p className="text-center text-leather-400 text-xs mt-6">
-            En t'inscrivant, tu acceptes nos{' '}
+            En t&apos;inscrivant, tu acceptes nos{' '}
             <Link to="/legal/terms" className="text-gold-400 hover:underline">
-              Conditions d'utilisation
+              Conditions d&apos;utilisation
             </Link>
             {' '}et notre{' '}
             <Link to="/legal/privacy" className="text-gold-400 hover:underline">

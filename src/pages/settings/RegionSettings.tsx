@@ -49,7 +49,7 @@ export const RegionSettings: React.FC = () => {
         {/* Info */}
         <div className="leather-card rounded-xl p-4 stitched bg-gold-500/10 border border-gold-500/30">
           <p className="text-white text-sm">
-            Sélectionne ta région pour voir du contenu local et connecter avec d'autres Québécois de ta région! ⚜️
+            Sélectionne ta région pour voir du contenu local et connecter avec d&apos;autres Québécois de ta région! ⚜️
           </p>
         </div>
 
