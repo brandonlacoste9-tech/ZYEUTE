@@ -1,0 +1,131 @@
+// Foreman Service - Task Router & Worker Coordinator
+// 
+// Internal RPC for Bee workers to pull tasks and report results.
+// Not exposed externally - only for Colony OS internal communication.
+
+syntax = "proto3";
+
+package colony.foreman;
+
+option go_package = "github.com/colony-os/proto/foreman";
+
+// ═══════════════════════════════════════════════════════════════
+// FOREMAN SERVICE
+// ═══════════════════════════════════════════════════════════════
+
+service ForemanService {
+  // Pull next task for a Bee worker
+  rpc PullTask(PullTaskRequest) returns (PullTaskResponse);
+  
+  // Report successful task completion
+  rpc ReportResult(ReportResultRequest) returns (ReportResultResponse);
+  
+  // Report task failure
+  rpc ReportFailure(ReportFailureRequest) returns (ReportFailureResponse);
+  
+  // Worker heartbeat (liveness)
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  
+  // Register new worker
+  rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PULL TASK
+// ═══════════════════════════════════════════════════════════════
+
+message PullTaskRequest {
+  string bee_id = 1;                    // Worker agent ID
+  string role = 2;                      // BeeRole ('DocBee', 'CodeBee', etc.)
+  repeated string capabilities = 3;     // Skills this worker has
+}
+
+message PullTaskResponse {
+  Task task = 1;                        // Assigned task (null if none available)
+  string lease_id = 2;                  // Lease ID for this assignment
+  int64 lease_expires_at = 3;           // Unix timestamp
+}
+
+message Task {
+  string id = 1;
+  string type = 2;
+  string payload_json = 3;
+  string priority = 4;                  // 'low', 'medium', 'high'
+  string semantic_category = 5;         // Classified by Mind
+  repeated string semantic_labels = 6;
+  int32 attempts = 7;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REPORT RESULT
+// ═══════════════════════════════════════════════════════════════
+
+message ReportResultRequest {
+  string task_id = 1;
+  string lease_id = 2;
+  string result_json = 3;               // Task output
+  float execution_time_ms = 4;
+}
+
+message ReportResultResponse {
+  bool acknowledged = 1;
+  string next_task_id = 2;              // Optional: immediately assign next task
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REPORT FAILURE
+// ═══════════════════════════════════════════════════════════════
+
+message ReportFailureRequest {
+  string task_id = 1;
+  string lease_id = 2;
+  string error = 3;
+  string error_trace = 4;
+  bool retryable = 5;
+}
+
+message ReportFailureResponse {
+  bool acknowledged = 1;
+  bool will_retry = 2;
+  int32 retry_count = 3;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HEARTBEAT
+// ═══════════════════════════════════════════════════════════════
+
+message HeartbeatRequest {
+  string bee_id = 1;
+  string status = 2;                    // 'idle', 'busy', 'error'
+  string current_task_id = 3;           // Task currently executing
+  WorkerMetrics metrics = 4;
+}
+
+message WorkerMetrics {
+  float cpu_usage = 1;
+  float memory_usage = 2;
+  int32 tasks_completed = 3;
+  int32 tasks_failed = 4;
+}
+
+message HeartbeatResponse {
+  bool acknowledged = 1;
+  string command = 2;                   // 'continue', 'pause', 'restart'
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REGISTER WORKER
+// ═══════════════════════════════════════════════════════════════
+
+message RegisterWorkerRequest {
+  string bee_id = 1;
+  string role = 2;
+  repeated string skills = 3;
+  map<string, string> config = 4;
+}
+
+message RegisterWorkerResponse {
+  bool registered = 1;
+  string worker_id = 2;
+}
+

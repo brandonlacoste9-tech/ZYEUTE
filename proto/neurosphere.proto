@@ -1,0 +1,113 @@
+// Neurosphere Service - The Mind
+// 
+// Provides orbital embeddings, classification, and reasoning
+// via gRPC for Colony OS Kernel integration.
+
+syntax = "proto3";
+
+package colony.mind;
+
+option go_package = "github.com/colony-os/proto/mind";
+
+// ═══════════════════════════════════════════════════════════════
+// NEUROSPHERE SERVICE
+// ═══════════════════════════════════════════════════════════════
+
+service NeurosphereService {
+  // Generate orbital embedding on unit sphere
+  rpc Embed(EmbedRequest) returns (EmbedResponse);
+  
+  // Classify input into semantic categories
+  rpc Classify(ClassifyRequest) returns (ClassifyResponse);
+  
+  // Multi-hop reasoning over knowledge graph
+  rpc Reason(ReasonRequest) returns (ReasonResponse);
+  
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EMBED ENDPOINT
+// ═══════════════════════════════════════════════════════════════
+
+message EmbedRequest {
+  string input = 1;
+  string model = 2;  // 'orbital-512', 'orbital-1024'
+}
+
+message EmbedResponse {
+  repeated float embedding = 1;  // Unit vector on S^(d-1)
+  float confidence = 2;
+  EmbedMetadata metadata = 3;
+}
+
+message EmbedMetadata {
+  string model = 1;
+  int32 dim = 2;
+  bool on_unit_sphere = 3;
+  float norm = 4;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLASSIFY ENDPOINT
+// ═══════════════════════════════════════════════════════════════
+
+message ClassifyRequest {
+  string input = 1;
+  repeated string categories = 2;  // Optional constraints
+}
+
+message ClassifyResponse {
+  repeated string labels = 1;       // Semantic labels
+  string category = 2;              // Primary category (BeeRole)
+  float confidence = 3;
+  ClassifyMetadata metadata = 4;
+}
+
+message ClassifyMetadata {
+  int32 concepts_extracted = 1;
+  repeated string all_concepts = 2;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REASON ENDPOINT
+// ═══════════════════════════════════════════════════════════════
+
+message ReasonRequest {
+  string query = 1;
+  map<string, string> context = 2;  // Additional context
+  int32 max_hops = 3;               // Maximum reasoning depth
+  bool include_visual = 4;          // Enable multimodal reasoning
+}
+
+message ReasonResponse {
+  string reasoning = 1;              // Reasoning chain
+  string next_action = 2;            // Recommended action
+  float confidence = 3;
+  ReasonMetadata metadata = 4;
+}
+
+message ReasonMetadata {
+  int32 convergence_cycle = 1;       // Cycle where Attractor Well formed
+  float final_energy = 2;            // System energy at convergence
+  float pairwise_uplift = 3;         // Cosine similarity uplift
+  float clustering = 4;              // Clustering coefficient
+  int32 graph_nodes = 5;
+  int32 graph_edges = 6;
+  repeated string reasoning_path = 7;  // Node IDs in reasoning chain
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HEALTH CHECK
+// ═══════════════════════════════════════════════════════════════
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;  // 'healthy', 'degraded', 'unhealthy'
+  string version = 2;
+  int64 uptime_seconds = 3;
+  map<string, string> metrics = 4;
+}
+
