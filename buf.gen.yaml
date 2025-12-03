@@ -1,0 +1,11 @@
+version: v2
+plugins:
+  - remote: buf.build/connectrpc/es:v1.4.0
+    out: packages/kernel-node/src/gen
+    opt:
+      - target=ts
+      - import_extension=.js
+  - remote: buf.build/grpc/python:v1.60.0
+    out: packages/neurosphere-python/gen
+  - remote: buf.build/grpc/python:v1.60.0
+    out: packages/neurasphere-python/gen

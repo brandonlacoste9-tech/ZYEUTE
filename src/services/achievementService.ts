@@ -4,6 +4,9 @@
  */
 
 import { supabase } from '../lib/supabase';
+import { logger } from '@/lib/logger';
+
+const achievementServiceLogger = logger.withContext('AchievementService');
 import { toast } from '../components/Toast';
 
 export type AchievementCategory = 'cultural' | 'regional' | 'engagement' | 'tiguy' | 'elite' | 'seasonal';
@@ -71,7 +74,7 @@ export async function getAllAchievements(): Promise<Achievement[]> {
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching achievements:', error);
+    achievementServiceLogger.error('Error fetching achievements:', error);
     return [];
   }
 }
@@ -89,7 +92,7 @@ export async function getUserAchievements(userId: string): Promise<UserAchieveme
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching user achievements:', error);
+    achievementServiceLogger.error('Error fetching user achievements:', error);
     return [];
   }
 }
@@ -127,7 +130,7 @@ export async function getUserTier(userId: string): Promise<TierInfo | null> {
       points_to_next: nextTier ? nextTier[1].min - totalPoints : undefined,
     };
   } catch (error) {
-    console.error('Error fetching user tier:', error);
+    achievementServiceLogger.error('Error fetching user tier:', error);
     return null;
   }
 }
@@ -172,7 +175,7 @@ export async function awardAchievement(
 
     return data === true;
   } catch (error) {
-    console.error('Error awarding achievement:', error);
+    achievementServiceLogger.error('Error awarding achievement:', error);
     return false;
   }
 }
@@ -214,7 +217,7 @@ export async function checkAchievements(
       }
     }
   } catch (error) {
-    console.error('Error checking achievements:', error);
+    achievementServiceLogger.error('Error checking achievements:', error);
   }
 }
 
@@ -346,7 +349,7 @@ async function checkAchievementCondition(
 
     return false;
   } catch (error) {
-    console.error('Error checking condition:', error);
+    achievementServiceLogger.error('Error checking condition:', error);
     return false;
   }
 }
@@ -390,7 +393,7 @@ export async function getAchievementStats(userId: string): Promise<{
       recent_achievements: recentAchievements,
     };
   } catch (error) {
-    console.error('Error fetching achievement stats:', error);
+    achievementServiceLogger.error('Error fetching achievement stats:', error);
     return {
       total_achievements: 0,
       earned_count: 0,
@@ -416,7 +419,7 @@ export async function getLeaderboard(limit = 100): Promise<any[]> {
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
+    achievementServiceLogger.error('Error fetching leaderboard:', error);
     return [];
   }
 }
@@ -441,7 +444,7 @@ export async function getUserRank(userId: string): Promise<number> {
 
     return (count || 0) + 1;
   } catch (error) {
-    console.error('Error fetching user rank:', error);
+    achievementServiceLogger.error('Error fetching user rank:', error);
     return 0;
   }
 }

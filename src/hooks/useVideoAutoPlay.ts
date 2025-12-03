@@ -3,6 +3,10 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { logger } from '../lib/logger';
+
+const useVideoAutoPlayLogger = logger.withContext('UseVideoAutoPlay');
+
 
 interface UseVideoAutoPlayOptions {
   threshold?: number;
@@ -38,7 +42,7 @@ export const useVideoAutoPlay = (options: UseVideoAutoPlayOptions = {}) => {
               setIsPlaying(true);
               onPlay?.();
             }).catch((error) => {
-              console.warn('Auto-play prevented:', error);
+              useVideoAutoPlayLogger.warn('Auto-play prevented:', error);
             });
           } else {
             // Video is not visible - pause it

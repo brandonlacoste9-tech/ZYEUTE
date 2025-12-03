@@ -5,6 +5,10 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { logger } from '../lib/logger';
+
+const usePremiumLogger = logger.withContext('UsePremium');
+
 
 export type PremiumTier = 'free' | 'bronze' | 'silver' | 'gold';
 
@@ -113,7 +117,7 @@ export function usePremium() {
         });
       }
     } catch (error) {
-      console.error('Error loading premium status:', error);
+      usePremiumLogger.error('Error loading premium status:', error);
       // Default to free on error
       setStatus({
         tier: 'free',

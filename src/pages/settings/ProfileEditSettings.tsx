@@ -11,6 +11,10 @@ import { QUEBEC_REGIONS } from '@/lib/quebecFeatures';
 import { toast } from '@/components/Toast';
 import { useHaptics } from '@/hooks/useHaptics';
 import { getCurrentUser } from '@/services/api';
+import { logger } from '../../lib/logger';
+
+const profileEditSettingsLogger = logger.withContext('ProfileEditSettings');
+
 
 export const ProfileEditSettings: React.FC = () => {
   const { tap } = useHaptics();
@@ -42,7 +46,7 @@ export const ProfileEditSettings: React.FC = () => {
           });
         }
       } catch (error) {
-        console.error('Error fetching user:', error);
+        profileEditSettingsLogger.error('Error fetching user:', error);
         toast.error('Erreur lors du chargement du profil');
       } finally {
         setIsLoading(false);
@@ -75,7 +79,7 @@ export const ProfileEditSettings: React.FC = () => {
       const updatedUser = await getCurrentUser();
       if (updatedUser) setUser(updatedUser);
     } catch (error: any) {
-      console.error('Error updating profile:', error);
+      profileEditSettingsLogger.error('Error updating profile:', error);
       toast.error(error.message || 'Erreur lors de la mise à jour');
     } finally {
       setIsSaving(false);
@@ -113,7 +117,7 @@ export const ProfileEditSettings: React.FC = () => {
       const updatedUser = await getCurrentUser();
       if (updatedUser) setUser(updatedUser);
     } catch (error: any) {
-      console.error('Error updating avatar:', error);
+      profileEditSettingsLogger.error('Error updating avatar:', error);
       toast.error('Erreur lors du téléversement');
     }
   };

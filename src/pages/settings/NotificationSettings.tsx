@@ -14,7 +14,7 @@ export const NotificationSettings: React.FC = () => {
   const { tap } = useHaptics();
 
   const handleToggle = (
-    path: 'notifications.push' | 'notifications.emailDigest' | 'notifications.reminders',
+    path: 'notifications.push' | 'notifications.emailDigest' | 'notifications.reminders' | 'notifications.notifyComments' | 'notifications.notifyFires' | 'notifications.notifyFollows',
     value: boolean
   ) => {
     tap();
@@ -87,6 +87,72 @@ export const NotificationSettings: React.FC = () => {
               <div
                 className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
                   preferences.notifications.reminders ? 'translate-x-6' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Comments on my posts */}
+        <div className="leather-card rounded-xl p-4 stitched">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-white font-semibold mb-1">Commentaires sur mes posts</h3>
+              <p className="text-leather-300 text-sm">Recevoir des notifications pour les commentaires</p>
+            </div>
+            <button
+              onClick={() => handleToggle('notifications.notifyComments', !preferences.notifications.notifyComments)}
+              className={`relative w-14 h-8 rounded-full transition-colors ${
+                preferences.notifications.notifyComments ? 'bg-gold-500' : 'bg-leather-700'
+              }`}
+            >
+              <div
+                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                  preferences.notifications.notifyComments ? 'translate-x-6' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Fires on my posts */}
+        <div className="leather-card rounded-xl p-4 stitched">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-white font-semibold mb-1">Feux sur mes posts</h3>
+              <p className="text-leather-300 text-sm">Recevoir des notifications pour les feux (likes)</p>
+            </div>
+            <button
+              onClick={() => handleToggle('notifications.notifyFires', !preferences.notifications.notifyFires)}
+              className={`relative w-14 h-8 rounded-full transition-colors ${
+                preferences.notifications.notifyFires ? 'bg-gold-500' : 'bg-leather-700'
+              }`}
+            >
+              <div
+                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                  preferences.notifications.notifyFires ? 'translate-x-6' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* New followers */}
+        <div className="leather-card rounded-xl p-4 stitched">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-white font-semibold mb-1">Nouveaux abonnés</h3>
+              <p className="text-leather-300 text-sm">Recevoir des notifications pour les nouveaux abonnés</p>
+            </div>
+            <button
+              onClick={() => handleToggle('notifications.notifyFollows', !preferences.notifications.notifyFollows)}
+              className={`relative w-14 h-8 rounded-full transition-colors ${
+                preferences.notifications.notifyFollows ? 'bg-gold-500' : 'bg-leather-700'
+              }`}
+            >
+              <div
+                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                  preferences.notifications.notifyFollows ? 'translate-x-6' : 'translate-x-0'
                 }`}
               />
             </button>

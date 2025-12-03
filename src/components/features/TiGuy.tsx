@@ -69,6 +69,8 @@ export const TiGuy: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom
@@ -89,9 +91,19 @@ export const TiGuy: React.FC = () => {
     }
   }, [isOpen]);
 
-  // Add Ti-Guy message
+  // Add Ti-Guy message with progress indicator
   const addTiGuyMessage = (responseKey: string) => {
     setIsTyping(true);
+    setGenerating(true);
+    setProgress(0);
+    
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        const next = Math.min(prev + 10, 90);
+        return next;
+      });
+    }, 100);
     
     setTimeout(() => {
       const responses = TI_GUY_RESPONSES[responseKey] || TI_GUY_RESPONSES.default;
@@ -104,8 +116,12 @@ export const TiGuy: React.FC = () => {
         timestamp: new Date(),
       };
       
+      setProgress(100);
       setMessages((prev) => [...prev, newMessage]);
       setIsTyping(false);
+      setGenerating(false);
+      clearInterval(progressInterval);
+      setTimeout(() => setProgress(0), 500);
     }, 1000);
   };
 
@@ -297,17 +313,42 @@ export const TiGuy: React.FC = () => {
                   />
                 </div>
                 <div
-                  className="p-3 rounded-2xl"
+                  className="p-3 rounded-2xl flex-1"
                   style={{
                     background: 'linear-gradient(135deg, #2d2218 0%, #1a1512 100%)',
                     border: '1px solid #4a3b22',
                   }}
                 >
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '300ms' }} />
-                  </div>
+                  {generating && progress > 0 ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span style={{ color: '#B38600' }}>Ti-Guy réfléchit...</span>
+                        <span style={{ color: '#8B7355' }}>{progress}%</span>
+                      </div>
+                      <div
+                        className="h-2 rounded-full overflow-hidden"
+                        style={{
+                          background: 'rgba(0,0,0,0.3)',
+                          border: '1px solid #4a3b22',
+                        }}
+                      >
+                        <div
+                          className="h-full transition-all duration-100 ease-out"
+                          style={{
+                            width: `${progress}%`,
+                            background: 'linear-gradient(90deg, #B38600 0%, #FFD966 100%)',
+                            boxShadow: '0 0 10px rgba(255, 191, 0, 0.5)',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-1">
+                      <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '300ms' }} />
+                    </div>
+                  )}
                 </div>
               </div>
             )}

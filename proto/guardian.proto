@@ -1,0 +1,128 @@
+// Guardian Service - The Immune System
+// 
+// Provides Byzantine consensus, drift detection, and safety validation
+// via gRPC for Colony OS Kernel integration.
+
+syntax = "proto3";
+
+package colony.guardian;
+
+option go_package = "github.com/colony-os/proto/guardian";
+
+// ═══════════════════════════════════════════════════════════════
+// GUARDIAN SERVICE (NEURASPHERE)
+// ═══════════════════════════════════════════════════════════════
+
+service GuardianService {
+  // Validate input for safety
+  rpc Guard(GuardRequest) returns (GuardResponse);
+  
+  // Byzantine consensus voting
+  rpc Vote(VoteRequest) returns (VoteResponse);
+  
+  // Check for semantic drift
+  rpc CheckDrift(DriftRequest) returns (DriftResponse);
+  
+  // Health and uptime metrics
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GUARD ENDPOINT (SAFETY VALIDATION)
+// ═══════════════════════════════════════════════════════════════
+
+message GuardRequest {
+  string source = 1;           // Service/agent making request
+  string input_json = 2;       // Input payload to validate
+  string context_json = 3;     // Additional context
+}
+
+message GuardResponse {
+  GuardStatus status = 1;
+  string safe_output_json = 2;  // Sanitized output (if rollback)
+  float confidence = 3;
+  repeated string violations = 4;  // Safety violations detected
+  GuardMetadata metadata = 5;
+}
+
+enum GuardStatus {
+  GUARD_STATUS_UNSPECIFIED = 0;
+  OK = 1;                      // Safe to proceed
+  BLOCKED = 2;                 // Rejected (adversarial/dangerous)
+  ROLLBACK = 3;                // Modified (sanitized version provided)
+}
+
+message GuardMetadata {
+  repeated string patterns_matched = 1;
+  float drift_score = 2;
+  bool consensus_required = 3;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VOTE ENDPOINT (BYZANTINE CONSENSUS)
+// ═══════════════════════════════════════════════════════════════
+
+message VoteRequest {
+  repeated string candidates_json = 1;  // Candidate outputs to vote on
+  float threshold = 2;                  // Consensus threshold (default: 0.67)
+}
+
+message VoteResponse {
+  string consensus_json = 1;            // Agreed-upon output
+  float agreement = 2;                  // Fraction of votes
+  repeated VoteResult votes = 3;
+  VoteMetadata metadata = 4;
+}
+
+message VoteResult {
+  string candidate_json = 1;
+  int32 vote_count = 2;
+  float confidence = 3;
+}
+
+message VoteMetadata {
+  int32 total_candidates = 1;
+  int32 voting_agents = 2;
+  string consensus_method = 3;  // 'byzantine', 'majority', 'weighted'
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DRIFT ENDPOINT (SEMANTIC STABILITY)
+// ═══════════════════════════════════════════════════════════════
+
+message DriftRequest {
+  string scope = 1;              // 'global', 'agent', 'task'
+  string input_json = 2;         // Current input to check
+  string baseline_hash = 3;      // Optional baseline to compare against
+}
+
+message DriftResponse {
+  float kl_divergence = 1;       // KL divergence from baseline
+  bool alert = 2;                // True if drift exceeds threshold
+  string current_hash = 3;       // Hash of current distribution
+  DriftMetadata metadata = 4;
+}
+
+message DriftMetadata {
+  float threshold = 1;           // Drift alert threshold
+  string last_stable_hash = 2;
+  int64 samples_since_baseline = 3;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HEALTH CHECK
+// ═══════════════════════════════════════════════════════════════
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;             // 'healthy', 'degraded', 'unhealthy'
+  string version = 2;
+  int64 uptime_seconds = 3;
+  float uptime_percent = 4;      // 99.9% target
+  bool blackout_survival = 5;    // Can survive outages
+  int32 faulty_agents = 6;
+  float consensus_rate = 7;
+  map<string, string> metrics = 8;
+}
+

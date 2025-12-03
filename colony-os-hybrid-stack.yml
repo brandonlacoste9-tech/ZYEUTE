@@ -1,0 +1,301 @@
+# Colony OS Hybrid Stack
+# 
+# Complete deployment with:
+# - Node.js Kernel (Fastify + Connect RPC)
+# - Python Mind (Neurosphere with OrbitalProp)
+# - Python Guardian (Neurasphere with Byzantine consensus)
+# - Bee Workers (DocBee, CodeBee, VisionBee, etc.)
+# - Infrastructure (Postgres + pgvector, Redis, S3)
+
+version: '3.8'
+
+services:
+  # ═══════════════════════════════════════════════════════════════
+  # INFRASTRUCTURE LAYER
+  # ═══════════════════════════════════════════════════════════════
+  
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: colony-postgres
+    environment:
+      POSTGRES_DB: colony
+      POSTGRES_USER: colony
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-colony_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./packages/kernel-node/prisma/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U colony"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  redis:
+    image: redis:7-alpine
+    container_name: colony-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  # ═══════════════════════════════════════════════════════════════
+  # PYTHON SERVICES (MIND & GUARDIAN)
+  # ═══════════════════════════════════════════════════════════════
+  
+  neurosphere:
+    build:
+      context: ./packages/neurosphere-python
+      dockerfile: Dockerfile
+    container_name: colony-neurosphere
+    environment:
+      - PORT=8000
+      - LOG_LEVEL=INFO
+      - EMBEDDING_DIM=512
+      - ETA=0.06
+      - CYCLES=24
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  neurasphere:
+    build:
+      context: ./packages/neurasphere-python
+      dockerfile: Dockerfile
+    container_name: colony-neurasphere
+    environment:
+      - PORT=8001
+      - LOG_LEVEL=INFO
+      - CONSENSUS_THRESHOLD=0.67
+      - DRIFT_THRESHOLD=0.15
+      - NEUROSPHERE_URL=http://neurosphere:8000
+    ports:
+      - "8001:8001"
+    depends_on:
+      - neurosphere
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  # ═══════════════════════════════════════════════════════════════
+  # NODE.JS KERNEL (THE BODY)
+  # ═══════════════════════════════════════════════════════════════
+  
+  kernel:
+    build:
+      context: ./packages/kernel-node
+      dockerfile: Dockerfile
+    container_name: colony-kernel
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgresql://colony:${POSTGRES_PASSWORD:-colony_pass}@postgres:5432/colony
+      - REDIS_URL=redis://redis:6379
+      - NEUROSPHERE_URL=http://neurosphere:8000
+      - NEURASPHERE_URL=http://neurasphere:8001
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      neurosphere:
+        condition: service_started
+      neurasphere:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  # ═══════════════════════════════════════════════════════════════
+  # BEE WORKERS (SPECIALIZED AGENTS)
+  # ═══════════════════════════════════════════════════════════════
+  
+  bee-doc-1:
+    build:
+      context: ./packages/bee-node
+      dockerfile: Dockerfile
+    container_name: colony-bee-doc-1
+    environment:
+      - BEE_ID=doc-bee-1
+      - BEE_ROLE=DocBee
+      - FOREMAN_URL=http://kernel:3000
+      - KERNEL_URL=http://kernel:3000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - POLL_INTERVAL_MS=5000
+      - HEARTBEAT_INTERVAL_MS=30000
+    depends_on:
+      kernel:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  bee-doc-2:
+    build:
+      context: ./packages/bee-node
+      dockerfile: Dockerfile
+    container_name: colony-bee-doc-2
+    environment:
+      - BEE_ID=doc-bee-2
+      - BEE_ROLE=DocBee
+      - FOREMAN_URL=http://kernel:3000
+      - KERNEL_URL=http://kernel:3000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      kernel:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  bee-code-1:
+    build:
+      context: ./packages/bee-node
+      dockerfile: Dockerfile
+    container_name: colony-bee-code-1
+    environment:
+      - BEE_ID=code-bee-1
+      - BEE_ROLE=CodeBee
+      - FOREMAN_URL=http://kernel:3000
+      - KERNEL_URL=http://kernel:3000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      kernel:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  bee-vision-1:
+    build:
+      context: ./packages/bee-node
+      dockerfile: Dockerfile
+    container_name: colony-bee-vision-1
+    environment:
+      - BEE_ID=vision-bee-1
+      - BEE_ROLE=VisionBee
+      - FOREMAN_URL=http://kernel:3000
+      - KERNEL_URL=http://kernel:3000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      kernel:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  bee-memory-1:
+    build:
+      context: ./packages/bee-node
+      dockerfile: Dockerfile
+    container_name: colony-bee-memory-1
+    environment:
+      - BEE_ID=memory-bee-1
+      - BEE_ROLE=MemoryBee
+      - FOREMAN_URL=http://kernel:3000
+      - KERNEL_URL=http://kernel:3000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      kernel:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  bee-ops-1:
+    build:
+      context: ./packages/bee-node
+      dockerfile: Dockerfile
+    container_name: colony-bee-ops-1
+    environment:
+      - BEE_ID=ops-bee-1
+      - BEE_ROLE=OpsBee
+      - FOREMAN_URL=http://kernel:3000
+      - KERNEL_URL=http://kernel:3000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      kernel:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - colony-network
+  
+  bee-general-1:
+    build:
+      context: ./packages/bee-node
+      dockerfile: Dockerfile
+    container_name: colony-bee-general-1
+    environment:
+      - BEE_ID=general-bee-1
+      - BEE_ROLE=GeneralBee
+      - FOREMAN_URL=http://kernel:3000
+      - KERNEL_URL=http://kernel:3000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      kernel:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - colony-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  colony-network:
+    driver: bridge
+
+# ═══════════════════════════════════════════════════════════════
+# USAGE
+# ═══════════════════════════════════════════════════════════════
+#
+# Start the complete Colony OS:
+#   docker-compose -f colony-os-hybrid-stack.yml up -d
+#
+# View logs:
+#   docker-compose -f colony-os-hybrid-stack.yml logs -f
+#
+# Stop:
+#   docker-compose -f colony-os-hybrid-stack.yml down
+#
+# Endpoints:
+#   Kernel API:     http://localhost:3000
+#   Neurosphere:    http://localhost:8000
+#   Neurasphere:    http://localhost:8001
+#   Postgres:       localhost:5432
+#   Redis:          localhost:6379
+

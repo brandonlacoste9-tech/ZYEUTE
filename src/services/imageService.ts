@@ -4,6 +4,9 @@
  */
 
 import { supabase } from '../lib/supabase';
+import { logger } from '@/lib/logger';
+
+const imageServiceLogger = logger.withContext('ImageService');
 import { toast } from '../components/Toast';
 
 // OpenAI API Key
@@ -31,7 +34,7 @@ export async function generateImage(
 
   // 2. Demo Mode (if no API key)
   if (!openaiKey) {
-    console.warn('⚠️ No OpenAI API Key found. Using Demo Mode.');
+    imageServiceLogger.warn('⚠️ No OpenAI API Key found. Using Demo Mode.');
     await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate delay
     
     toast.success('🎨 Mode Démo: Image générée!');
@@ -85,7 +88,7 @@ export async function generateImage(
     };
 
   } catch (error: any) {
-    console.error('Image generation error:', error);
+    imageServiceLogger.error('Image generation error:', error);
     toast.error('Erreur de création. Réessaie!');
     
     // Fallback to demo image

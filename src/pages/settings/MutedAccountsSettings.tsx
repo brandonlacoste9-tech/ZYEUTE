@@ -9,6 +9,10 @@ import { useSettingsPreferences } from '@/hooks/useSettingsPreferences';
 import { toast } from '@/components/Toast';
 import { useHaptics } from '@/hooks/useHaptics';
 import { supabase } from '@/lib/supabase';
+import { logger } from '../../lib/logger';
+
+const mutedAccountsSettingsLogger = logger.withContext('MutedAccountsSettings');
+
 
 export const MutedAccountsSettings: React.FC = () => {
   const { preferences, setPreference } = useSettingsPreferences();
@@ -34,7 +38,7 @@ export const MutedAccountsSettings: React.FC = () => {
       if (error) throw error;
       setSearchResults(data || []);
     } catch (error) {
-      console.error('Error searching users:', error);
+      mutedAccountsSettingsLogger.error('Error searching users:', error);
       toast.error('Erreur lors de la recherche');
     }
   };

@@ -67,3 +67,17 @@ test.describe('Zyeuté E2E Tests', () => {
     // await expect(page.getByText('Test post caption')).toBeVisible();
   });
 });
+test('example test', async ({ page }) => {
+  // Navigate to a page
+  await page.goto('https://example.com');
+  
+  // Some test steps here
+  await page.click('button');
+  
+  // Fixed: added await for web-first assertion
+  await expect(page).toHaveTitle('Expected Title');
+  
+  // More test steps
+  await page.waitForTimeout(1000);
+});
+

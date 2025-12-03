@@ -4,7 +4,10 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import type { Post, User, Story } from '@/types';
+
+const apiLogger = logger.withContext('API');
 
 /**
  * Gets the currently authenticated user's profile data
@@ -28,7 +31,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
     // If profile doesn't exist (error code PGRST116 = not found), create it
     if (error && error.code === 'PGRST116') {
-      console.log('[getCurrentUser] Profile not found, creating new profile for user:', authUser.id);
+      apiLogger.info('Profile not found, creating new profile for user:', authUser.id);
       
       // Extract username from email or use a default
       const email = authUser.email || '';
@@ -49,19 +52,19 @@ export async function getCurrentUser(): Promise<User | null> {
         .single();
 
       if (createError) {
-        console.error('[getCurrentUser] Error creating profile:', createError);
+        apiLogger.error('Error creating profile:', createError);
         return null;
       }
 
-      console.log('[getCurrentUser] Profile created successfully');
+      apiLogger.info('Profile created successfully');
       return newProfile as User;
     }
 
     // Other errors
-    console.error('[getCurrentUser] Error fetching current user:', error);
+    apiLogger.error('Error fetching current user:', error);
     return null;
   } catch (error) {
-    console.error('[getCurrentUser] Error in getCurrentUser:', error);
+    apiLogger.error('Error in getCurrentUser:', error);
     return null;
   }
 }
@@ -74,7 +77,7 @@ export async function getFeedPosts(page: number = 0, limit: number = 20): Promis
     const start = page * limit;
     const end = start + limit - 1;
 
-    console.log('[getFeedPosts] Starting query:', { page, limit, start, end });
+    apiLogger.debug('Starting query:', { page, limit, start, end });
 
     // Query publications directly instead of posts view to avoid RLS/view issues
     const { data, error } = await supabase
@@ -89,15 +92,15 @@ export async function getFeedPosts(page: number = 0, limit: number = 20): Promis
       .order('created_at', { ascending: false })
       .range(start, end);
 
-    console.log('[getFeedPosts] Query result:', { 
+    apiLogger.debug('Query result:', { 
       dataCount: data?.length || 0, 
       error: error?.message || null,
       firstItem: data?.[0] 
     });
 
     if (error) {
-      console.error('[getFeedPosts] Supabase error:', error);
-      console.error('[getFeedPosts] Error details:', {
+      apiLogger.error('Supabase error:', error);
+      apiLogger.error('Error details:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
@@ -107,7 +110,7 @@ export async function getFeedPosts(page: number = 0, limit: number = 20): Promis
     }
 
     if (!data || data.length === 0) {
-      console.warn('[getFeedPosts] No data returned from query');
+      apiLogger.warn('No data returned from query');
       return [];
     }
 
@@ -131,15 +134,15 @@ export async function getFeedPosts(page: number = 0, limit: number = 20): Promis
         visibility: pub.visibilite,
         is_hidden: pub.est_masque,
       };
-      console.log('[getFeedPosts] Mapped post:', { id: mapped.id, caption: mapped.caption, user: mapped.user?.username });
+      apiLogger.debug('Mapped post:', { id: mapped.id, caption: mapped.caption, user: mapped.user?.username });
       return mapped;
     }) as Post[];
 
-    console.log('[getFeedPosts] Returning posts:', posts.length);
+    apiLogger.debug('Returning posts:', posts.length);
     return posts;
   } catch (error) {
-    console.error('[getFeedPosts] Exception:', error);
-    console.error('[getFeedPosts] Error stack:', error instanceof Error ? error.stack : 'No stack');
+    apiLogger.error('Exception:', error);
+    apiLogger.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
     return [];
   }
 }
@@ -172,13 +175,13 @@ export async function getUserProfile(
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching user profile:', error);
+      apiLogger.error('Error fetching user profile:', error);
       return null;
     }
 
     return data as User;
   } catch (error) {
-    console.error('Error in getUserProfile:', error);
+    apiLogger.error('Error in getUserProfile:', error);
     return null;
   }
 }
@@ -197,7 +200,7 @@ export async function getPostById(postId: string): Promise<Post | null> {
       .single();
 
     if (error || !data) {
-      console.error('[getPostById] Error:', error);
+      apiLogger.error('Error:', error);
       return null;
     }
 
@@ -220,7 +223,7 @@ export async function getPostById(postId: string): Promise<Post | null> {
       is_hidden: data.est_masque,
     } as Post;
   } catch (error) {
-    console.error('[getPostById] Exception:', error);
+    apiLogger.error('Exception:', error);
     return null;
   }
 }
@@ -239,7 +242,7 @@ export async function getUserPosts(userId: string): Promise<Post[]> {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('[getUserPosts] Supabase error:', error);
+      apiLogger.error('Supabase error:', error);
       return [];
     }
 
@@ -264,7 +267,7 @@ export async function getUserPosts(userId: string): Promise<Post[]> {
 
     return posts;
   } catch (error) {
-    console.error('[getUserPosts] Exception:', error);
+    apiLogger.error('[getUserPosts] Exception:', error);
     return [];
   }
 }
@@ -283,7 +286,7 @@ export async function getStories(
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching stories:', error);
+      apiLogger.error('Error fetching stories:', error);
       return [];
     }
 
@@ -324,7 +327,7 @@ export async function getStories(
 
     return storyList;
   } catch (error) {
-    console.error('Error in getStories:', error);
+    apiLogger.error('Error in getStories:', error);
     return [];
   }
 }
@@ -343,13 +346,13 @@ export async function checkFollowing(followerId: string, followingId: string): P
 
     if (error && error.code !== 'PGRST116') {
       // PGRST116 is "not found" which is expected
-      console.error('Error checking follow status:', error);
+      apiLogger.error('Error checking follow status:', error);
       return false;
     }
 
     return !!data;
   } catch (error) {
-    console.error('Error in checkFollowing:', error);
+    apiLogger.error('Error in checkFollowing:', error);
     return false;
   }
 }
@@ -372,7 +375,7 @@ export async function toggleFollow(
         .eq('following_id', followingId);
 
       if (error) {
-        console.error('Error unfollowing user:', error);
+        apiLogger.error('Error unfollowing user:', error);
         return false;
       }
     } else {
@@ -383,14 +386,14 @@ export async function toggleFollow(
       });
 
       if (error) {
-        console.error('Error following user:', error);
+        apiLogger.error('Error following user:', error);
         return false;
       }
     }
 
     return true;
   } catch (error) {
-    console.error('Error in toggleFollow:', error);
+    apiLogger.error('Error in toggleFollow:', error);
     return false;
   }
 }
@@ -417,7 +420,7 @@ export async function togglePostFire(postId: string, userId: string): Promise<bo
         .eq('user_id', userId);
 
       if (error) {
-        console.error('Error removing fire:', error);
+        apiLogger.error('Error removing fire:', error);
         return false;
       }
     } else {
@@ -429,14 +432,14 @@ export async function togglePostFire(postId: string, userId: string): Promise<bo
       });
 
       if (error) {
-        console.error('Error adding fire:', error);
+        apiLogger.error('Error adding fire:', error);
         return false;
       }
     }
 
     return true;
   } catch (error) {
-    console.error('Error in togglePostFire:', error);
+    apiLogger.error('Error in togglePostFire:', error);
     return false;
   }
 }

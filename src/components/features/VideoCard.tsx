@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import DOMPurify from 'dompurify';
 import { Link, useNavigate } from 'react-router-dom';
 import { Avatar } from '../Avatar';
 import { VideoPlayer } from './VideoPlayer';
@@ -195,7 +196,7 @@ const VideoCardComponent: React.FC<VideoCardProps> = ({
           </button>
         </div>
 
-        {/* Caption */}
+        {/* Caption - sanitized for XSS protection */}
         {post.caption && (
           <div className={cn(
             'text-stone-300 leading-relaxed',
@@ -204,7 +205,15 @@ const VideoCardComponent: React.FC<VideoCardProps> = ({
             <Link to={`/profile/${user.username}`} className="font-bold text-gold-400 hover:text-gold-300 mr-2">
               {user.username}
             </Link>
-            <span className="text-stone-300">{post.caption}</span>
+            <span 
+              className="text-stone-300"
+              dangerouslySetInnerHTML={{ 
+                __html: DOMPurify.sanitize(post.caption, {
+                  ALLOWED_TAGS: ['b', 'i', 'em', 'strong'],
+                  ALLOWED_ATTR: []
+                })
+              }}
+            />
           </div>
         )}
 

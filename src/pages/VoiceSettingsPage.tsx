@@ -8,6 +8,10 @@ import { Header } from '../components/Header';
 import { BottomNav } from '../components/BottomNav';
 import { Button } from '../components/Button';
 import { toast } from '../components/Toast';
+import { logger } from '../lib/logger';
+
+const voiceSettingsPageLogger = logger.withContext('VoiceSettingsPage');
+
 
 interface VoiceSettings {
   enabled: boolean;
@@ -42,7 +46,7 @@ export default function VoiceSettingsPage() {
       try {
         setSettings(JSON.parse(saved));
       } catch (error) {
-        console.error('Error loading voice settings:', error);
+        voiceSettingsPageLogger.error('Error loading voice settings:', error);
       }
     }
   };

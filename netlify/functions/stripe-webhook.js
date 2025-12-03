@@ -1,10 +1,13 @@
 /**
  * Netlify Function: Stripe Webhook Handler
  * Handles Stripe webhook events for subscription management
+ * 
+ * Integration: Submits tasks to Colony OS for processing
  */
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
+const { submitTask } = require('./lib/colony-client');
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -12,6 +15,12 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+// Colony OS configuration
+const USE_COLONY_OS = process.env.USE_COLONY_OS === 'true';
+const COLONIES_SERVER_HOST = process.env.COLONIES_SERVER_HOST;
+const COLONIES_USER_PRVKEY = process.env.COLONIES_USER_PRVKEY;
+const COLONIES_COLONY_NAME = process.env.COLONIES_COLONY_NAME || 'zyeute-colony';
 
 exports.handler = async (event, context) => {
   const signature = event.headers['stripe-signature'] || event.headers['Stripe-Signature'];
@@ -24,11 +33,40 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const event = stripe.webhooks.constructEvent(event.body, signature, webhookSecret);
+    const stripeEvent = stripe.webhooks.constructEvent(event.body, signature, webhookSecret);
 
+    // If Colony OS is enabled, submit task and return immediately
+    if (USE_COLONY_OS && COLONIES_SERVER_HOST && COLONIES_USER_PRVKEY) {
+      try {
+        await submitTask(
+          {
+            funcname: 'validate_revenue',
+            args: [JSON.stringify(stripeEvent)],
+            priority: 8, // High priority for revenue events
+            maxexectime: 30,
+          },
+          COLONIES_SERVER_HOST,
+          COLONIES_COLONY_NAME,
+          COLONIES_USER_PRVKEY
+        );
+
+        console.log(`✅ Stripe event ${stripeEvent.type} submitted to Colony OS`);
+        
+        // Return immediately to Stripe (non-blocking)
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ received: true, method: 'colony_os' }),
+        };
+      } catch (colonyError) {
+        console.error('⚠️ Colony OS submission failed, falling back to direct processing:', colonyError);
+        // Fall through to direct processing
+      }
+    }
+
+    // Direct processing (fallback or when Colony OS disabled)
     // Handle checkout.session.completed
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
+    if (stripeEvent.type === 'checkout.session.completed') {
+      const session = stripeEvent.data.object;
       const userId = session.metadata?.userId;
       const tier = session.metadata?.tier;
       const subscriptionId = session.subscription;
@@ -87,8 +125,8 @@ exports.handler = async (event, context) => {
     }
 
     // Handle subscription updates
-    if (event.type === 'customer.subscription.updated') {
-      const subscription = event.data.object;
+    if (stripeEvent.type === 'customer.subscription.updated') {
+      const subscription = stripeEvent.data.object;
       const userId = subscription.metadata?.userId;
       const tier = subscription.metadata?.tier;
 
@@ -108,8 +146,8 @@ exports.handler = async (event, context) => {
     }
 
     // Handle subscription cancellations
-    if (event.type === 'customer.subscription.deleted') {
-      const subscription = event.data.object;
+    if (stripeEvent.type === 'customer.subscription.deleted') {
+      const subscription = stripeEvent.data.object;
       const userId = subscription.metadata?.userId;
 
       if (userId) {
