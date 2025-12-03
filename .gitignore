@@ -56,3 +56,4 @@ supabase/.temp
 korean-AI-compliance-/
 korean-AI-compliance-~*/
 
+*.bak*
