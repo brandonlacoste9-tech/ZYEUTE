@@ -1,0 +1,47 @@
+# Labeler configuration for automatic PR labeling
+# See: https://github.com/actions/labeler
+
+# Dependencies
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file: ['package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml']
+
+# Documentation
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: ['**/*.md', 'docs/**/*']
+
+# CI/CD
+ci:
+  - changed-files:
+    - any-glob-to-any-file: ['.github/**/*', '.circleci/**/*', 'netlify.toml']
+
+# Frontend
+frontend:
+  - changed-files:
+    - any-glob-to-any-file: ['src/**/*.tsx', 'src/**/*.jsx', 'src/**/*.css']
+
+# Backend
+backend:
+  - changed-files:
+    - any-glob-to-any-file: ['netlify/functions/**/*', 'supabase/**/*', 'app/api/**/*']
+
+# Tests
+tests:
+  - changed-files:
+    - any-glob-to-any-file: ['**/*.test.ts', '**/*.test.tsx', '**/*.test.js', '**/*.spec.ts', 'e2e/**/*']
+
+# Infrastructure
+infrastructure:
+  - changed-files:
+    - any-glob-to-any-file: ['infrastructure/**/*', 'colony/**/*', 'packages/**/*']
+
+# Security
+security:
+  - changed-files:
+    - any-glob-to-any-file: ['SECURITY.md', '.github/workflows/security-audit.yml']
+
+# Configuration
+config:
+  - changed-files:
+    - any-glob-to-any-file: ['*.config.js', '*.config.ts', 'tsconfig.json', '.eslintrc*', '.prettierrc*']

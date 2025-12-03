@@ -61,5 +61,29 @@
     "scripts/",
     "public/",
     "fix-imports.js"
+  ],
+  "overrides": [
+    {
+      "files": ["netlify/functions/**/*.js"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off",
+        "no-console": "off"
+      }
+    },
+    {
+      "files": ["**/*.test.js", "**/*.spec.js"],
+      "env": {
+        "jest": true
+      },
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    },
+    {
+      "files": ["colony/**/*.js"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
   ]
 }
