@@ -27,6 +27,7 @@ import { createGrpcTransport } from '@connectrpc/connect-node';
 // Services
 import { createTaskRoutes } from './routes/tasks';
 import { createMemoryRoutes } from './routes/memory';
+import { createTestRoutes } from './routes/test';
 import { createForemanHandler } from './grpc/foreman.handler';
 import { guardianInterceptor } from './middleware/guardian';
 
@@ -113,6 +114,9 @@ export async function buildServer() {
 
   // Memory routes (Honeycomb)
   await app.register(createMemoryRoutes, { prefix: '/v1' });
+  
+  // Test routes (for Comet validation)
+  await app.register(createTestRoutes, { prefix: '/v1' });
 
   // ═══════════════════════════════════════════════════════════════
   // CONNECT RPC SERVICES (INTERNAL)
