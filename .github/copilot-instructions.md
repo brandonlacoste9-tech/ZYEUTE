@@ -927,6 +927,8 @@ When making changes, manually verify:
   1. Run `npm install` to update dependencies
   2. Run `npm run type-check` to see all type errors
   3. Check if new types need to be imported
+  4. Restart TypeScript server in your IDE (VS Code: Cmd/Ctrl+Shift+P → "TypeScript: Restart TS Server")
+  5. Clear TypeScript cache: `npx tsc --build --clean`
 
 #### Development Server Issues
 
@@ -941,7 +943,10 @@ When making changes, manually verify:
 - **Solution**:
   1. Restart the dev server (`npm run dev`)
   2. Check if files are being watched correctly
-  3. Try clearing Vite cache: `rm -rf node_modules/.vite`
+  3. Try clearing Vite cache:
+     - Unix/Mac: `rm -rf node_modules/.vite`
+     - Windows: `rmdir /s node_modules\.vite`
+     - Cross-platform: `npx vite --force`
 
 #### Database Issues
 
@@ -976,7 +981,8 @@ When making changes, manually verify:
 
 **Issue**: Not sure if text is authentic Joual
 - **Solution**: Always consult `src/lib/quebecFeatures.ts` for approved phrases
-- **Resources**: Check `JOUAL_DICTIONARY` and `QUEBEC_EXPRESSIONS` constants
+- **Best Practice**: Import and use constants from `JOUAL_DICTIONARY` or `QUEBEC_EXPRESSIONS` rather than hardcoding Quebec French text
+- **Resources**: Check these constants for pre-approved authentic Joual phrases
 
 **Issue**: Need Quebec-specific data
 - **Solution**: 
