@@ -54,7 +54,7 @@ export const AppSettings: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <h3 className="text-white font-semibold mb-1">Analytiques</h3>
-              <p className="text-leather-300 text-sm">Partager des données d'utilisation pour améliorer l'app</p>
+              <p className="text-leather-300 text-sm">Partager des données d&apos;utilisation pour améliorer l&apos;app</p>
             </div>
             <button
               onClick={() => handleToggle('app.analytics', !preferences.app.analytics)}
@@ -95,7 +95,7 @@ export const AppSettings: React.FC = () => {
 
         {/* App Info */}
         <div className="leather-card rounded-xl p-4 stitched">
-          <h3 className="text-white font-semibold mb-3">Informations sur l'app</h3>
+          <h3 className="text-white font-semibold mb-3">Informations sur l&apos;app</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-leather-400">Version</span>

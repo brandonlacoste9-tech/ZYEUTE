@@ -54,7 +54,7 @@ export const FeedGrid: React.FC<FeedGridProps> = ({
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-4">
         <div className="text-6xl mb-4">⚜️</div>
         <h3 className="text-xl font-bold text-white mb-2">
-          Aucun post pour l'instant
+          Aucun post pour l&apos;instant
         </h3>
         <p className="text-white/60 mb-6">
           Sois le premier à partager du contenu!

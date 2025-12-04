@@ -212,7 +212,7 @@ export const Login: React.FC = () => {
             className="text-sm font-bold tracking-[0.3em] mt-2"
             style={{ color: '#DAA520' }}
           >
-            L'APP SOCIALE DU QUÉBEC
+            L&apos;APP SOCIALE DU QUÉBEC
           </p>
           <p className="text-white/50 text-sm mt-2">
             Fait au Québec, pour le Québec 🇨🇦⚜️

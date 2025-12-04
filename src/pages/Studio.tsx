@@ -63,7 +63,7 @@ export default function Studio() {
             />
             <div className="text-6xl mb-4">📤</div>
             <h3 className="text-xl font-bold text-white mb-2">Téléverse ta vidéo</h3>
-            <p className="text-white/50">MP4, MOV jusqu'à 50MB</p>
+            <p className="text-white/50">MP4, MOV jusqu&apos;à 50MB</p>
             {isUploading && <p className="text-purple-400 mt-4 animate-pulse">Analyse IA en cours...</p>}
           </div>
         ) : (

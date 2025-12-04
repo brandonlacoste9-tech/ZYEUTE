@@ -294,7 +294,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
           {/* No results */}
           {!isLoading && query && results.length === 0 && (
             <div className="p-4 text-center text-white/60">
-              Aucun résultat pour "{query}"
+              Aucun résultat pour &quot;{query}&quot;
             </div>
           )}
 
