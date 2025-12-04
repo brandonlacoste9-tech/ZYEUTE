@@ -56,7 +56,7 @@ class ComfyUIClient {
       throw new Error(`ComfyUI API error: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as { prompt_id: string };
     return data.prompt_id;
   }
 

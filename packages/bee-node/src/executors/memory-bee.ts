@@ -81,8 +81,8 @@ async function recallContext(payload: any): Promise<TaskResult> {
     body: JSON.stringify({ query, scope, limit: 10 })
   });
   
-  const result = await response.json();
-  
+  const result = await response.json() as { results: any[] };
+
   return {
     success: true,
     output: {
