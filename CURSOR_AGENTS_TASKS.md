@@ -23,13 +23,6 @@ Error Location: Lines 18-19
 Issue: `prefix: "chore"` and `include: "scope"` are incorrectly indented. These should be separate top-level keys under the npm package-ecosystem entry, not nested under `labels:`.
 
 Current (incorrect):
-```yaml
-    labels:
-      - "dependencies"
-      prefix: "chore"
-      include: "scope"
-```
-
 Expected structure:
 - `prefix` and `include` should be at the same indentation level as `labels:`, `schedule:`, etc.
 - Reference: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
