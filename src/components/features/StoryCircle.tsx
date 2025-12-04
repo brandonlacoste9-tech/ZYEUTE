@@ -117,7 +117,7 @@ export const StoryCarousel: React.FC<{
         {/* Other users' stories */}
         {stories
           .filter(s => s.user.id !== currentUser?.id)
-          .map(({ user, story, isViewed }, index) => (
+          .map(({ user, story, isViewed }) => (
             <StoryCircle
               key={user.id}
               user={user}

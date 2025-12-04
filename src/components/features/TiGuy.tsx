@@ -6,7 +6,6 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '../Button';
 import { cn } from '../../lib/utils';
 
 interface Message {
@@ -166,7 +165,7 @@ export const TiGuy: React.FC = () => {
   };
 
   // Handle quick action
-  const handleQuickAction = (key: string, label: string) => {
+  const handleQuickAction = (_key: string, label: string) => {
     handleSendMessage(label);
   };
 

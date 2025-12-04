@@ -3,13 +3,13 @@
  */
 
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Avatar } from '../Avatar';
 import { VideoPlayer } from './VideoPlayer';
 import { supabase } from '../../lib/supabase';
 import { getTimeAgo } from '../../lib/utils';
-import type { Story, User } from '../../types';
+import type { Story } from '../../types';
 import { logger } from '../../lib/logger';
+import { toast } from '../Toast';
 
 const storyViewerLogger = logger.withContext('StoryViewer');
 
@@ -25,7 +25,6 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
   initialIndex = 0,
   onClose,
 }) => {
-  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);

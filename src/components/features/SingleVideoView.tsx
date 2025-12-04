@@ -3,8 +3,8 @@
  * Full-screen video with overlay UI matching app aesthetic
  */
 
-import React, { useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { VideoPlayer } from './VideoPlayer';
 import { Avatar } from '../Avatar';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -30,7 +30,6 @@ export const SingleVideoView: React.FC<SingleVideoViewProps> = ({
   const videoRef = useRef<HTMLDivElement>(null);
   const [isLiked, setIsLiked] = React.useState(false);
   const { tap, impact } = useHaptics();
-  const navigate = useNavigate();
 
   const handleFire = () => {
     setIsLiked(!isLiked);

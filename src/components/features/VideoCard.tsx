@@ -13,9 +13,9 @@ import { toast } from '../Toast';
 import { cn } from '../../lib/utils';
 import type { Post, User } from '../../types';
 
-interface VideoCardProps {
+export interface VideoCardProps {
   post: Post;
-  user: User;
+  user?: User;
   variant?: 'horizontal' | 'vertical';
   autoPlay?: boolean;
   muted?: boolean;
@@ -26,7 +26,7 @@ interface VideoCardProps {
 
 const VideoCardComponent: React.FC<VideoCardProps> = ({
   post,
-  user,
+  user: userProp,
   variant = 'vertical',
   autoPlay = false,
   muted = true,
@@ -34,10 +34,17 @@ const VideoCardComponent: React.FC<VideoCardProps> = ({
   onComment,
   onShare,
 }) => {
+  // Use provided user prop or fall back to post.user
+  const user = userProp || post.user;
   const navigate = useNavigate();
   const { tap } = useHaptics();
   const [isLiked, setIsLiked] = React.useState(false);
   const isHorizontal = variant === 'horizontal';
+
+  // Guard: Don't render if no user data
+  if (!user) {
+    return null;
+  }
 
   const handleCardClick = () => {
     // Only navigate to player if it's a video post
@@ -255,7 +262,7 @@ export const VideoCard = React.memo(VideoCardComponent, (prevProps, nextProps) =
     prevProps.post.id === nextProps.post.id &&
     prevProps.post.fire_count === nextProps.post.fire_count &&
     prevProps.post.is_fired === nextProps.post.is_fired &&
-    prevProps.user.id === nextProps.user.id &&
+    prevProps.user?.id === nextProps.user?.id &&
     prevProps.variant === nextProps.variant &&
     prevProps.autoPlay === nextProps.autoPlay &&
     prevProps.muted === nextProps.muted &&
@@ -266,5 +273,25 @@ export const VideoCard = React.memo(VideoCardComponent, (prevProps, nextProps) =
 });
 
 VideoCard.displayName = 'VideoCard';
+
+/**
+ * VideoCardSkeleton - Loading placeholder for VideoCard
+ */
+export const VideoCardSkeleton: React.FC = () => (
+  <div className="leather-card rounded-2xl overflow-hidden animate-pulse">
+    <div className="flex items-center gap-3 p-3 border-b border-neutral-800 bg-black/20">
+      <div className="w-10 h-10 rounded-full bg-neutral-700" />
+      <div className="flex-1">
+        <div className="h-4 bg-neutral-700 rounded w-24 mb-1" />
+        <div className="h-3 bg-neutral-700 rounded w-16" />
+      </div>
+    </div>
+    <div className="aspect-[9/16] bg-neutral-800" />
+    <div className="p-3 space-y-2">
+      <div className="h-3 bg-neutral-700 rounded w-full" />
+      <div className="h-3 bg-neutral-700 rounded w-3/4" />
+    </div>
+  </div>
+);
 
 export default VideoCard;
