@@ -97,6 +97,8 @@ Exclude:
 - *.test.tsx, *.spec.ts files
 
 Example replacements:
+```
+
 ```typescript
 // Before
 console.log('User logged in:', user);
@@ -111,6 +113,7 @@ const log = logger.withContext('Feed');
 log.info('Loading feed');
 ```
 
+```
 Success Criteria:
 - ✅ All console.log/info/debug replaced with logger
 - ✅ Code compiles without errors
