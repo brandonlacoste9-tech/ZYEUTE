@@ -15,8 +15,6 @@ updates:
       - "zyeute-maintainers"
     labels:
       - "dependencies"
-      prefix: "chore"
-      include: "scope"
     # Group updates to reduce PR noise
     groups:
       production-dependencies:

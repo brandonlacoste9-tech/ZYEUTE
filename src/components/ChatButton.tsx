@@ -5,7 +5,6 @@
  */
 
 import React, { useState } from 'react';
-import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 import { useHaptics } from '@/hooks/useHaptics';
 import { ChatModal } from './ChatModal';
 import { cn } from '@/lib/utils';
@@ -23,19 +22,13 @@ const sizeClasses = {
   lg: 'w-20 h-20',
 };
 
-const iconSizes = {
-  sm: 'text-2xl',
-  md: 'text-3xl',
-  lg: 'text-4xl',
-};
-
 export const ChatButton: React.FC<ChatButtonProps> = ({
   onClick,
   isFixed = true,
   className,
   size = 'md',
 }) => {
-  const { tap, impact } = useHaptics();
+  const { impact } = useHaptics();
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const handleClick = () => {

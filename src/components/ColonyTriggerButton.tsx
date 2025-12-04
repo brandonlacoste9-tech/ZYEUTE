@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { createColonyTask, getColonyTaskStatus, getRecentColonyTasks, type ColonyTask } from '@/integrations/colony/zyeute-trigger';
+import { createColonyTask, getRecentColonyTasks, type ColonyTask } from '@/integrations/colony/zyeute-trigger';
 import { isAdmin } from '@/lib/admin';
 import { toast } from './Toast';
 

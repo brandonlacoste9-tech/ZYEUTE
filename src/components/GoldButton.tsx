@@ -31,7 +31,7 @@ export const GoldButton: React.FC<GoldButtonProps> = ({
   disabled,
   ...rest
 }) => {
-  const { tap, impact } = useHaptics();
+  const { impact } = useHaptics();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (disabled) return;
