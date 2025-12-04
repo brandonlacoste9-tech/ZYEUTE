@@ -134,4 +134,3 @@ export async function cancelColonyTask(taskId: string): Promise<boolean> {
     return false;
   }
 }
-
