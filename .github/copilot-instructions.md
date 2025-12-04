@@ -20,6 +20,11 @@ This document provides comprehensive guidance for GitHub Copilot when assisting 
 10. [Design System](#design-system)
 11. [Testing Approach](#testing-approach)
 12. [Best Practices](#best-practices)
+13. [Troubleshooting](#troubleshooting)
+14. [Environment Variables](#environment-variables)
+15. [Additional Resources](#additional-resources)
+16. [Quick Reference Commands](#quick-reference-commands)
+17. [Getting Started](#getting-started)
 
 ---
 
@@ -904,6 +909,98 @@ When making changes, manually verify:
 3. **Branch naming**: `feature/`, `fix/`, `refactor/` prefixes
 4. **Pull before push** - avoid merge conflicts
 5. **Review changes** - use `git diff` before committing
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues and Solutions
+
+#### Build Errors
+
+**Issue**: `Cannot find type definition file for 'vite/client'`
+- **Solution**: Run `npm install` to ensure all dependencies are installed
+- **Root Cause**: Missing or corrupted node_modules
+
+**Issue**: TypeScript compilation errors after pulling latest changes
+- **Solution**: 
+  1. Run `npm install` to update dependencies
+  2. Run `npm run type-check` to see all type errors
+  3. Check if new types need to be imported
+
+#### Development Server Issues
+
+**Issue**: Dev server won't start or shows blank page
+- **Solution**:
+  1. Check if environment variables are set in `.env.local`
+  2. Verify Supabase URL and keys are valid
+  3. Clear browser cache and restart dev server
+  4. Check browser console for errors
+
+**Issue**: Hot reload not working
+- **Solution**:
+  1. Restart the dev server (`npm run dev`)
+  2. Check if files are being watched correctly
+  3. Try clearing Vite cache: `rm -rf node_modules/.vite`
+
+#### Database Issues
+
+**Issue**: "relation does not exist" errors
+- **Solution**: Run database migrations in order:
+  1. Open Supabase Dashboard → SQL Editor
+  2. Run migrations from `supabase/migrations/` in order
+  3. Verify Row Level Security (RLS) policies are enabled
+
+**Issue**: Authentication not working
+- **Solution**:
+  1. Verify Supabase keys in `.env.local`
+  2. Check if auth provider is enabled in Supabase dashboard
+  3. Clear browser cookies and local storage
+  4. Verify user exists in auth.users table
+
+#### External Service Issues
+
+**Issue**: OpenAI features not working
+- **Solution**: 
+  - If API key is missing, features run in demo mode (expected behavior)
+  - Verify `VITE_OPENAI_API_KEY` is set correctly
+  - Check API key has proper permissions and credits
+
+**Issue**: Stripe payment errors
+- **Solution**:
+  - Demo mode is enabled if `VITE_STRIPE_PUBLIC_KEY` is not set
+  - Verify you're using test keys for development
+  - Check webhook setup if testing subscriptions
+
+#### Quebec/Joual Content Issues
+
+**Issue**: Not sure if text is authentic Joual
+- **Solution**: Always consult `src/lib/quebecFeatures.ts` for approved phrases
+- **Resources**: Check `JOUAL_DICTIONARY` and `QUEBEC_EXPRESSIONS` constants
+
+**Issue**: Need Quebec-specific data
+- **Solution**: 
+  - Regions: See `QUEBEC_REGIONS` in `quebecFeatures.ts`
+  - Montreal neighborhoods: See `MONTREAL_QUARTIERS`
+  - Events: See `QUEBEC_EVENTS`
+
+### Getting Help
+
+If you encounter an issue not covered here:
+
+1. **Check existing documentation**:
+   - `README.md` - Project overview
+   - `SETUP_GUIDE.md` - Detailed setup instructions
+   - `CONTRIBUTING.md` - Contribution guidelines
+   - `DESIGN_SYSTEM.md` - Design system documentation
+
+2. **Search existing issues**: Check GitHub Issues for similar problems
+
+3. **Ask for help**: Open a new GitHub Issue with:
+   - Clear description of the problem
+   - Steps to reproduce
+   - Error messages or screenshots
+   - Your environment (OS, Node version, browser)
 
 ---
 
