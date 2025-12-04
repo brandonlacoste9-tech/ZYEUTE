@@ -105,7 +105,7 @@ export default function Artiste() {
               <Button onClick={handlePost} className="flex-1">
                 🚀 Publier
               </Button>
-              <Button variant="outline" onClick={() => setResult(null)} className=&quot;flex-1&quot;>
+              <Button variant="outline" onClick={() => setResult(null)} className="flex-1">
                 🗑️ Ignorer
               </Button>
             </div>
