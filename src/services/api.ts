@@ -19,7 +19,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
     // Try to fetch existing profile
     const { data, error } = await supabase
-      .from('user_profiles')
+      .from('users')
       .select('*')
       .eq('id', authUser.id)
       .single();
@@ -40,7 +40,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
       // Create the profile
       const { data: newProfile, error: createError } = await supabase
-        .from('user_profiles')
+        .from('users')
         .insert({
           id: authUser.id,
           username: username,
@@ -160,13 +160,13 @@ export async function getUserProfile(
 
     if (usernameOrId === 'me' && currentUserId) {
       query = supabase
-        .from('user_profiles')
+        .from('users')
         .select('*')
         .eq('id', currentUserId)
         .single();
     } else {
       query = supabase
-        .from('user_profiles')
+        .from('users')
         .select('*')
         .eq('username', usernameOrId)
         .single();
@@ -315,7 +315,7 @@ export async function getStories(
       }
       // If current user has no story, add them to the beginning
       const { data: currentUserData } = await supabase
-        .from('user_profiles')
+        .from('users')
         .select('*')
         .eq('id', currentUserId)
         .single();
