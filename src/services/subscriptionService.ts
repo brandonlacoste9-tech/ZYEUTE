@@ -210,22 +210,22 @@ export async function subscribeToCreator(
 
     // Check if user has enough cennes (for demo purposes)
     const { data: userData } = await supabase
-      .from('user_profiles')
-      .select('cennes')
+      .from('users')
+      .select('coins')
       .eq('id', subscriberId)
       .single();
 
-    const cennesRequired = Math.round(tier.price * 100); // $1 = 100 cennes
+    const cennesRequired = Math.round(tier.price * 100); // $1 = 100 coins
 
-    if (!userData || (userData.cennes || 0) < cennesRequired) {
-      toast.error(`Tu as besoin de ${cennesRequired} cennes (${tier.price}$ CAD)`);
+    if (!userData || (userData.coins || 0) < cennesRequired) {
+      toast.error(`Tu as besoin de ${cennesRequired} coins (${tier.price}$ CAD)`);
       return false;
     }
 
-    // Deduct cennes
+    // Deduct coins
     await supabase
-      .from('user_profiles')
-      .update({ cennes: (userData.cennes || 0) - cennesRequired })
+      .from('users')
+      .update({ coins: (userData.coins || 0) - cennesRequired })
       .eq('id', subscriberId);
 
     // Create subscription
@@ -298,7 +298,7 @@ export async function getCreatorRevenue(creatorId: string): Promise<RevenueSumma
   try {
     // Get user stats
     const { data: userData } = await supabase
-      .from('user_profiles')
+      .from('users')
       .select('total_earnings, pending_earnings, total_subscribers')
       .eq('id', creatorId)
       .single();
@@ -390,7 +390,7 @@ export async function requestPayout(
 
     // Check pending earnings
     const { data: userData } = await supabase
-      .from('user_profiles')
+      .from('users')
       .select('pending_earnings, payout_email')
       .eq('id', creatorId)
       .single();
@@ -419,7 +419,7 @@ export async function requestPayout(
 
     // Update pending earnings
     await supabase
-      .from('user_profiles')
+      .from('users')
       .update({
         pending_earnings: (userData.pending_earnings || 0) - amount,
       })

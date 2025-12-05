@@ -62,7 +62,7 @@ export const ProfileEditSettings: React.FC = () => {
     setIsSaving(true);
     try {
       const { error } = await supabase
-        .from('user_profiles')
+        .from('users')
         .update({
           username: formData.username,
           display_name: formData.display_name,
@@ -107,7 +107,7 @@ export const ProfileEditSettings: React.FC = () => {
         .getPublicUrl(filePath);
 
       const { error: updateError } = await supabase
-        .from('user_profiles')
+        .from('users')
         .update({ avatar_url: publicUrl })
         .eq('id', user.id);
 

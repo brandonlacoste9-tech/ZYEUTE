@@ -29,7 +29,7 @@ export const RegionSettings: React.FC = () => {
       if (user) {
         const region = QUEBEC_REGIONS.find(r => r.id === regionId);
         await supabase
-          .from('user_profiles')
+          .from('users')
           .update({ region: regionId })
           .eq('id', user.id);
         
