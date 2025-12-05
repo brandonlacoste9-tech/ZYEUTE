@@ -213,7 +213,7 @@ export const Feed: React.FC = () => {
             <p className="text-stone-400 font-medium">Chargement du feed...</p>
           </div>
         ) : posts.length === 0 ? (
-          <div className="leather-card-elevated rounded-2xl p-12 text-center stitched">
+          <div className="leather-card rounded-2xl p-12 text-center stitched">
             <div className="text-6xl mb-4 animate-bounce">🦫</div>
             <h3 className="text-xl font-bold text-gold-400 mb-2 embossed">Bienvenue sur Zyeuté!</h3>
             <p className="text-stone-400 mb-6">
