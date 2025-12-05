@@ -1,0 +1,5 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data: https://r2cdn.perplexity.ai; img-src 'self' data: https:; connect-src 'self' https://api.supabase.co https://api.stripe.com https://api.openai.com; frame-src 'self' https://checkout.stripe.com;
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block

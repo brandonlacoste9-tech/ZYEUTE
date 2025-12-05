@@ -153,7 +153,7 @@ export const LogoFull: React.FC<{ className?: string }> = ({ className }) => {
             Zyeuté
           </h1>
           <p className="text-gold-400 text-sm font-semibold tracking-widest">
-            L'APP SOCIALE DU QUÉBEC
+            L&apos;APP SOCIALE DU QUÉBEC
           </p>
           <p className="text-white/60 text-xs mt-1">
             Fait au Québec, pour le Québec 🇨🇦⚜️

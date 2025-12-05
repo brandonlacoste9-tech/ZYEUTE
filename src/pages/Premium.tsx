@@ -109,7 +109,7 @@ export default function Premium() {
             Zyeuté VIP
           </h1>
           <p className="text-leather-200 text-lg embossed">
-            L'expérience premium québécoise
+            L&apos;expérience premium québécoise
           </p>
         </div>
         {/* Gold accent lines */}
@@ -306,7 +306,7 @@ export default function Premium() {
                 </svg>
               </summary>
               <p className="text-leather-300 text-sm py-3">
-                Oui! Tu peux annuler ton abonnement à tout moment depuis tes paramètres. Tu garderas l'accès jusqu'à la fin de ta période payée.
+                Oui! Tu peux annuler ton abonnement à tout moment depuis tes paramètres. Tu garderas l&apos;accès jusqu&apos;à la fin de ta période payée.
               </p>
             </details>
 
