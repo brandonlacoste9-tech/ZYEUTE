@@ -58,8 +58,12 @@
 [dev]
   # Command to run local dev server
   command = "npm run dev"
-  # Port for local development (matches vite.config.ts)
-  port = 5173
+  # Port for local development (external access for Netlify CLI)
+  port = 8888
+  # Vite's internal dev server port - Netlify CLI forwards traffic to this port
+  targetPort = 5173
+  # Framework (explicit, prevents auto-detection as Next.js)
+  framework = "#custom"
   # Auto-open browser on dev server start
   autoLaunch = false
 
