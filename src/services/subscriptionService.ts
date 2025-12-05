@@ -208,24 +208,24 @@ export async function subscribeToCreator(
       return false;
     }
 
-    // Check if user has enough cennes (for demo purposes)
+    // Check if user has enough coins (for demo purposes)
     const { data: userData } = await supabase
       .from('users')
       .select('coins')
       .eq('id', subscriberId)
       .single();
 
-    const cennesRequired = Math.round(tier.price * 100); // $1 = 100 coins
+    const coinsRequired = Math.round(tier.price * 100); // $1 = 100 coins
 
-    if (!userData || (userData.coins || 0) < cennesRequired) {
-      toast.error(`Tu as besoin de ${cennesRequired} coins (${tier.price}$ CAD)`);
+    if (!userData || (userData.coins || 0) < coinsRequired) {
+      toast.error(`Tu as besoin de ${coinsRequired} coins (${tier.price}$ CAD)`);
       return false;
     }
 
     // Deduct coins
     await supabase
       .from('users')
-      .update({ coins: (userData.coins || 0) - cennesRequired })
+      .update({ coins: (userData.coins || 0) - coinsRequired })
       .eq('id', subscriberId);
 
     // Create subscription
