@@ -302,7 +302,9 @@ function App() {
                           path="/settings/voice"
                           element={
                             <ProtectedRoute>
-                              <VoiceSettingsPage />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <VoiceSettingsPage />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -310,7 +312,9 @@ function App() {
                           path="/settings/tags"
                           element={
                             <ProtectedRoute>
-                              <TagsSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <TagsSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -318,7 +322,9 @@ function App() {
                           path="/settings/comments"
                           element={
                             <ProtectedRoute>
-                              <CommentsSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <CommentsSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -326,7 +332,9 @@ function App() {
                           path="/settings/sharing"
                           element={
                             <ProtectedRoute>
-                              <SharingSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <SharingSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -334,7 +342,9 @@ function App() {
                           path="/settings/restricted"
                           element={
                             <ProtectedRoute>
-                              <RestrictedAccountsSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <RestrictedAccountsSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -342,7 +352,9 @@ function App() {
                           path="/settings/favorites"
                           element={
                             <ProtectedRoute>
-                              <FavoritesSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <FavoritesSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -350,7 +362,9 @@ function App() {
                           path="/settings/muted"
                           element={
                             <ProtectedRoute>
-                              <MutedAccountsSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <MutedAccountsSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -358,7 +372,9 @@ function App() {
                           path="/settings/content"
                           element={
                             <ProtectedRoute>
-                              <ContentPreferencesSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <ContentPreferencesSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -366,7 +382,9 @@ function App() {
                           path="/settings/media"
                           element={
                             <ProtectedRoute>
-                              <MediaSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <MediaSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -374,7 +392,9 @@ function App() {
                           path="/settings/audio"
                           element={
                             <ProtectedRoute>
-                              <AudioSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <AudioSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -382,7 +402,9 @@ function App() {
                           path="/settings/storage"
                           element={
                             <ProtectedRoute>
-                              <StorageSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <StorageSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -390,7 +412,9 @@ function App() {
                           path="/settings/app"
                           element={
                             <ProtectedRoute>
-                              <AppSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <AppSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -398,7 +422,9 @@ function App() {
                           path="/settings/region"
                           element={
                             <ProtectedRoute>
-                              <RegionSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <RegionSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -406,7 +432,9 @@ function App() {
                           path="/settings/language"
                           element={
                             <ProtectedRoute>
-                              <LanguageSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <LanguageSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -414,7 +442,9 @@ function App() {
                           path="/settings/profile"
                           element={
                             <ProtectedRoute>
-                              <ProfileEditSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <ProfileEditSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -422,7 +452,9 @@ function App() {
                           path="/settings/privacy"
                           element={
                             <ProtectedRoute>
-                              <PrivacySettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <PrivacySettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -430,7 +462,9 @@ function App() {
                           path="/settings/notifications"
                           element={
                             <ProtectedRoute>
-                              <NotificationSettings />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <NotificationSettings />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -440,7 +474,9 @@ function App() {
                           path="/live"
                           element={
                             <ProtectedRoute>
-                              <LiveDiscover />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <LiveDiscover />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -448,7 +484,9 @@ function App() {
                           path="/live/go"
                           element={
                             <ProtectedRoute>
-                              <GoLive />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <GoLive />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -456,32 +494,38 @@ function App() {
                           path="/live/watch/:id"
                           element={
                             <ProtectedRoute>
-                              <WatchLive />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <WatchLive />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
-                        
+
                         {/* Moderation Routes (Admin Only) */}
                         <Route
                           path="/moderation"
                           element={
                             <ProtectedAdminRoute>
-                              <Moderation />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <Moderation />
+                              </Suspense>
                             </ProtectedAdminRoute>
                           }
                         />
 
                         {/* Legal Pages (Public) */}
-                        <Route path="/legal/community-guidelines" element={<CommunityGuidelines />} />
-                        <Route path="/legal/terms" element={<TermsOfService />} />
-                        <Route path="/legal/privacy" element={<PrivacyPolicy />} />
+                        <Route path="/legal/community-guidelines" element={<Suspense fallback={<LazyLoadFallback />}><CommunityGuidelines /></Suspense>} />
+                        <Route path="/legal/terms" element={<Suspense fallback={<LazyLoadFallback />}><TermsOfService /></Suspense>} />
+                        <Route path="/legal/privacy" element={<Suspense fallback={<LazyLoadFallback />}><PrivacyPolicy /></Suspense>} />
 
                         {/* Gamification */}
                         <Route
                           path="/achievements"
                           element={
                             <ProtectedRoute>
-                              <Achievements />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <Achievements />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -491,7 +535,9 @@ function App() {
                           path="/revenue"
                           element={
                             <ProtectedRoute>
-                              <CreatorRevenue />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <CreatorRevenue />
+                              </Suspense>
                             </ProtectedRoute>
                           }
                         />
@@ -501,7 +547,9 @@ function App() {
                           path="/admin"
                           element={
                             <ProtectedAdminRoute>
-                              <AdminDashboard />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <AdminDashboard />
+                              </Suspense>
                             </ProtectedAdminRoute>
                           }
                         />
@@ -509,7 +557,9 @@ function App() {
                           path="/admin/emails"
                           element={
                             <ProtectedAdminRoute>
-                              <EmailCampaigns />
+                              <Suspense fallback={<LazyLoadFallback />}>
+                                <EmailCampaigns />
+                              </Suspense>
                             </ProtectedAdminRoute>
                           }
                         />

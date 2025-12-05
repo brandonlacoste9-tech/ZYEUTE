@@ -1,11 +1,8 @@
 {
-  "name": "colony-os",
+  "name": "zyeute",
   "version": "1.0.0",
-  "description": "Colony OS - The First AI Civilization Operating System",
+  "description": "Zyeuté - Quebec's first social media platform",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -29,11 +26,6 @@
     "setup:preview-branch": "bash scripts/setup-preview-branch.sh",
     "db:migrate": "node scripts/setup-database.js",
     "generate": "buf generate",
-    "install:all": "npm install && npm run install:packages",
-    "install:packages": "npm install --workspace=packages/kernel-node && npm install --workspace=packages/bee-node",
-    "dev:kernel": "npm run dev --workspace=packages/kernel-node",
-    "dev:bee": "npm run dev --workspace=packages/bee-node",
-    "build:all": "npm run build --workspace=packages/kernel-node && npm run build --workspace=packages/bee-node",
     "docs": "npx tsx scripts/generate-docs.ts",
     "docs:generate": "npm run docs",
         "prepare": "husky install"

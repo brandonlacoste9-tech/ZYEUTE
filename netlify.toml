@@ -4,14 +4,17 @@
 # IMPORTANT: This is a Vite app, NOT Next.js
 # Disable Next.js auto-detection
 [build]
+  # Base directory for the Vite/React app (root of the repo)
+  base = "/"
+
   # Command to build your Vite project for production
   # This runs 'vite build' which outputs to the 'dist' directory by default
   command = "npm run build"
-  
+
   # Directory containing the built static files
   # Vite outputs to 'dist' by default (configured in vite.config.ts)
   publish = "dist"
-  
+
   # Set Node.js version for the build environment
   # Using Node 20.19.0+ as required by Vite 7.2.4 and other dependencies
   [build.environment]
