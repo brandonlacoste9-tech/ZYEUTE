@@ -33,7 +33,7 @@ git commit -m "Your commit message"
 
 **Option B: Stash your changes temporarily**
 ```bash
-git stash save "Work in progress"
+git stash push -m "Work in progress"
 ```
 
 ### Step 3: Switch to Main Branch
