@@ -1,4 +1,7 @@
 name: Auto PR Lint/Type Status
+permissions:
+  contents: read
+  issues: write
 
 on:
   pull_request:
