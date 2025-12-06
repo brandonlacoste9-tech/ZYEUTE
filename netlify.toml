@@ -34,7 +34,7 @@
   to = "/index.html"
   status = 200
 
-# Headers for index.html - CRITICAL for preventing black screen
+# Headers for index.html - Important for preventing stale asset references and display issues
 # Force browsers to always fetch fresh index.html with correct asset hashes
 [[headers]]
   for = "/index.html"
