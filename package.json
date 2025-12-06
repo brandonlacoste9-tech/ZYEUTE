@@ -36,7 +36,7 @@
     "build:all": "npm run build --workspace=packages/kernel-node && npm run build --workspace=packages/bee-node",
     "docs": "npx tsx scripts/generate-docs.ts",
     "docs:generate": "npm run docs",
-        "prepare": "husky install"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.74",
@@ -62,6 +62,9 @@
   "devDependencies": {
     "@bufbuild/buf": "^1.28.1",
     "@tailwindcss/postcss": "^4.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.10.0",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
@@ -74,9 +77,9 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
-        "husky": "^8.0.0",
-        "lint-staged": "^15.0.0",
+    "husky": "^8.0.0",
     "jsdom": "^25.0.1",
+    "lint-staged": "^15.0.0",
     "postcss": "^8.4.47",
     "prettier": "^3.4.2",
     "serve": "^14.2.4",
