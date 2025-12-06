@@ -2,7 +2,6 @@
   "name": "colony-os",
   "version": "1.0.0",
   "description": "Colony OS - The First AI Civilization Operating System",
-  "type": "module",
   "private": true,
   "workspaces": [
     "packages/*"
