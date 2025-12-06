@@ -23,13 +23,12 @@
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 # ============================================
-# CRITICAL: Asset routes MUST come BEFORE SPA fallback
+# STATIC ASSETS - Serve as-is (MUST BE FIRST)
 # ============================================
-# SPA routing: Standard Netlify rewrite for React Router
-# All unknown paths serve index.html (200 status = rewrite, not redirect)
-# This is the recommended pattern from Netlify docs for Vite/React SPAs
+# CRITICAL: These rules MUST come BEFORE the SPA fallback
+# Otherwise, asset requests will be intercepted and served as HTML
 
-# Serve assets with correct routing
+# Vite build outputs all hashed JS/CSS to /assets/ directory
 [[redirects]]
   from = "/assets/*"
   to = "/assets/:splat"
@@ -41,7 +40,86 @@
   to = "/sw.js"
   status = 200
 
-# SPA fallback - MUST BE LAST
+# PWA manifest
+[[redirects]]
+  from = "/manifest.json"
+  to = "/manifest.json"
+  status = 200
+
+# Common static file extensions
+[[redirects]]
+  from = "/*.js"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.css"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.png"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.jpg"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.jpeg"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.gif"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.svg"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.ico"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.webp"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.woff"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.woff2"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.ttf"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.eot"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.otf"
+  to = "/:splat"
+  status = 200
+
+# ============================================
+# SPA FALLBACK - MUST BE LAST
+# ============================================
 # All unknown paths serve index.html (200 status = rewrite, not redirect)
 [[redirects]]
   from = "/*"

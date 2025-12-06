@@ -1,3 +1,29 @@
+# ============================================
+# Static Assets - Explicit MIME Types and Caching
+# ============================================
+
+# JavaScript files - ensure correct MIME type
+/assets/*.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+
+# CSS files - ensure correct MIME type
+/assets/*.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+
+# ============================================
+# Security Headers (Applied to All Pages)
+# ============================================
+
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data: https://r2cdn.perplexity.ai; img-src 'self' data: https:; connect-src 'self' https://api.supabase.co https://api.stripe.com https://api.openai.com; frame-src 'self' https://checkout.stripe.com;
   X-Frame-Options: DENY
