@@ -16,6 +16,10 @@ import { QUEBEC_REGIONS } from '@/lib/quebecFeatures';
 import { useBorderColor } from '@/contexts/BorderColorContext';
 import { useHaptics } from '@/hooks/useHaptics';
 import type { User } from '@/types';
+import { logger } from '../lib/logger';
+
+const settingsLogger = logger.withContext('Settings');
+
 
 interface SettingItem {
   icon: React.ReactNode;
@@ -55,7 +59,7 @@ export const Settings: React.FC = () => {
           setUser(data);
         }
       } catch (error) {
-        console.error('Error fetching user:', error);
+        settingsLogger.error('Error fetching user:', error);
       } finally {
         setIsLoading(false);
       }
@@ -274,7 +278,26 @@ export const Settings: React.FC = () => {
     tap();
     
     // Routes that exist
-    const existingRoutes = ['/settings/voice', '/premium'];
+    const existingRoutes = [
+      '/settings/tags',
+      '/settings/comments',
+      '/settings/sharing',
+      '/settings/restricted',
+      '/settings/favorites',
+      '/settings/muted',
+      '/settings/content',
+      '/settings/media',
+      '/settings/audio',
+      '/settings/storage',
+      '/settings/app',
+      '/settings/region',
+      '/settings/language',
+      '/settings/voice',
+      '/settings/profile',
+      '/settings/privacy',
+      '/settings/notifications',
+      '/premium',
+    ];
     
     if (item.path && existingRoutes.includes(item.path)) {
       navigate(item.path);
@@ -402,38 +425,116 @@ export const Settings: React.FC = () => {
             Personnalisation
           </h2>
           
-          {/* RGB Lighting Setting Item */}
-          <div className="leather-card rounded-xl overflow-hidden mb-2">
-            <div className="flex items-center justify-between p-4 hover:bg-leather-700/30 transition-colors group border-b border-leather-700/30">
-              <div className="flex items-center gap-4 flex-1">
-                <div className="text-leather-300 group-hover:text-gold-500 transition-colors">
+          <div className="leather-card rounded-xl overflow-hidden stitched">
+            {/* Header */}
+            <div className="p-4 border-b border-leather-700/30">
+              <div className="flex items-center gap-4 mb-2">
+                <div className="text-gold-500">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <p className="text-white font-medium group-hover:text-gold-400 transition-colors">
-                    Éclairage d'accent de l'app
+                  <p className="text-white font-semibold">
+                    Éclairage d&apos;accent de l&apos;app
                   </p>
                   <p className="text-sm text-leather-400 mt-0.5">
-                    Couleur de bordure personnalisable autour de l'app
+                    Couleur de bordure personnalisable autour de l&apos;app
                   </p>
                 </div>
               </div>
-              
-              {/* Color Picker Input */}
-              <input
-                type="color"
-                value={borderColor}
-                onChange={handleColorChange}
-                className="w-10 h-10 p-0 border-2 border-gold-500/50 rounded-full cursor-pointer bg-transparent hover:border-gold-500 transition-colors"
-                style={{ 
-                  WebkitAppearance: 'none',
-                  appearance: 'none',
-                  cursor: 'pointer',
-                }}
-                title="Changer la couleur d'accent"
-              />
+
+              {/* Current Color Preview */}
+              <div className="flex items-center gap-3 mt-4">
+                <div 
+                  className="w-16 h-16 rounded-xl border-2 border-gold-500/30 shadow-lg"
+                  style={{ backgroundColor: borderColor }}
+                />
+                <div className="flex-1">
+                  <p className="text-white text-sm font-medium mb-1">Couleur actuelle</p>
+                  <p className="text-gold-500/80 font-mono text-xs">{borderColor.toUpperCase()}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Preset Colors */}
+            <div className="p-4 border-b border-leather-700/30">
+              <p className="text-white text-sm font-medium mb-3">Couleurs prédéfinies</p>
+              <div className="grid grid-cols-6 gap-3">
+                {[
+                  { name: 'Or', color: '#FFBF00' },
+                  { name: 'Rouge', color: '#FF4444' },
+                  { name: 'Bleu', color: '#4444FF' },
+                  { name: 'Vert', color: '#44FF44' },
+                  { name: 'Violet', color: '#B744FF' },
+                  { name: 'Cyan', color: '#00D4FF' },
+                  { name: 'Rose', color: '#FF0080' },
+                  { name: 'Orange', color: '#FF8800' },
+                  { name: 'Blanc', color: '#FFFFFF' },
+                  { name: 'Jaune', color: '#FFFF00' },
+                  { name: 'Turquoise', color: '#00FF88' },
+                  { name: 'Magenta', color: '#FF00FF' },
+                ].map((preset) => (
+                  <button
+                    key={preset.color}
+                    onClick={() => {
+                      tap();
+                      setBorderColor(preset.color);
+                      toast.success(`Couleur changée: ${preset.name}! ✨`);
+                    }}
+                    className={`relative aspect-square rounded-lg border-2 transition-all hover:scale-110 ${
+                      borderColor.toUpperCase() === preset.color.toUpperCase()
+                        ? 'border-gold-500 ring-2 ring-gold-500/50'
+                        : 'border-leather-700 hover:border-gold-500/50'
+                    }`}
+                    style={{ backgroundColor: preset.color }}
+                    title={preset.name}
+                  >
+                    {borderColor.toUpperCase() === preset.color.toUpperCase() && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                        </svg>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom Color Picker */}
+            <div className="p-4 border-b border-leather-700/30">
+              <p className="text-white text-sm font-medium mb-3">Couleur personnalisée</p>
+              <div className="flex items-center gap-4">
+                <input
+                  type="color"
+                  value={borderColor}
+                  onChange={handleColorChange}
+                  className="w-20 h-20 rounded-xl border-2 border-gold-500/50 cursor-pointer bg-transparent hover:border-gold-500 transition-colors"
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    appearance: 'none',
+                    cursor: 'pointer',
+                  }}
+                  title="Choisir une couleur personnalisée"
+                />
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={borderColor.toUpperCase()}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^#[0-9A-F]{6}$/i.test(value)) {
+                        setBorderColor(value);
+                        toast.success('Couleur mise à jour! ✨');
+                      }
+                    }}
+                    placeholder="#FFBF00"
+                    className="w-full bg-leather-800/50 border border-leather-700 rounded-lg px-4 py-2 text-white font-mono text-sm focus:outline-none focus:border-gold-500"
+                  />
+                  <p className="text-leather-400 text-xs mt-1">Entrer un code hexadécimal (ex: #FFBF00)</p>
+                </div>
+              </div>
             </div>
 
             {/* Reset to Default Gold Option */}
@@ -447,11 +548,20 @@ export const Settings: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <p className="text-white font-medium group-hover:text-gold-400 transition-colors">
-                  Réinitialiser à l'or par défaut
-                </p>
+                <div>
+                  <p className="text-white font-medium group-hover:text-gold-400 transition-colors">
+                    Réinitialiser à l&apos;or par défaut
+                  </p>
+                  <p className="text-sm text-leather-400">Retourner à la couleur d&apos;origine</p>
+                </div>
               </div>
-              <span className="text-sm text-gold-500/80 font-mono">{defaultGold}</span>
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-8 h-8 rounded-lg border border-gold-500/50"
+                  style={{ backgroundColor: defaultGold }}
+                />
+                <span className="text-sm text-gold-500/80 font-mono">{defaultGold}</span>
+              </div>
             </button>
           </div>
         </div>

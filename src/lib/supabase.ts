@@ -5,20 +5,56 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database';
 
+import { extractSupabaseProjectRef, validateSupabaseUrl } from './utils';
+import { logger } from './logger';
+
+const supabaseLogger = logger.withContext('Supabase');
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://demo.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'demo-key';
 
-// Log which Supabase project is being used (for debugging)
-console.log('[Supabase] Using URL:', supabaseUrl);
-console.log('[Supabase] Expected project: vuanulvyqkfefmjcikfk');
-if (supabaseUrl.includes('kihxqurnmyxnsyqgpdaw')) {
-  console.error('❌ WRONG SUPABASE PROJECT! Using kihxqurnmyxnsyqgpdaw instead of vuanulvyqkfefmjcikfk');
-  console.error('❌ Please update VITE_SUPABASE_URL in Netlify environment variables to: https://vuanulvyqkfefmjcikfk.supabase.co');
+const EXPECTED_PROJECT_REF = 'vuanulvyqkfefmjcikfk';
+
+// Enhanced logging with actual URL values
+supabaseLogger.info('Initializing...');
+supabaseLogger.info('URL:', supabaseUrl);
+supabaseLogger.info('URL is set:', !!import.meta.env.VITE_SUPABASE_URL);
+supabaseLogger.info('Anon key is set:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+supabaseLogger.info('Expected project:', EXPECTED_PROJECT_REF);
+
+// Extract and validate project reference
+const detectedProjectRef = extractSupabaseProjectRef(supabaseUrl);
+if (detectedProjectRef) {
+  supabaseLogger.info('Detected project:', detectedProjectRef);
+  
+  // Check for wrong project
+  if (supabaseUrl.includes('kihxqurnmyxnsyqgpdaw')) {
+    supabaseLogger.error('❌ WRONG SUPABASE PROJECT DETECTED!');
+    supabaseLogger.error('   Current: kihxqurnmyxnsyqgpdaw');
+    supabaseLogger.error('   Expected: vuanulvyqkfefmjcikfk');
+    supabaseLogger.error('   Action: Update VITE_SUPABASE_URL to: https://vuanulvyqkfefmjcikfk.supabase.co');
+    supabaseLogger.error('   Platforms: Check Netlify and Vercel environment variables');
+  } else if (detectedProjectRef === 'vuanulvyqkfefmjcikfk') {
+    supabaseLogger.info('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
+  } else if (supabaseUrl.includes('demo.supabase.co')) {
+    supabaseLogger.warn('⚠️ Using demo Supabase URL - features will be limited');
+  } else {
+    supabaseLogger.warn('⚠️ Using unexpected Supabase project:', detectedProjectRef);
+    supabaseLogger.warn('   Expected: vuanulvyqkfefmjcikfk');
+  }
+  
+  validateSupabaseUrl(supabaseUrl, EXPECTED_PROJECT_REF);
+} else {
+  supabaseLogger.warn('Could not extract project reference from URL:', supabaseUrl);
 }
 
 // Warn about missing credentials but don't crash
 if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  console.warn('⚠️ Missing Supabase credentials! Using demo mode. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local');
+  supabaseLogger.warn('⚠️ Missing Supabase credentials! Using demo mode.');
+  supabaseLogger.warn('   Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local or Netlify environment variables');
+} else {
+  // Show that key is set (but don't expose the actual key)
+  supabaseLogger.info('Anon key:', supabaseAnonKey.substring(0, 20) + '...' + ' ✅ Set');
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -90,8 +126,8 @@ export async function signOut() {
  */
 export async function signInWithGoogle() {
   const redirectTo = `${window.location.origin}/auth/callback`;
-  console.log('[Supabase OAuth] Redirect URL:', redirectTo);
-  console.log('[Supabase OAuth] Supabase URL:', supabaseUrl);
+  supabaseLogger.debug('OAuth Redirect URL:', redirectTo);
+  supabaseLogger.debug('OAuth Supabase URL:', supabaseUrl);
   
   try {
     const result = await supabase.auth.signInWithOAuth({
@@ -105,10 +141,10 @@ export async function signInWithGoogle() {
       },
     });
     
-    console.log('[Supabase OAuth] Result:', result);
+    supabaseLogger.debug('OAuth Result:', result);
     return result;
   } catch (error) {
-    console.error('[Supabase OAuth] Exception:', error);
+    supabaseLogger.error('OAuth Exception:', error);
     throw error;
   }
 }

@@ -7,34 +7,11 @@ import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { BottomNav } from '../components/BottomNav';
 import { Avatar } from '../components/Avatar';
-import { supabase } from '../lib/supabase';
+import { useNotifications } from '../contexts/NotificationContext';
 import { getTimeAgo } from '../lib/utils';
-import type { Notification } from '../types';
 
 export const Notifications: React.FC = () => {
-  const [notifications, setNotifications] = React.useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const fetchNotifications = async () => {
-      setIsLoading(true);
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) return;
-
-        // TODO: Fetch from notifications table when it exists
-        // For now, return empty array
-        setNotifications([]);
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchNotifications();
-  }, []);
+  const { notifications, loading: isLoading, markAsRead } = useNotifications();
 
   return (
     <div className="min-h-screen bg-black pb-20">
@@ -61,6 +38,7 @@ export const Notifications: React.FC = () => {
               <Link
                 key={notification.id}
                 to={notification.post_id ? `/p/${notification.post_id}` : `/profile/${notification.actor?.username}`}
+                onClick={() => !notification.is_read && markAsRead(notification.id)}
                 className="block glass-card rounded-xl p-4 hover:bg-white/10 transition-colors"
               >
                 <div className="flex items-start gap-3">

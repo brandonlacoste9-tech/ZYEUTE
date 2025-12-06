@@ -75,7 +75,7 @@ export const AdminDashboard: React.FC = () => {
             >
               <span className="text-3xl mb-2 block">📊</span>
               <h3 className="text-white font-bold text-lg group-hover:text-gold-400">Analytiques</h3>
-              <p className="text-white/60 text-sm">Vue d'ensemble de la plateforme</p>
+              <p className="text-white/60 text-sm">Vue d&apos;ensemble de la plateforme</p>
             </button>
 
             <button 

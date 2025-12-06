@@ -3,8 +3,8 @@
  * Leather post cards with gold accents and stitching
  */
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { ChatButton } from '@/components/ChatButton';
@@ -12,10 +12,15 @@ import { GoldButton } from '@/components/GoldButton';
 import { SectionHeader } from '@/components/SectionHeader';
 import { StoryCarousel } from '@/components/features/StoryCircle';
 import { VideoCard } from '@/components/features/VideoCard';
-import { getCurrentUser, getFeedPosts, getStories } from '@/services/api';
+import { getCurrentUser, getFeedPosts, getStories, togglePostFire } from '@/services/api';
 import type { Post, User, Story } from '@/types';
+import { logger } from '../lib/logger';
+
+const feedLogger = logger.withContext('Feed');
+
 
 export const Feed: React.FC = () => {
+  const location = useLocation();
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [stories, setStories] = React.useState<Array<{ user: User; story?: Story; isViewed?: boolean }>>([]);
   const [currentUser, setCurrentUser] = React.useState<User | null>(null);
@@ -37,18 +42,34 @@ export const Feed: React.FC = () => {
   const fetchPosts = React.useCallback(async (pageNum: number) => {
     setIsLoading(true);
     try {
+      feedLogger.debug('[Feed] Fetching posts, page:', pageNum);
       const data = await getFeedPosts(pageNum, 20);
+      feedLogger.debug('[Feed] Received posts data:', { 
+        count: data?.length || 0, 
+        posts: data,
+        firstPost: data?.[0] 
+      });
 
       if (pageNum === 0) {
-        setPosts(data);
+        setPosts(data || []);
+        feedLogger.debug('[Feed] Set posts (page 0):', data?.length || 0);
       } else {
-        setPosts(prev => [...prev, ...data]);
+        setPosts(prev => {
+          const updated = [...prev, ...(data || [])];
+          feedLogger.debug('[Feed] Appended posts (page > 0):', updated.length);
+          return updated;
+        });
       }
-      setHasMore(data.length === 20);
+      setHasMore((data?.length || 0) === 20);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      feedLogger.error('[Feed] Error fetching posts:', error);
+      // Set empty array on error to show empty state
+      if (pageNum === 0) {
+        setPosts([]);
+      }
     } finally {
       setIsLoading(false);
+      feedLogger.debug('[Feed] Fetch complete, isLoading set to false');
     }
   }, []);
 
@@ -59,17 +80,26 @@ export const Feed: React.FC = () => {
         const storyList = await getStories(currentUser?.id);
         setStories(storyList);
       } catch (error) {
-        console.error('Error fetching stories:', error);
+        feedLogger.error('Error fetching stories:', error);
       }
     };
 
     fetchStories();
   }, [currentUser]);
 
-  // Initial fetch
+  // Initial fetch and refresh on navigation
   React.useEffect(() => {
     fetchPosts(0);
   }, [fetchPosts]);
+
+  // Refresh feed when navigating from upload (with refreshFeed flag)
+  React.useEffect(() => {
+    if (location.state?.refreshFeed) {
+      fetchPosts(0);
+      // Clear the state to prevent infinite refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, fetchPosts]);
 
   // Load more on scroll
   const handleScroll = React.useCallback(() => {
@@ -85,18 +115,26 @@ export const Feed: React.FC = () => {
     }
   }, [isLoading, hasMore, page, fetchPosts]);
 
-  // Handle fire toggle
-  const handleFireToggle = React.useCallback(async (postId: string, currentFire: number) => {
+  // Handle fire toggle - memoized to prevent VideoCard re-renders
+  const handleFireToggle = React.useCallback(async (postId: string, _currentFire: number) => {
+    if (!currentUser) return;
+    
     try {
-      // TODO: Implement API call to toggle fire
-      console.log('Fire toggled for post:', postId, 'Current fire count:', currentFire);
-      // For now, just log - will be implemented with API
+      const success = await togglePostFire(postId, currentUser.id);
+      if (success) {
+        // Optimistically update local state
+        setPosts(prev => prev.map(p => 
+          p.id === postId 
+            ? { ...p, fire_count: p.fire_count + (p.is_fired ? -1 : 1), is_fired: !p.is_fired }
+            : p
+        ));
+      }
     } catch (error) {
-      console.error('Error toggling fire:', error);
+      feedLogger.error('Error toggling fire:', error);
     }
-  }, []);
+  }, [currentUser]);
 
-  // Handle comment
+  // Memoize comment handler to prevent VideoCard re-renders
   const handleComment = React.useCallback((postId: string) => {
     // Navigate to post detail page for comments
     window.location.href = `/p/${postId}`;
@@ -117,7 +155,7 @@ export const Feed: React.FC = () => {
         alert('Lien copié dans le presse-papiers! 📋');
       }
     } catch (error) {
-      console.error('Error sharing:', error);
+      feedLogger.error('Error sharing:', error);
     }
   }, []);
 
@@ -125,6 +163,12 @@ export const Feed: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  // Memoize horizontal posts slice (expensive array operation)
+  // Performance optimization: Only recompute when posts array changes
+  const horizontalPosts = useMemo(() => {
+    return posts.slice(0, 10);
+  }, [posts]);
 
   return (
     <div className="min-h-screen bg-black leather-overlay pb-20">
@@ -177,7 +221,7 @@ export const Feed: React.FC = () => {
         <>
           <SectionHeader title="Videos" showArrow linkTo="/explore" />
           <div className="flex overflow-x-auto gap-4 px-4 pb-6 scrollbar-hide">
-            {posts.slice(0, 10).map((post, index) => (
+            {horizontalPosts.map((post, index) => (
               <div
                 key={`h-${post.id}`}
                 className="animate-fade-in-up flex-shrink-0"
@@ -207,6 +251,15 @@ export const Feed: React.FC = () => {
       {/* Latest Hitants Section - Vertical Feed */}
       <SectionHeader title="Latest Hitants" />
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+        {/* Debug info - remove in production */}
+        {import.meta.env.DEV && (
+          <div className="mb-4 p-2 bg-black/50 rounded text-xs text-white/60">
+            <div>Posts count: {posts.length}</div>
+            <div>Is loading: {isLoading ? 'true' : 'false'}</div>
+            <div>Has more: {hasMore ? 'true' : 'false'}</div>
+            <div>Current user: {currentUser?.username || 'none'}</div>
+          </div>
+        )}
         {isLoading && posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-16 h-16 border-4 border-gold-500/30 border-t-gold-500 rounded-full animate-spin mb-4 shadow-[0_0_20px_rgba(255,191,0,0.2)]" />

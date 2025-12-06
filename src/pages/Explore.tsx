@@ -3,14 +3,21 @@
  * Discover trending content with leather grid and gold filters
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { supabase } from '@/lib/supabase';
+import { getFeedPosts } from '@/services/api';
 import { QUEBEC_HASHTAGS, QUEBEC_REGIONS } from '@/lib/quebecFeatures';
 import { formatNumber } from '@/lib/utils';
+import { useHaptics } from '@/hooks/useHaptics';
+import { toast } from '@/components/Toast';
 import type { Post } from '@/types';
+import { logger } from '../lib/logger';
+
+const exploreLogger = logger.withContext('Explore');
+
 
 export const Explore: React.FC = () => {
   const [posts, setPosts] = React.useState<Post[]>([]);
@@ -18,34 +25,49 @@ export const Explore: React.FC = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedRegion, setSelectedRegion] = React.useState('');
   const [selectedHashtag, setSelectedHashtag] = React.useState('');
+  const { tap } = useHaptics();
+
+  // Memoize trending hashtags slice (constant array operation)
+  // Performance optimization: Only compute once since QUEBEC_HASHTAGS doesn't change
+  const trendingHashtags = useMemo(() => {
+    return QUEBEC_HASHTAGS.slice(0, 10);
+  }, []);
 
   // Fetch posts
   const fetchPosts = React.useCallback(async () => {
     setIsLoading(true);
     try {
-      let query = supabase
-        .from('posts')
-        .select('*, user:users(*)')
-        .order('fire_count', { ascending: false });
-
+      // Use centralized API function - get all posts then filter client-side
+      // (API function doesn't support region/hashtag filters yet)
+      const allPosts = await getFeedPosts(0, 50);
+      
+      // Apply client-side filters
+      let filtered = allPosts;
+      
       if (selectedRegion) {
-        query = query.eq('region', selectedRegion);
+        filtered = filtered.filter(p => p.region === selectedRegion);
       }
 
       if (selectedHashtag) {
-        query = query.contains('hashtags', [selectedHashtag]);
+        const tagToSearch = selectedHashtag.startsWith('#') ? selectedHashtag.slice(1) : selectedHashtag;
+        filtered = filtered.filter(p => 
+          p.caption?.toLowerCase().includes(`#${tagToSearch.toLowerCase()}`) ||
+          p.hashtags?.includes(tagToSearch)
+        );
       }
 
       if (searchQuery) {
-        query = query.ilike('caption', `%${searchQuery}%`);
+        filtered = filtered.filter(p => 
+          p.caption?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
       }
 
-      const { data, error } = await query.limit(50);
-
-      if (error) throw error;
-      if (data) setPosts(data);
+      // Sort by fire_count (reactions_count)
+      filtered.sort((a, b) => (b.fire_count || 0) - (a.fire_count || 0));
+      
+      setPosts(filtered);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      exploreLogger.error('Error fetching posts:', error);
     } finally {
       setIsLoading(false);
     }
@@ -76,10 +98,11 @@ export const Explore: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Recherche des posts, users, hashtags..."
-              className="input-premium pl-12"
+              className="input-premium pl-14 pr-4"
+              style={{ paddingLeft: '3.5rem' }}
             />
             <svg
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gold-400"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gold-400 pointer-events-none z-10"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -97,19 +120,31 @@ export const Explore: React.FC = () => {
             <span>Hashtags populaires</span>
           </h2>
           <div className="flex gap-2 overflow-x-auto gold-scrollbar pb-2">
-            {QUEBEC_HASHTAGS.slice(0, 10).map((tag) => (
-              <button
-                key={tag}
-                onClick={() => setSelectedHashtag(selectedHashtag === tag ? '' : tag)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                  selectedHashtag === tag
-                    ? 'btn-gold'
-                    : 'btn-leather'
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
+            {trendingHashtags.map((tag) => {
+              const tagWithoutHash = tag.startsWith('#') ? tag.slice(1) : tag;
+              const isSelected = selectedHashtag === tag || selectedHashtag === tagWithoutHash;
+              
+              return (
+                <button
+                  key={tag}
+                  onClick={() => {
+                    tap();
+                    const newTag = isSelected ? '' : tagWithoutHash;
+                    setSelectedHashtag(newTag);
+                    if (newTag) {
+                      toast.info(`Filtre: #${newTag}`);
+                    }
+                  }}
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                    isSelected
+                      ? 'btn-gold'
+                      : 'btn-leather'
+                  }`}
+                >
+                  {tag}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -121,7 +156,13 @@ export const Explore: React.FC = () => {
           </h2>
           <div className="flex gap-2 overflow-x-auto gold-scrollbar pb-2">
             <button
-              onClick={() => setSelectedRegion('')}
+              onClick={() => {
+                tap();
+                setSelectedRegion('');
+                if (selectedRegion) {
+                  toast.info('Filtre régional retiré');
+                }
+              }}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
                 selectedRegion === ''
                   ? 'btn-gold'
@@ -130,19 +171,30 @@ export const Explore: React.FC = () => {
             >
               Toutes
             </button>
-            {QUEBEC_REGIONS.map((region) => (
-              <button
-                key={region.id}
-                onClick={() => setSelectedRegion(selectedRegion === region.id ? '' : region.id)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                  selectedRegion === region.id
-                    ? 'btn-gold'
-                    : 'btn-leather'
-                }`}
-              >
-                {region.emoji} {region.name}
-              </button>
-            ))}
+            {QUEBEC_REGIONS.map((region) => {
+              const isSelected = selectedRegion === region.id;
+              
+              return (
+                <button
+                  key={region.id}
+                  onClick={() => {
+                    tap();
+                    const newRegion = isSelected ? '' : region.id;
+                    setSelectedRegion(newRegion);
+                    if (newRegion) {
+                      toast.info(`Filtre: ${region.name}`);
+                    }
+                  }}
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                    isSelected
+                      ? 'btn-gold'
+                      : 'btn-leather'
+                  }`}
+                >
+                  {region.emoji} {region.name}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -152,7 +204,7 @@ export const Explore: React.FC = () => {
             <span className="text-leather-300 text-sm">Filtres actifs:</span>
             {searchQuery && (
               <span className="badge-premium text-xs">
-                🔍 "{searchQuery}"
+                🔍 &quot;{searchQuery}&quot;
               </span>
             )}
             {selectedHashtag && (
@@ -167,11 +219,13 @@ export const Explore: React.FC = () => {
             )}
             <button
               onClick={() => {
+                tap();
                 setSearchQuery('');
                 setSelectedHashtag('');
                 setSelectedRegion('');
+                toast.success('Filtres réinitialisés');
               }}
-              className="text-gold-400 hover:text-gold-300 text-sm font-semibold"
+              className="text-gold-400 hover:text-gold-300 text-sm font-semibold transition-colors"
             >
               Effacer tout
             </button>
@@ -189,13 +243,15 @@ export const Explore: React.FC = () => {
             <div className="text-6xl mb-4">🦫</div>
             <h3 className="text-xl font-bold text-gold-500 mb-2">Aucun post trouvé</h3>
             <p className="text-leather-300 mb-6">
-              Essaye de changer tes filtres ou explore d'autres régions!
+              Essaye de changer tes filtres ou explore d&apos;autres régions!
             </p>
             <button
               onClick={() => {
+                tap();
                 setSearchQuery('');
                 setSelectedHashtag('');
                 setSelectedRegion('');
+                toast.success('Filtres réinitialisés');
               }}
               className="btn-gold px-8 py-3 rounded-xl"
             >
@@ -207,7 +263,7 @@ export const Explore: React.FC = () => {
             {posts.map((post) => (
               <Link
                 key={post.id}
-                to={`/post/${post.id}`}
+                to={`/p/${post.id}`}
                 className="relative aspect-square leather-card rounded-xl overflow-hidden stitched-subtle hover:scale-105 transition-transform group"
               >
                 <img

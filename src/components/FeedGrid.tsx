@@ -2,7 +2,7 @@
  * FeedGrid - Masonry grid layout for posts
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import { VideoCard } from './features/VideoCard';
 import type { Post } from '../types';
 import { cn } from '../lib/utils';
@@ -15,7 +15,7 @@ export interface FeedGridProps {
   className?: string;
 }
 
-export const FeedGrid: React.FC<FeedGridProps> = ({
+const FeedGridComponent: React.FC<FeedGridProps> = ({
   posts,
   isLoading = false,
   hasMore = false,
@@ -54,7 +54,7 @@ export const FeedGrid: React.FC<FeedGridProps> = ({
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-4">
         <div className="text-6xl mb-4">⚜️</div>
         <h3 className="text-xl font-bold text-white mb-2">
-          Aucun post pour l'instant
+          Aucun post pour l&apos;instant
         </h3>
         <p className="text-white/60 mb-6">
           Sois le premier à partager du contenu!
@@ -128,3 +128,17 @@ export const FeedGrid: React.FC<FeedGridProps> = ({
     </div>
   );
 };
+
+// Memoize FeedGrid to prevent unnecessary re-renders
+// Performance optimization: Only re-render when posts array or loading state changes
+export const FeedGrid = memo(FeedGridComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.posts.length === nextProps.posts.length &&
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.hasMore === nextProps.hasMore &&
+    prevProps.onLoadMore === nextProps.onLoadMore &&
+    prevProps.className === nextProps.className
+  );
+});
+
+FeedGrid.displayName = 'FeedGrid';

@@ -7,6 +7,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase, signIn, signInWithGoogle } from '@/lib/supabase';
+import { logger } from '../lib/logger';
+
+const loginLogger = logger.withContext('Login');
+
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -45,17 +49,17 @@ export const Login: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      console.log('🔵 Initiating Google OAuth...');
-      console.log('Current origin:', window.location.origin);
-      console.log('Redirect URL will be:', `${window.location.origin}/auth/callback`);
+      loginLogger.debug('🔵 Initiating Google OAuth...');
+      loginLogger.debug('Current origin:', window.location.origin);
+      loginLogger.debug('Redirect URL will be:', `${window.location.origin}/auth/callback`);
       
       const { data, error } = await signInWithGoogle();
       
-      console.log('OAuth response:', { data, error });
+      loginLogger.debug('OAuth response:', { data, error });
       
       if (error) {
-        console.error('❌ Google OAuth error:', error);
-        console.error('Error details:', {
+        loginLogger.error('❌ Google OAuth error:', error);
+        loginLogger.error('Error details:', {
           message: error.message,
           status: error.status,
           statusCode: error.statusCode,
@@ -66,21 +70,21 @@ export const Login: React.FC = () => {
       
       // If we get data with a URL, Supabase is redirecting
       if (data?.url) {
-        console.log('✅ OAuth URL generated, redirecting to:', data.url);
+        loginLogger.debug('✅ OAuth URL generated, redirecting to:', data.url);
         // The browser will redirect automatically
         // Don't set isLoading to false - let the redirect happen
         return;
       }
       
       // If no URL and no error, something unexpected happened
-      console.warn('⚠️ No redirect URL received from OAuth');
+      loginLogger.warn('⚠️ No redirect URL received from OAuth');
       setTimeout(() => {
         setIsLoading(false);
         setError('Erreur: aucune redirection générée. Vérifie la configuration OAuth.');
       }, 2000);
     } catch (err: any) {
-      console.error('❌ Google sign-in error:', err);
-      console.error('Error object:', {
+      loginLogger.error('❌ Google sign-in error:', err);
+      loginLogger.error('Error object:', {
         message: err?.message,
         status: err?.status,
         statusCode: err?.statusCode,
@@ -119,8 +123,8 @@ export const Login: React.FC = () => {
 
       <div className="w-full max-w-md relative z-10">
         {/* Glowing Fleur-de-lys Logo */}
-        <div className="text-center mb-10">
-          <div className="relative inline-block">
+        <div className="text-center mb-10 overflow-visible">
+          <div className="relative inline-block overflow-visible">
             {/* Outer Glow */}
             <div 
               className="absolute inset-0 blur-xl opacity-60"
@@ -197,6 +201,9 @@ export const Login: React.FC = () => {
               WebkitTextFillColor: 'transparent',
               textShadow: '0 0 40px rgba(255,191,0,0.5)',
               filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))',
+              lineHeight: '1.2',
+              paddingTop: '0.25rem',
+              overflow: 'visible',
             }}
           >
             Zyeuté
@@ -205,7 +212,7 @@ export const Login: React.FC = () => {
             className="text-sm font-bold tracking-[0.3em] mt-2"
             style={{ color: '#DAA520' }}
           >
-            L'APP SOCIALE DU QUÉBEC
+            L&apos;APP SOCIALE DU QUÉBEC
           </p>
           <p className="text-white/50 text-sm mt-2">
             Fait au Québec, pour le Québec 🇨🇦⚜️

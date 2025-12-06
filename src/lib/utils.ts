@@ -4,6 +4,10 @@
 
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { logger } from '../lib/logger';
+
+const utilsLogger = logger.withContext('Utils');
+
 
 /**
  * Merge Tailwind classes with proper precedence
@@ -128,7 +132,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
+  let timeout: ReturnType<typeof setTimeout>;
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
@@ -150,4 +154,44 @@ export function throttle<T extends (...args: any[]) => any>(
       setTimeout(() => (inThrottle = false), limit);
     }
   };
+}
+
+/**
+ * Extract Supabase project reference from URL
+ * @param url - Supabase URL
+ * @returns Project reference ID or null if invalid
+ * @example extractSupabaseProjectRef('https://vuanulvyqkfefmjcikfk.supabase.co') => 'vuanulvyqkfefmjcikfk'
+ */
+export function extractSupabaseProjectRef(url: string): string | null {
+  const match = url.match(/https?:\/\/([^.]+)\.supabase\.(co|in)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Validate Supabase URL and log appropriate messages
+ * @param url - Supabase URL to validate
+ * @param expectedRef - Expected project reference (default: 'vuanulvyqkfefmjcikfk')
+ */
+export function validateSupabaseUrl(url: string, expectedRef: string = 'vuanulvyqkfefmjcikfk'): void {
+  const projectRef = extractSupabaseProjectRef(url);
+  
+  if (!projectRef) {
+    utilsLogger.warn('⚠️ Supabase URL format is unexpected:', url);
+    return;
+  }
+  
+  if (url.includes('kihxqurnmyxnsyqgpdaw')) {
+    utilsLogger.error('❌ WRONG SUPABASE PROJECT DETECTED!');
+    utilsLogger.error('   Current: kihxqurnmyxnsyqgpdaw');
+    utilsLogger.error(`   Expected: ${expectedRef}`);
+    utilsLogger.error(`   Action: Update VITE_SUPABASE_URL to: https://${expectedRef}.supabase.co`);
+    utilsLogger.error('   Platforms: Check Netlify and Vercel environment variables');
+  } else if (projectRef === expectedRef) {
+    utilsLogger.debug(`✅ Using correct Supabase project: ${expectedRef}`);
+  } else if (url.includes('demo.supabase.co')) {
+    utilsLogger.warn('⚠️ Using demo Supabase URL - features will be limited');
+  } else {
+    utilsLogger.warn('⚠️ Using unexpected Supabase project:', projectRef);
+    utilsLogger.warn(`   Expected: ${expectedRef}`);
+  }
 }

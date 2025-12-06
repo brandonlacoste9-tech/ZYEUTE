@@ -14,11 +14,11 @@
  * });
  * 
  * if (response) {
- *   console.log(response.caption);   // "Haha! C'est ben drôle ça..."
- *   console.log(response.emojis);    // ['😂', '🔥', '🦫']
- *   console.log(response.tags);      // ['Humour', 'Quebec', 'Construction']
- *   console.log(response.reply);     // "C'est tiguidou! Continue comme ça..."
- *   console.log(response.flagged);   // false
+ *   tiGuyAgentLogger.debug(response.caption);   // "Haha! C'est ben drôle ça..."
+ *   tiGuyAgentLogger.debug(response.emojis);    // ['😂', '🔥', '🦫']
+ *   tiGuyAgentLogger.debug(response.tags);      // ['Humour', 'Quebec', 'Construction']
+ *   tiGuyAgentLogger.debug(response.reply);     // "C'est tiguidou! Continue comme ça..."
+ *   tiGuyAgentLogger.debug(response.flagged);   // false
  * }
  * ```
  * 
@@ -42,6 +42,9 @@
  */
 
 import OpenAI from 'openai';
+import { logger } from '@/lib/logger';
+
+const tiGuyAgentLogger = logger.withContext('TiGuyAgent');
 
 // Initialize OpenAI client
 // NOTE: Using client-side OpenAI is for demo/development purposes
@@ -73,7 +76,7 @@ export type TiGuyResponse = {
 export const TiGuyAgent = async (input: TiGuyInput): Promise<TiGuyResponse | null> => {
   // Demo mode if no API key
   if (!openai) {
-    console.warn('⚠️ No OpenAI API Key found. Using demo response.');
+    tiGuyAgentLogger.warn('⚠️ No OpenAI API Key found. Using demo response.');
     return generateDemoResponse(input);
   }
 
@@ -115,13 +118,13 @@ export const TiGuyAgent = async (input: TiGuyInput): Promise<TiGuyResponse | nul
     
     // Validate response structure
     if (!parsed.caption || !Array.isArray(parsed.emojis) || !Array.isArray(parsed.tags)) {
-      console.error('Invalid Ti-Guy response structure:', parsed);
+      tiGuyAgentLogger.error('Invalid Ti-Guy response structure:', parsed);
       return generateDemoResponse(input);
     }
     
     return parsed;
   } catch (error) {
-    console.error('Ti-Guy Error:', error);
+    tiGuyAgentLogger.error('Ti-Guy Error:', error);
     return null;
   }
 };

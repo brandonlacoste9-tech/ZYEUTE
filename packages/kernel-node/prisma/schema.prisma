@@ -1,0 +1,175 @@
+// Colony OS Database Schema
+// 
+// Implements the complete Colony OS data model with:
+// - Tasks (work units)
+// - Agents (Bee workers)
+// - Memories (Honeycomb with pgvector)
+// - Events (message bus persistence)
+// - Snapshots (Immortal Archive)
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TASKS - Work Units
+// ═══════════════════════════════════════════════════════════════
+
+model Task {
+  id                String    @id @default(uuid()) @db.Uuid
+  type              String    @db.VarChar(64)
+  payload           Json      @db.JsonB
+  priority          String    @default("medium") @db.VarChar(8)
+  status            String    @default("pending") @db.VarChar(16)
+  
+  // Semantic classification (from Mind)
+  semanticCategory  String?   @db.Text
+  semanticLabels    String[]  @default([])
+  
+  // Assignment & leasing
+  leaseId           String?   @db.Uuid
+  leaseExpiresAt    DateTime? @db.Timestamptz
+  attempts          Int       @default(0)
+  assignedTo        String?   @db.Uuid
+  assignedAgent     Agent?    @relation(fields: [assignedTo], references: [id])
+  
+  // Results
+  result            Json?     @db.JsonB
+  error             String?   @db.Text
+  
+  // Timestamps
+  createdAt         DateTime  @default(now()) @db.Timestamptz
+  updatedAt         DateTime  @default(now()) @updatedAt @db.Timestamptz
+  
+  // Relations
+  memories          Memory[]
+  
+  @@index([status, priority, createdAt])
+  @@index([semanticCategory])
+  @@index([assignedTo])
+  @@index([leaseExpiresAt])
+  @@map("tasks")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AGENTS - Bee Workers
+// ═══════════════════════════════════════════════════════════════
+
+model Agent {
+  id          String   @id @default(uuid()) @db.Uuid
+  role        String   @db.VarChar(64)  // 'DocBee', 'CodeBee', etc.
+  skills      String[] @default([])
+  state       Json     @default("{}") @db.JsonB
+  active      Boolean  @default(true)
+  
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamptz
+  
+  // Relations
+  tasks       Task[]
+  heartbeats  AgentHeartbeat[]
+  memories    Memory[]
+  
+  @@index([role])
+  @@index([active])
+  @@map("agents")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MEMORIES - Honeycomb (Vector-Enabled)
+// ═══════════════════════════════════════════════════════════════
+
+model Memory {
+  id        String   @id @default(uuid()) @db.Uuid
+  scope     String   @db.VarChar(16)  // 'task', 'agent', 'global'
+  key       String   @db.Text
+  value     Json     @db.JsonB
+  
+  // Vector embedding for semantic search (pgvector)
+  embedding String?  @db.Text  // Will store as vector(512) via raw SQL
+  
+  // Relations
+  taskId    String?  @db.Uuid
+  task      Task?    @relation(fields: [taskId], references: [id])
+  agentId   String?  @db.Uuid
+  agent     Agent?   @relation(fields: [agentId], references: [id])
+  
+  createdAt DateTime @default(now()) @db.Timestamptz
+  
+  @@unique([scope, key])
+  @@index([scope])
+  @@index([key])
+  @@map("memories")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AGENT HEARTBEATS - Liveness Tracking
+// ═══════════════════════════════════════════════════════════════
+
+model AgentHeartbeat {
+  id       BigInt   @id @default(autoincrement())
+  agentId  String   @db.Uuid
+  agent    Agent    @relation(fields: [agentId], references: [id])
+  ts       DateTime @default(now()) @db.Timestamptz
+  status   String   @default("ok") @db.VarChar(16)
+  
+  @@index([agentId, ts])
+  @@map("agent_heartbeats")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EVENTS - Message Bus Persistence
+// ═══════════════════════════════════════════════════════════════
+
+model Event {
+  id        BigInt   @id @default(autoincrement())
+  type      String   @db.VarChar(64)
+  payload   Json     @db.JsonB
+  source    String?  @db.VarChar(100)
+  createdAt DateTime @default(now()) @db.Timestamptz
+  
+  @@index([type, createdAt])
+  @@map("events")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SNAPSHOTS - Immortal Archive
+// ═══════════════════════════════════════════════════════════════
+
+model Snapshot {
+  id         String   @id @default(uuid()) @db.Uuid
+  label      String   @db.VarChar(128)
+  merkleRoot String   @db.VarChar(128)
+  storageUrl String   @db.Text  // S3/MinIO URL
+  metadata   Json?    @db.JsonB
+  createdAt  DateTime @default(now()) @db.Timestamptz
+  
+  @@index([createdAt])
+  @@map("snapshots")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APPROVAL REQUESTS - Badge Auth (Operator-in-the-Loop)
+// ═══════════════════════════════════════════════════════════════
+
+model ApprovalRequest {
+  id         String    @id @default(uuid()) @db.Uuid
+  agentId    String    @db.Uuid
+  action     String    @db.Text
+  context    Json      @db.JsonB
+  status     String    @default("pending") @db.VarChar(20)
+  approvedBy String?   @db.VarChar(100)
+  approvedAt DateTime? @db.Timestamptz
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+  
+  @@index([status, createdAt])
+  @@map("approval_requests")
+}
+

@@ -57,7 +57,7 @@ jobs:
       
       # Step 2: Setup Node.js (latest LTS version)
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           # Use latest LTS version of Node.js
           # LTS versions are recommended for production stability

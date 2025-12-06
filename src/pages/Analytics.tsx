@@ -8,6 +8,10 @@ import { BottomNav } from '../components/BottomNav';
 import { supabase } from '../lib/supabase';
 import { formatNumber } from '../lib/utils';
 import type { User } from '../types';
+import { logger } from '../lib/logger';
+
+const analyticsLogger = logger.withContext('Analytics');
+
 
 interface AnalyticsData {
   totalPosts: number;
@@ -126,7 +130,7 @@ export const Analytics: React.FC = () => {
           engagementRate,
         });
       } catch (error) {
-        console.error('Error fetching analytics:', error);
+        analyticsLogger.error('Error fetching analytics:', error);
       } finally {
         setIsLoading(false);
       }
@@ -213,14 +217,14 @@ export const Analytics: React.FC = () => {
 
         {/* Engagement rate */}
         <div className="card-edge p-6 mb-6">
-          <h2 className="text-white text-xl font-bold mb-4">Taux d'engagement</h2>
+          <h2 className="text-white text-xl font-bold mb-4">Taux d&apos;engagement</h2>
           <div className="flex items-end gap-4">
             <div>
               <p className="text-gold-400 text-5xl font-bold">
                 {analytics.engagementRate.toFixed(1)}%
               </p>
               <p className="text-white/60 text-sm mt-2">
-                Moyenne de l'industrie: 3-5%
+                Moyenne de l&apos;industrie: 3-5%
               </p>
             </div>
             <div className="flex-1">
@@ -280,7 +284,7 @@ export const Analytics: React.FC = () => {
             </li>
             <li className="flex gap-3">
               <span className="text-gold-400 font-bold">3.</span>
-              <span>Réponds à tes commentaires pour augmenter l'engagement</span>
+              <span>Réponds à tes commentaires pour augmenter l&apos;engagement</span>
             </li>
             <li className="flex gap-3">
               <span className="text-gold-400 font-bold">4.</span>
@@ -288,7 +292,7 @@ export const Analytics: React.FC = () => {
             </li>
             <li className="flex gap-3">
               <span className="text-gold-400 font-bold">5.</span>
-              <span>Collabore avec d'autres créateurs québécois</span>
+              <span>Collabore avec d&apos;autres créateurs québécois</span>
             </li>
           </ul>
         </div>

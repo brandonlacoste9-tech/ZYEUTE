@@ -8,9 +8,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Logo } from '@/components/Logo';
 import { signUp } from '@/lib/supabase';
+import { toast } from '@/components/Toast';
 
 export const Signup: React.FC = () => {
   const navigate = useNavigate();
+  const isMountedRef = React.useRef(true);
+  const navigationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -18,8 +21,20 @@ export const Signup: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
+  // Cleanup on unmount to prevent state updates after navigation
+  React.useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isMountedRef.current) return;
+    
     setError('');
 
     // Validation
@@ -40,12 +55,27 @@ export const Signup: React.FC = () => {
 
       if (error) throw error;
 
-      alert('Compte créé! Vérifie ton courriel pour confirmer ton compte.');
-      navigate('/login');
+      // Check if component is still mounted before updating state
+      if (!isMountedRef.current) return;
+
+      // Show success toast (non-blocking)
+      toast.success('Compte créé! Vérifie ton courriel pour confirmer ton compte.');
+      
+      // Use window.location for immediate redirect to bypass animation system
+      // This prevents React DOM manipulation errors with AnimatePresence
+      navigationTimeoutRef.current = setTimeout(() => {
+        if (isMountedRef.current) {
+          // Use window.location instead of navigate() to bypass PageTransition animations
+          // This prevents AnimatePresence from trying to animate during unmount
+          window.location.href = '/login';
+        }
+      }, 150);
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de l\'inscription');
-    } finally {
-      setIsLoading(false);
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setError(err.message || 'Erreur lors de l\'inscription');
+        setIsLoading(false);
+      }
     }
   };
 
@@ -76,7 +106,7 @@ export const Signup: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-gold-400 font-semibold mb-2 text-sm embossed">
-                Nom d'utilisateur
+                Nom d&apos;utilisateur
               </label>
               <input
                 type="text"
@@ -135,9 +165,9 @@ export const Signup: React.FC = () => {
 
           {/* Terms */}
           <p className="text-center text-leather-400 text-xs mt-6">
-            En t'inscrivant, tu acceptes nos{' '}
+            En t&apos;inscrivant, tu acceptes nos{' '}
             <Link to="/legal/terms" className="text-gold-400 hover:underline">
-              Conditions d'utilisation
+              Conditions d&apos;utilisation
             </Link>
             {' '}et notre{' '}
             <Link to="/legal/privacy" className="text-gold-400 hover:underline">

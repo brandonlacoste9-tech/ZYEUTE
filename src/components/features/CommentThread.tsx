@@ -3,13 +3,20 @@
  */
 
 import React, { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { supabase } from '../../lib/supabase';
 import { toast } from '../Toast';
 import { moderateContent } from '../../services/moderationService';
 import { getTimeAgo, formatNumber } from '../../lib/utils';
+import { validateComment, sanitizeText } from '../../lib/validation';
+import { checkRateLimit, RATE_LIMITS } from '../../lib/rateLimiter';
 import type { Comment as CommentType, User } from '../../types';
+import { logger } from '../../lib/logger';
+
+const commentThreadLogger = logger.withContext('CommentThread');
+
 
 interface CommentThreadProps {
   comment: CommentType;
@@ -20,7 +27,7 @@ interface CommentThreadProps {
   maxDepth?: number;
 }
 
-export const CommentThread: React.FC<CommentThreadProps> = ({
+const CommentThreadComponent: React.FC<CommentThreadProps> = ({
   comment,
   postId,
   currentUser,
@@ -44,12 +51,12 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
 
       const { data, error } = await supabase
         .from('comments')
-        .select('*, user:users(*)')
+        .select('*, user:user_profiles!user_id(*)')
         .eq('parent_id', comment.id)
         .order('created_at', { ascending: true });
 
       if (error) {
-        console.error('Error fetching replies:', error);
+        commentThreadLogger.error('Error fetching replies:', error);
         return;
       }
 
@@ -82,11 +89,26 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   const handleSubmitReply = async () => {
     if (!replyText.trim() || !currentUser) return;
 
+    // Rate limiting - prevent spam
+    if (!checkRateLimit(`comment-${currentUser.id}`, RATE_LIMITS.COMMENT_CREATE)) {
+      return;
+    }
+
+    // Validate input before processing
+    const validation = validateComment(replyText);
+    if (!validation.valid) {
+      toast.error(validation.error || 'Commentaire invalide');
+      return;
+    }
+
+    // Sanitize input
+    const sanitizedText = sanitizeText(replyText.trim());
+
     setIsSubmitting(true);
     try {
       // AI Moderation Check
       const moderationResult = await moderateContent(
-        { text: replyText.trim() },
+        { text: sanitizedText },
         'comment',
         currentUser.id
       );
@@ -108,10 +130,10 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         .insert({
           post_id: postId,
           user_id: currentUser.id,
-          text: replyText.trim(),
+          text: sanitizedText,
           parent_id: comment.id,
         } as any)
-        .select('*, user:users(*)')
+        .select('*, user:user_profiles!user_id(*)')
         .single() as { data: CommentType | null; error: any };
 
       if (error) throw error;
@@ -119,7 +141,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       if (data) {
         // Log moderation with content ID
         await moderateContent(
-          { text: replyText.trim() },
+          { text: sanitizedText },
           'comment',
           currentUser.id,
           data.id
@@ -134,7 +156,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         onReply?.(comment.id, replyText);
       }
     } catch (error) {
-      console.error('Error posting reply:', error);
+      commentThreadLogger.error('Error posting reply:', error);
       toast.error('Erreur lors de la réponse');
     } finally {
       setIsSubmitting(false);
@@ -166,7 +188,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           } as any);
       }
     } catch (error) {
-      console.error('Error liking comment:', error);
+      commentThreadLogger.error('Error liking comment:', error);
       // Revert optimistic update
       setHasLiked(!hasLiked);
       setLikes(hasLiked ? likes + 1 : likes - 1);
@@ -199,8 +221,16 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           </span>
         </div>
 
-        {/* Comment text */}
-        <p className="text-white text-sm mb-2 break-words">{comment.content || comment.text}</p>
+        {/* Comment text - sanitized for XSS protection */}
+        <p 
+          className="text-white text-sm mb-2 break-words"
+          dangerouslySetInnerHTML={{ 
+            __html: DOMPurify.sanitize(comment.content || comment.text || '', {
+              ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'br'],
+              ALLOWED_ATTR: []
+            })
+          }}
+        />
 
         {/* Actions */}
         <div className="flex items-center gap-4 text-xs">
@@ -289,6 +319,23 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     </div>
   );
 };
+
+// Memoize CommentThread to prevent unnecessary re-renders in feed
+// Performance optimization: Focus on components that render per post/comment
+export const CommentThread = React.memo(CommentThreadComponent, (prevProps, nextProps) => {
+  // Custom comparison - only re-render if comment data or user changes
+  return (
+    prevProps.comment.id === nextProps.comment.id &&
+    prevProps.comment.likes === nextProps.comment.likes &&
+    prevProps.comment.text === nextProps.comment.text &&
+    prevProps.currentUser?.id === nextProps.currentUser?.id &&
+    prevProps.postId === nextProps.postId &&
+    prevProps.depth === nextProps.depth &&
+    prevProps.onReply === nextProps.onReply
+  );
+});
+
+CommentThread.displayName = 'CommentThread';
 
 export default CommentThread;
 

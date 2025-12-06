@@ -2,13 +2,17 @@
  * StoryViewer - View stories with swipe navigation (Instagram/TikTok style)
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar } from '../Avatar';
 import { VideoPlayer } from './VideoPlayer';
 import { supabase } from '../../lib/supabase';
 import { getTimeAgo } from '../../lib/utils';
 import type { Story, User } from '../../types';
+import { logger } from '../../lib/logger';
+
+const storyViewerLogger = logger.withContext('StoryViewer');
+
 
 interface StoryViewerProps {
   stories: Story[];
@@ -16,7 +20,7 @@ interface StoryViewerProps {
   onClose: () => void;
 }
 
-export const StoryViewer: React.FC<StoryViewerProps> = ({
+const StoryViewerComponent: React.FC<StoryViewerProps> = ({
   stories,
   initialIndex = 0,
   onClose,
@@ -69,7 +73,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
 
       // TODO: Create story_views table and insert view
       // For now, just log
-      console.log('Story viewed:', currentStory.id);
+      storyViewerLogger.debug('Story viewed:', currentStory.id);
     };
 
     markAsViewed();
@@ -145,7 +149,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
       setReplyText('');
       setShowReplyInput(false);
     } catch (error) {
-      console.error('Error sending reply:', error);
+      storyViewerLogger.error('Error sending reply:', error);
       toast.error('Erreur lors de l\'envoi');
     }
   };
@@ -325,6 +329,18 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
     </div>
   );
 };
+
+// Memoize StoryViewer to prevent unnecessary re-renders
+// Performance optimization: Only re-render when stories array or callbacks change
+export const StoryViewer = memo(StoryViewerComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.stories.length === nextProps.stories.length &&
+    prevProps.initialIndex === nextProps.initialIndex &&
+    prevProps.onClose === nextProps.onClose
+  );
+});
+
+StoryViewer.displayName = 'StoryViewer';
 
 export default StoryViewer;
 

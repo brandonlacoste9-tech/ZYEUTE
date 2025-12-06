@@ -1,21 +1,42 @@
 {
-  "name": "zyeute",
-  "private": true,
+  "name": "colony-os",
   "version": "1.0.0",
-  "type": "module",
-  "description": "L'app sociale du Québec - Fait au Québec, pour le Québec 🇨🇦⚜️",
-  "engines": {
-    "node": ">=20.19.0"
-  },
+  "description": "Colony OS - The First AI Civilization Operating System",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\" \"*.{ts,tsx,js,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css}\" \"*.{ts,tsx,js,json,md}\"",
     "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:coverage:check": "vitest run --coverage && echo 'Coverage check complete'",
+    "test:integration": "vitest run --config vitest.config.integration.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:all": "npm run test:run && npm run test:integration && npm run test:e2e",
     "health-check": "npm run type-check || true && npm run build",
     "setup:preview-branch": "bash scripts/setup-preview-branch.sh",
-    "db:migrate": "node scripts/setup-database.js"
+    "db:migrate": "node scripts/setup-database.js",
+    "generate": "buf generate",
+    "install:all": "npm install && npm run install:packages",
+    "install:packages": "npm install --workspace=packages/kernel-node && npm install --workspace=packages/bee-node",
+    "dev:kernel": "npm run dev --workspace=packages/kernel-node",
+    "dev:bee": "npm run dev --workspace=packages/bee-node",
+    "build:all": "npm run build --workspace=packages/kernel-node && npm run build --workspace=packages/bee-node",
+    "docs": "npx tsx scripts/generate-docs.ts",
+    "docs:generate": "npm run docs",
+        "prepare": "husky install"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.74",
@@ -23,8 +44,10 @@
     "@stripe/stripe-js": "^4.0.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.45.0",
+    "@types/dompurify": "^3.0.5",
     "ai": "^5.0.104",
     "clsx": "^2.1.1",
+    "dompurify": "^3.3.0",
     "framer-motion": "^12.23.24",
     "next": "^16.0.5",
     "openai": "^4.67.0",
@@ -37,19 +60,32 @@
     "tailwind-merge": "^2.5.0"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.28.1",
     "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^20.10.0",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/ui": "^2.1.8",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
+        "husky": "^8.0.0",
+        "lint-staged": "^15.0.0",
+    "jsdom": "^25.0.1",
     "postcss": "^8.4.47",
+    "prettier": "^3.4.2",
+    "serve": "^14.2.4",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.5.4",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

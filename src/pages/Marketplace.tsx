@@ -12,6 +12,10 @@ import { purchaseProduct } from '../services/stripeService';
 import { supabase } from '../lib/supabase';
 import { toast } from '../components/Toast';
 import { formatNumber } from '../lib/utils';
+import { logger } from '../lib/logger';
+
+const marketplaceLogger = logger.withContext('Marketplace');
+
 
 interface Product {
   id: string;
@@ -67,7 +71,7 @@ export default function Marketplace() {
       if (error) throw error;
       setProducts(data || []);
     } catch (error) {
-      console.error('Error loading products:', error);
+      marketplaceLogger.error('Error loading products:', error);
       toast.error('Erreur de chargement');
     } finally {
       setIsLoading(false);
@@ -80,7 +84,7 @@ export default function Marketplace() {
       toast.success('Achat en cours! 🎉');
       loadProducts();
     } catch (error: any) {
-      console.error('Purchase error:', error);
+      marketplaceLogger.error('Purchase error:', error);
     }
   };
 

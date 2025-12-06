@@ -5,6 +5,12 @@ node_modules
 
 # Testing
 coverage
+*.lcov
+.nyc_output
+playwright-report/
+playwright/.cache
+test-results/
+.lighthouseci/
 
 # Production
 dist

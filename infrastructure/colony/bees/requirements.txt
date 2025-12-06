@@ -1,0 +1,15 @@
+# Colony OS Finance Bee Dependencies
+
+# Colony OS SDK
+pycolonies>=2.0.0
+
+# Supabase client
+supabase>=2.0.0
+
+# Stripe API
+stripe>=7.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+requests>=2.31.0
+

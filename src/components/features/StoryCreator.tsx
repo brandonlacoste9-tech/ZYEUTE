@@ -8,6 +8,10 @@ import { Button } from '../Button';
 import { supabase } from '../../lib/supabase';
 import { toast } from '../Toast';
 import { generateId } from '../../lib/utils';
+import { logger } from '../../lib/logger';
+
+const storyCreatorLogger = logger.withContext('StoryCreator');
+
 
 export const StoryCreator: React.FC = () => {
   const navigate = useNavigate();
@@ -104,7 +108,7 @@ export const StoryCreator: React.FC = () => {
       toast.success('Story publiée! 🎉');
       setTimeout(() => navigate('/'), 1000);
     } catch (error: any) {
-      console.error('Error uploading story:', error);
+      storyCreatorLogger.error('Error uploading story:', error);
       toast.error(error.message || 'Erreur lors de l\'upload');
     } finally {
       setIsUploading(false);

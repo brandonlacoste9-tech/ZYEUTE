@@ -50,9 +50,10 @@ export const ChatButton: React.FC<ChatButtonProps> = ({
     setIsChatOpen(false);
   };
 
-  // Base positioning classes
+  // Base positioning classes - positioned above bottom nav (h-16 = 64px + safe area + padding)
+  // Using bottom-32 (8rem = 128px) to ensure clearance above the bottom navigation bar
   const positionClasses = isFixed
-    ? 'fixed bottom-24 right-4 z-40'
+    ? 'fixed bottom-32 right-4 z-40'
     : 'relative';
 
   // Custom shadow effect simulating the gold ring and depth

@@ -12,9 +12,14 @@ import { VideoPlayer } from '../components/features/VideoPlayer';
 import { CommentThread } from '../components/features/CommentThread';
 import { GiftModal } from '../components/features/GiftModal';
 import { supabase } from '../lib/supabase';
+import { getPostById } from '../services/api';
 import { formatNumber, getTimeAgo } from '../lib/utils';
 import { toast } from '../components/Toast';
 import type { Post, Comment as CommentType, User } from '../types';
+import { logger } from '../lib/logger';
+
+const postDetailLogger = logger.withContext('PostDetail');
+
 
 export const PostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -53,20 +58,24 @@ export const PostDetail: React.FC = () => {
 
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select(`
-            *,
-            user:users(*),
-            user_fire:fires!user_id(fire_level)
-          `)
-          .eq('id', id)
-          .single();
-
-        if (error) throw error;
-        if (data) setPost(data);
+        // Use centralized API function instead of direct query
+        const postData = await getPostById(id);
+        if (postData) {
+          // Fetch fire data separately if needed
+          const { data: fireData } = await supabase
+            .from('fires')
+            .select('fire_level')
+            .eq('post_id', id)
+            .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+            .single();
+          
+          setPost({
+            ...postData,
+            user_fire: fireData ? { fire_level: fireData.fire_level } : undefined,
+          });
+        }
       } catch (error) {
-        console.error('Error fetching post:', error);
+        postDetailLogger.error('Error fetching post:', error);
         navigate('/');
       } finally {
         setIsLoading(false);
@@ -140,19 +149,31 @@ export const PostDetail: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('comments')
         .insert({
           post_id: post.id,
           user_id: currentUser.id,
           text: newComment.trim(),
-        });
+        })
+        .select('*, user:user_profiles!user_id(*)')
+        .single();
 
-      if (!error) {
+      if (error) throw error;
+
+      if (data) {
+        // Optimistically add comment to list (realtime might be delayed)
+        setComments(prev => [...prev, data as CommentType]);
         setNewComment('');
+        // Update post comment count
+        if (post) {
+          setPost({ ...post, comment_count: (post.comment_count || 0) + 1 });
+        }
+        toast.success('Commentaire publié! 💬');
       }
     } catch (error) {
-      console.error('Error posting comment:', error);
+      postDetailLogger.error('Error posting comment:', error);
+      toast.error('Erreur lors de la publication du commentaire');
     } finally {
       setIsSubmitting(false);
     }

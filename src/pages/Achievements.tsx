@@ -9,6 +9,7 @@ import { BottomNav } from '../components/BottomNav';
 import { Button } from '../components/Button';
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
+import { logger } from '../lib/logger';
 import {
   getAllAchievements,
   getUserAchievements,
@@ -20,13 +21,7 @@ import {
   type TierInfo,
 } from '../services/achievementService';
 
-const TIER_ICONS = {
-  novice: '🥉',
-  vrai: '🥈',
-  pur_laine: '🥇',
-  legende: '💎',
-  icone: '👑',
-};
+const achievementsLogger = logger.withContext('Achievements');
 
 export const Achievements: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -61,7 +56,7 @@ export const Achievements: React.FC = () => {
       setStats(statsData);
       setTierInfo(tier);
     } catch (error) {
-      console.error('Error loading achievements:', error);
+      achievementsLogger.error('Error loading achievements:', error);
     } finally {
       setIsLoading(false);
     }
@@ -266,7 +261,7 @@ export const Achievements: React.FC = () => {
                   : 'bg-white/5 text-white/60 hover:bg-white/10'
               )}
             >
-              Débloqués d'abord
+              Débloqués d&apos;abord
             </button>
             <button
               onClick={() => setSortBy('rarity')}

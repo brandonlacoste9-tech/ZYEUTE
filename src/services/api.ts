@@ -4,7 +4,10 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import type { Post, User, Story } from '@/types';
+
+const apiLogger = logger.withContext('API');
 
 /**
  * Gets the currently authenticated user's profile data
@@ -28,7 +31,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
     // If profile doesn't exist (error code PGRST116 = not found), create it
     if (error && error.code === 'PGRST116') {
-      console.log('[getCurrentUser] Profile not found, creating new profile for user:', authUser.id);
+      apiLogger.info('Profile not found, creating new profile for user:', authUser.id);
       
       // Extract username from email or use a default
       const email = authUser.email || '';
@@ -49,19 +52,19 @@ export async function getCurrentUser(): Promise<User | null> {
         .single();
 
       if (createError) {
-        console.error('[getCurrentUser] Error creating profile:', createError);
+        apiLogger.error('Error creating profile:', createError);
         return null;
       }
 
-      console.log('[getCurrentUser] Profile created successfully');
+      apiLogger.info('Profile created successfully');
       return newProfile as User;
     }
 
     // Other errors
-    console.error('[getCurrentUser] Error fetching current user:', error);
+    apiLogger.error('Error fetching current user:', error);
     return null;
   } catch (error) {
-    console.error('[getCurrentUser] Error in getCurrentUser:', error);
+    apiLogger.error('Error in getCurrentUser:', error);
     return null;
   }
 }
@@ -74,23 +77,72 @@ export async function getFeedPosts(page: number = 0, limit: number = 20): Promis
     const start = page * limit;
     const end = start + limit - 1;
 
+    apiLogger.debug('Starting query:', { page, limit, start, end });
+
+    // Query publications directly instead of posts view to avoid RLS/view issues
     const { data, error } = await supabase
-      .from('posts')
+      .from('publications')
       .select(`
         *,
         user:user_profiles!user_id(*)
       `)
+      .eq('visibilite', 'public')  // Only show public posts
+      .is('est_masque', null)      // Not hidden
+      .is('deleted_at', null)      // Not deleted
       .order('created_at', { ascending: false })
       .range(start, end);
 
+    apiLogger.debug('Query result:', { 
+      dataCount: data?.length || 0, 
+      error: error?.message || null,
+      firstItem: data?.[0] 
+    });
+
     if (error) {
-      console.error('Error fetching feed posts:', error);
+      apiLogger.error('Supabase error:', error);
+      apiLogger.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       return [];
     }
 
-    return (data || []) as Post[];
+    if (!data || data.length === 0) {
+      apiLogger.warn('No data returned from query');
+      return [];
+    }
+
+    // Map publications columns to Post type (handle column name differences)
+    const posts = (data || []).map((pub: any) => {
+      const mapped = {
+        id: pub.id,
+        user_id: pub.user_id,
+        type: pub.media_url?.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'photo',  // Infer type from media_url
+        media_url: pub.media_url || '',
+        caption: pub.content || null,  // Map content to caption
+        hashtags: null,  // TODO: Extract from content or join hashtags table
+        region: null,  // TODO: Map from region field if exists
+        city: null,  // TODO: Map from city field if exists
+        fire_count: pub.reactions_count || 0,
+        comment_count: pub.comments_count || 0,
+        created_at: pub.created_at,
+        user: pub.user,  // Already joined
+        // Keep original fields for compatibility
+        ...pub,
+        visibility: pub.visibilite,
+        is_hidden: pub.est_masque,
+      };
+      apiLogger.debug('Mapped post:', { id: mapped.id, caption: mapped.caption, user: mapped.user?.username });
+      return mapped;
+    }) as Post[];
+
+    apiLogger.debug('Returning posts:', posts.length);
+    return posts;
   } catch (error) {
-    console.error('Error in getFeedPosts:', error);
+    apiLogger.error('Exception:', error);
+    apiLogger.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
     return [];
   }
 }
@@ -123,13 +175,55 @@ export async function getUserProfile(
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching user profile:', error);
+      apiLogger.error('Error fetching user profile:', error);
       return null;
     }
 
     return data as User;
   } catch (error) {
-    console.error('Error in getUserProfile:', error);
+    apiLogger.error('Error in getUserProfile:', error);
+    return null;
+  }
+}
+
+/**
+ * Gets a single post by ID
+ */
+export async function getPostById(postId: string): Promise<Post | null> {
+  try {
+    // Query publications directly instead of posts view
+    const { data, error } = await supabase
+      .from('publications')
+      .select('*, user:user_profiles!user_id(*)')
+      .eq('id', postId)
+      .is('deleted_at', null)
+      .single();
+
+    if (error || !data) {
+      apiLogger.error('Error:', error);
+      return null;
+    }
+
+    // Map publications columns to Post type
+    return {
+      id: data.id,
+      user_id: data.user_id,
+      type: data.media_url?.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'photo',
+      media_url: data.media_url || '',
+      caption: data.content || null,
+      hashtags: null,
+      region: null,
+      city: null,
+      fire_count: data.reactions_count || 0,
+      comment_count: data.comments_count || 0,
+      created_at: data.created_at,
+      user: data.user,
+      ...data,
+      visibility: data.visibilite,
+      is_hidden: data.est_masque,
+    } as Post;
+  } catch (error) {
+    apiLogger.error('Exception:', error);
     return null;
   }
 }
@@ -139,20 +233,41 @@ export async function getUserProfile(
  */
 export async function getUserPosts(userId: string): Promise<Post[]> {
   try {
+    // Query publications directly instead of posts view to avoid RLS/view issues
     const { data, error } = await supabase
-      .from('posts')
+      .from('publications')
       .select('*, user:user_profiles!user_id(*)')
       .eq('user_id', userId)
+      .is('deleted_at', null)  // Not deleted
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching user posts:', error);
+      apiLogger.error('Supabase error:', error);
       return [];
     }
 
-    return (data || []) as Post[];
+    // Map publications columns to Post type
+    const posts = (data || []).map((pub: any) => ({
+      id: pub.id,
+      user_id: pub.user_id,
+      type: pub.media_url?.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'photo',
+      media_url: pub.media_url || '',
+      caption: pub.content || null,
+      hashtags: null,
+      region: null,
+      city: null,
+      fire_count: pub.reactions_count || 0,
+      comment_count: pub.comments_count || 0,
+      created_at: pub.created_at,
+      user: pub.user,
+      ...pub,
+      visibility: pub.visibilite,
+      is_hidden: pub.est_masque,
+    })) as Post[];
+
+    return posts;
   } catch (error) {
-    console.error('Error in getUserPosts:', error);
+    apiLogger.error('[getUserPosts] Exception:', error);
     return [];
   }
 }
@@ -171,7 +286,7 @@ export async function getStories(
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching stories:', error);
+      apiLogger.error('Error fetching stories:', error);
       return [];
     }
 
@@ -212,7 +327,7 @@ export async function getStories(
 
     return storyList;
   } catch (error) {
-    console.error('Error in getStories:', error);
+    apiLogger.error('Error in getStories:', error);
     return [];
   }
 }
@@ -231,13 +346,13 @@ export async function checkFollowing(followerId: string, followingId: string): P
 
     if (error && error.code !== 'PGRST116') {
       // PGRST116 is "not found" which is expected
-      console.error('Error checking follow status:', error);
+      apiLogger.error('Error checking follow status:', error);
       return false;
     }
 
     return !!data;
   } catch (error) {
-    console.error('Error in checkFollowing:', error);
+    apiLogger.error('Error in checkFollowing:', error);
     return false;
   }
 }
@@ -260,7 +375,7 @@ export async function toggleFollow(
         .eq('following_id', followingId);
 
       if (error) {
-        console.error('Error unfollowing user:', error);
+        apiLogger.error('Error unfollowing user:', error);
         return false;
       }
     } else {
@@ -271,14 +386,14 @@ export async function toggleFollow(
       });
 
       if (error) {
-        console.error('Error following user:', error);
+        apiLogger.error('Error following user:', error);
         return false;
       }
     }
 
     return true;
   } catch (error) {
-    console.error('Error in toggleFollow:', error);
+    apiLogger.error('Error in toggleFollow:', error);
     return false;
   }
 }
@@ -305,7 +420,7 @@ export async function togglePostFire(postId: string, userId: string): Promise<bo
         .eq('user_id', userId);
 
       if (error) {
-        console.error('Error removing fire:', error);
+        apiLogger.error('Error removing fire:', error);
         return false;
       }
     } else {
@@ -317,14 +432,14 @@ export async function togglePostFire(postId: string, userId: string): Promise<bo
       });
 
       if (error) {
-        console.error('Error adding fire:', error);
+        apiLogger.error('Error adding fire:', error);
         return false;
       }
     }
 
     return true;
   } catch (error) {
-    console.error('Error in togglePostFire:', error);
+    apiLogger.error('Error in togglePostFire:', error);
     return false;
   }
 }

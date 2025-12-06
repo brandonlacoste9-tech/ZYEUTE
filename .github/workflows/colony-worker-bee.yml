@@ -1,0 +1,103 @@
+name: Colony Worker Bee
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "Task for the Colony Worker Bee to execute"
+        required: true
+        type: string
+      origin:
+        description: "Which colony module is sending this task (Neurosphere, Guardian, BeeHive, Zyeute, etc.)"
+        required: true
+        type: string
+      priority:
+        description: "Task priority level (low, normal, high, critical)"
+        required: false
+        default: "normal"
+        type: string
+      task_id:
+        description: "Colony task ID from Supabase (if applicable)"
+        required: false
+        type: string
+
+jobs:
+  execute-task:
+    runs-on: self-hosted
+    steps:
+      - name: Colony Banner
+        run: |
+          echo "🐝 Colony OS Worker Bee Active"
+          echo "-------------------------------"
+          echo "Origin: ${{ inputs.origin }}"
+          echo "Priority: ${{ inputs.priority }}"
+          echo "Task: ${{ inputs.task }}"
+          if [ -n "${{ inputs.task_id }}" ]; then
+            echo "Task ID: ${{ inputs.task_id }}"
+          fi
+          echo "-------------------------------"
+          echo "Preparing to execute…"
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.19.0'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Guardian Safety Check
+        run: |
+          TASK="${{ inputs.task }}"
+          
+          # Block dangerous operations
+          if [[ "$TASK" == *"rm -rf"* ]] || [[ "$TASK" == *"delete"* ]] || [[ "$TASK" == *"format"* ]]; then
+            echo "🛡️ Guardian blocked potentially dangerous task."
+            echo "Blocked command: $TASK"
+            exit 1
+          fi
+          
+          # Allow safe operations
+          echo "🛡️ Guardian approved task."
+
+      - name: Execute Bee Task
+        run: |
+          echo "🐝 Worker Bee executing task:"
+          echo ">>> ${{ inputs.task }}"
+          echo ""
+          
+          # Check if it's a script file
+          if [[ "${{ inputs.task }}" == *.sh ]]; then
+            SCRIPT_PATH="colony/bees/worker/tasks/${{ inputs.task }}"
+            if [ -f "$SCRIPT_PATH" ]; then
+              chmod +x "$SCRIPT_PATH"
+              bash "$SCRIPT_PATH"
+            else
+              echo "⚠️ Script not found: $SCRIPT_PATH"
+              exit 1
+            fi
+          else
+            # Execute command directly
+            bash -c "${{ inputs.task }}" || {
+              echo "⚠️ Task completed with warnings or errors."
+              exit 1
+            }
+          fi
+
+      - name: Report Back to Colony
+        if: always()
+        run: |
+          echo "📡 Reporting status to Hive Mind…"
+          echo "Task: ${{ inputs.task }}"
+          echo "Origin: ${{ inputs.origin }}"
+          echo "Priority: ${{ inputs.priority }}"
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "Status: SUCCESS ✅"
+          else
+            echo "Status: FAILED ❌"
+          fi
+

@@ -10,12 +10,19 @@ import { BottomNav } from '../components/BottomNav';
 import { Button } from '../components/Button';
 import { subscribeToPremium } from '../services/stripeService';
 import { usePremium } from '../hooks/usePremium';
+import { toast } from '../components/Toast';
+import { useHaptics } from '../hooks/useHaptics';
+import { logger } from '../lib/logger';
+
+const premiumLogger = logger.withContext('Premium');
+
 
 type SubscriptionTier = 'free' | 'bronze' | 'silver' | 'gold';
 
 export default function Premium() {
   const { tier: currentTier, isLoading } = usePremium();
   const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('gold');
+  const { tap } = useHaptics();
 
   const tiers = [
     {
@@ -77,7 +84,8 @@ export default function Premium() {
     try {
       await subscribeToPremium(tier);
     } catch (error: any) {
-      console.error('Subscription error:', error);
+      premiumLogger.error('Subscription error:', error);
+      toast.error('Erreur lors de l\'abonnement. Réessaie plus tard.');
     }
   };
 
@@ -101,7 +109,7 @@ export default function Premium() {
             Zyeuté VIP
           </h1>
           <p className="text-leather-200 text-lg embossed">
-            L'expérience premium québécoise
+            L&apos;expérience premium québécoise
           </p>
         </div>
         {/* Gold accent lines */}
@@ -184,7 +192,10 @@ export default function Premium() {
 
                 {/* CTA Button */}
                 <button
-                  onClick={() => handleSubscribe(tier.id)}
+                  onClick={() => {
+                    tap();
+                    handleSubscribe(tier.id);
+                  }}
                   disabled={isCurrentTier}
                   className={`w-full py-3 rounded-xl font-bold transition-all ${
                     isCurrentTier
@@ -295,7 +306,7 @@ export default function Premium() {
                 </svg>
               </summary>
               <p className="text-leather-300 text-sm py-3">
-                Oui! Tu peux annuler ton abonnement à tout moment depuis tes paramètres. Tu garderas l'accès jusqu'à la fin de ta période payée.
+                Oui! Tu peux annuler ton abonnement à tout moment depuis tes paramètres. Tu garderas l&apos;accès jusqu&apos;à la fin de ta période payée.
               </p>
             </details>
 

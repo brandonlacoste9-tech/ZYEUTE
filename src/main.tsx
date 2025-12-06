@@ -2,23 +2,51 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
+import { extractSupabaseProjectRef } from './lib/utils';
+import { logger } from './lib/logger';
+
+const errorLogger = logger.withContext('GlobalError');
+const appLogger = logger.withContext('App');
 
 // Add error handler for uncaught errors
 window.addEventListener('error', (event) => {
-  console.error('❌ Uncaught error:', event.error);
+  errorLogger.error('Uncaught error:', event.error);
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('❌ Unhandled promise rejection:', event.reason);
+  errorLogger.error('Unhandled promise rejection:', event.reason);
 });
 
 // Log that we're starting
-console.log('🚀 Starting Zyeuté app...');
-console.log('📍 Environment check:', {
-  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL ? '✅ Set' : '❌ Missing',
-  VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
+appLogger.info('🚀 Starting Zyeuté app...');
+appLogger.info('📍 Environment check:', {
+  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL 
+    ? `✅ Set (${extractSupabaseProjectRef(import.meta.env.VITE_SUPABASE_URL) || 'unknown'})` 
+    : '❌ Missing',
+  VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY 
+    ? `✅ Set (${import.meta.env.VITE_SUPABASE_ANON_KEY.substring(0, 10)}...)` 
+    : '❌ Missing',
   NODE_ENV: import.meta.env.MODE,
 });
+
+// Show actual Supabase URL if set
+if (import.meta.env.VITE_SUPABASE_URL) {
+  appLogger.debug('📍 Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+  
+  // Validate URL
+  const projectRef = extractSupabaseProjectRef(import.meta.env.VITE_SUPABASE_URL);
+  if (import.meta.env.VITE_SUPABASE_URL.includes('kihxqurnmyxnsyqgpdaw')) {
+    appLogger.error('❌ WRONG PROJECT! Using kihxqurnmyxnsyqgpdaw instead of vuanulvyqkfefmjcikfk');
+  } else if (projectRef === 'vuanulvyqkfefmjcikfk') {
+    appLogger.info('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
+  } else if (import.meta.env.VITE_SUPABASE_URL.includes('demo.supabase.co')) {
+    appLogger.warn('⚠️ Using demo Supabase URL');
+  } else {
+    appLogger.warn('⚠️ Unknown Supabase project. Expected: vuanulvyqkfefmjcikfk');
+  }
+} else {
+  appLogger.error('❌ VITE_SUPABASE_URL not set! App may not function correctly.');
+}
 
 try {
   const rootElement = document.getElementById('root');
@@ -26,7 +54,7 @@ try {
     throw new Error('Root element not found!');
   }
 
-  console.log('✅ Root element found, rendering App...');
+  appLogger.debug('✅ Root element found, rendering App...');
   
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
@@ -34,10 +62,10 @@ try {
     </React.StrictMode>,
   );
   
-  console.log('✅ App rendered successfully');
+  appLogger.debug('✅ App rendered successfully');
 } catch (error) {
-  console.error('❌ Failed to render app:', error);
-  console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
+  errorLogger.error('❌ Failed to render app:', error);
+  errorLogger.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
   
   // Show error on page with more details
   const rootElement = document.getElementById('root');
@@ -53,8 +81,8 @@ try {
           </div>
           <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
             <p style="color: #fff; margin-bottom: 10px;"><strong>Environment Variables:</strong></p>
-            <p style="color: ${import.meta.env.VITE_SUPABASE_URL ? '#4ade80' : '#ff6b6b'};">VITE_SUPABASE_URL: ${import.meta.env.VITE_SUPABASE_URL ? '✅ Set' : '❌ Missing'}</p>
-            <p style="color: ${import.meta.env.VITE_SUPABASE_ANON_KEY ? '#4ade80' : '#ff6b6b'};">VITE_SUPABASE_ANON_KEY: ${import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing'}</p>
+            <p style="color: ${import.meta.env.VITE_SUPABASE_URL ? '#4ade80' : '#ff6b6b'};">VITE_SUPABASE_URL: ${import.meta.env.VITE_SUPABASE_URL || '❌ Missing'}</p>
+            <p style="color: ${import.meta.env.VITE_SUPABASE_ANON_KEY ? '#4ade80' : '#ff6b6b'};">VITE_SUPABASE_ANON_KEY: ${import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅ Set (hidden)' : '❌ Missing'}</p>
           </div>
           <p style="color: #888; margin-top: 20px;">Check browser console (F12) for more details.</p>
           <button onclick="window.location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #F5C842; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Reload Page</button>

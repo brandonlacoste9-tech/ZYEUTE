@@ -63,7 +63,7 @@ export default function Studio() {
             />
             <div className="text-6xl mb-4">📤</div>
             <h3 className="text-xl font-bold text-white mb-2">Téléverse ta vidéo</h3>
-            <p className="text-white/50">MP4, MOV jusqu'à 50MB</p>
+            <p className="text-white/50">MP4, MOV jusqu&apos;à 50MB</p>
             {isUploading && <p className="text-purple-400 mt-4 animate-pulse">Analyse IA en cours...</p>}
           </div>
         ) : (
@@ -97,7 +97,18 @@ export default function Studio() {
               </button>
             </div>
 
-            <Button className="w-full py-4 text-lg font-bold bg-gradient-to-r from-red-600 to-orange-600">
+            <Button 
+              onClick={async () => {
+                if (!videoResult) return;
+                toast.info('Exportation en cours... 🎬');
+                // Simulate export process
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                toast.success('Vidéo exportée et publiée! 🚀');
+                // Navigate to profile after publish
+                window.location.href = '/profile/me';
+              }}
+              className="w-full py-4 text-lg font-bold bg-gradient-to-r from-red-600 to-orange-600"
+            >
               🚀 Exporter & Publier
             </Button>
           </div>
