@@ -100,11 +100,10 @@ export async function signUp(email: string, password: string, username: string) 
 
   // Create user profile
   if (data.user) {
-    const { error: profileError } = await supabase.from('user_profiles').insert({
+    const { error: profileError } = await supabase.from('users').insert({
       id: data.user.id,
       username,
       display_name: username,
-      email: email,
     });
 
     if (profileError) return { data: null, error: profileError };

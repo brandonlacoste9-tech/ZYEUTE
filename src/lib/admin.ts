@@ -43,7 +43,7 @@ export async function checkIsAdmin(): Promise<boolean> {
 
     // Method 1: Check user_profiles.is_admin field
     const { data: profile, error: profileError } = await supabase
-      .from('user_profiles')
+      .from('users')
       .select('is_admin')
       .eq('id', user.id)
       .single();

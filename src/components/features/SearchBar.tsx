@@ -72,7 +72,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
 
         // Search users
         const { data: users } = await supabase
-          .from('user_profiles')
+          .from('users')
           .select('*')
           .or(`username.ilike.%${sanitizedQuery}%,display_name.ilike.%${sanitizedQuery}%`)
           .limit(5);

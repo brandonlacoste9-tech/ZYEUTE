@@ -32,7 +32,7 @@ export const RestrictedAccountsSettings: React.FC = () => {
     setIsSearching(true);
     try {
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('users')
         .select('id, username, display_name, avatar_url')
         .ilike('username', `%${query}%`)
         .limit(10);

@@ -97,7 +97,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
           // Fetch actor details
           const { data: actor } = await supabase
-            .from('user_profiles')
+            .from('users')
             .select('*')
             .eq('id', newNotification.actor_id)
             .single();
