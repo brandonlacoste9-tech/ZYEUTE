@@ -5,6 +5,9 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database';
 
+// Re-export the Database type for use in other files
+export type { Database };
+
 import { extractSupabaseProjectRef, validateSupabaseUrl } from './utils';
 import { logger } from './logger';
 
@@ -26,13 +29,15 @@ supabaseLogger.info('Expected project:', EXPECTED_PROJECT_REF);
 const detectedProjectRef = extractSupabaseProjectRef(supabaseUrl);
 if (detectedProjectRef) {
   supabaseLogger.info('Detected project:', detectedProjectRef);
-  
+
   // Check for wrong project
   if (supabaseUrl.includes('kihxqurnmyxnsyqgpdaw')) {
     supabaseLogger.error('❌ WRONG SUPABASE PROJECT DETECTED!');
     supabaseLogger.error('   Current: kihxqurnmyxnsyqgpdaw');
     supabaseLogger.error('   Expected: vuanulvyqkfefmjcikfk');
-    supabaseLogger.error('   Action: Update VITE_SUPABASE_URL to: https://vuanulvyqkfefmjcikfk.supabase.co');
+    supabaseLogger.error(
+      '   Action: Update VITE_SUPABASE_URL to: https://vuanulvyqkfefmjcikfk.supabase.co'
+    );
     supabaseLogger.error('   Platforms: Check Netlify and Vercel environment variables');
   } else if (detectedProjectRef === 'vuanulvyqkfefmjcikfk') {
     supabaseLogger.info('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
@@ -42,7 +47,7 @@ if (detectedProjectRef) {
     supabaseLogger.warn('⚠️ Using unexpected Supabase project:', detectedProjectRef);
     supabaseLogger.warn('   Expected: vuanulvyqkfefmjcikfk');
   }
-  
+
   validateSupabaseUrl(supabaseUrl, EXPECTED_PROJECT_REF);
 } else {
   supabaseLogger.warn('Could not extract project reference from URL:', supabaseUrl);
@@ -51,7 +56,9 @@ if (detectedProjectRef) {
 // Warn about missing credentials but don't crash
 if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
   supabaseLogger.warn('⚠️ Missing Supabase credentials! Using demo mode.');
-  supabaseLogger.warn('   Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local or Netlify environment variables');
+  supabaseLogger.warn(
+    '   Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local or Netlify environment variables'
+  );
 } else {
   // Show that key is set (but don't expose the actual key)
   supabaseLogger.info('Anon key:', supabaseAnonKey.substring(0, 20) + '...' + ' ✅ Set');
@@ -63,6 +70,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: true,
   },
+  db: {
+    schema: 'public',
+  },
 });
 
 // Helper functions
@@ -71,7 +81,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
  * Get current user session
  */
 export async function getCurrentUser() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   return user;
 }
 
@@ -104,7 +116,6 @@ export async function signUp(email: string, password: string, username: string) 
       id: data.user.id,
       username,
       display_name: username,
-      email: email,
     });
 
     if (profileError) return { data: null, error: profileError };
@@ -128,7 +139,7 @@ export async function signInWithGoogle() {
   const redirectTo = `${window.location.origin}/auth/callback`;
   supabaseLogger.debug('OAuth Redirect URL:', redirectTo);
   supabaseLogger.debug('OAuth Supabase URL:', supabaseUrl);
-  
+
   try {
     const result = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -140,7 +151,7 @@ export async function signInWithGoogle() {
         },
       },
     });
-    
+
     supabaseLogger.debug('OAuth Result:', result);
     return result;
   } catch (error) {
@@ -164,7 +175,9 @@ export async function uploadFile(
 
   if (error) return { url: null, error };
 
-  const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(data.path);
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(bucket).getPublicUrl(data.path);
 
   return { url: publicUrl, error: null };
 }
