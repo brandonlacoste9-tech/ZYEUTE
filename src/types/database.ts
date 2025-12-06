@@ -11,6 +11,10 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export interface Database {
+  /**
+   * Internal metadata required by Supabase client for proper type inference.
+   * PostgrestVersion specifies the PostgREST API version used by Supabase.
+   */
   __InternalSupabase: {
     PostgrestVersion: '12';
   };
