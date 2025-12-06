@@ -22,7 +22,7 @@ export const TermsOfService: React.FC = () => {
           </div>
 
           <h1 className="text-4xl font-bold text-white mb-8">
-            Conditions d'Utilisation
+            Conditions d&apos;Utilisation
           </h1>
 
           {/* Section 1: Acceptance */}
@@ -31,8 +31,8 @@ export const TermsOfService: React.FC = () => {
               1. Acceptation des Conditions
             </h2>
             <p className="text-white/80 leading-relaxed mb-4">
-              En accédant et en utilisant Zyeuté ("l'Application", "le Service", "nous", "notre"), vous
-              acceptez d'être lié par ces Conditions d'Utilisation. Si vous n'acceptez pas ces conditions,
+              En accédant et en utilisant Zyeuté (&quot;l&apos;Application&quot;, &quot;le Service&quot;, &quot;nous&quot;, &quot;notre&quot;), vous
+              acceptez d&apos;être lié par ces Conditions d&apos;Utilisation. Si vous n&apos;acceptez pas ces conditions,
               veuillez ne pas utiliser notre service.
             </p>
             <p className="text-white/80 leading-relaxed">
@@ -52,10 +52,10 @@ export const TermsOfService: React.FC = () => {
               </p>
               <ul className="space-y-2 text-white/70">
                 <li>✅ Avoir au moins <strong className="text-white">13 ans</strong> (âge minimum au Canada)</li>
-                <li>✅ Avoir au moins <strong className="text-white">18 ans</strong> pour les fonctionnalités d'achat</li>
-                <li>✅ Ne pas être banni de l'Application</li>
+                <li>✅ Avoir au moins <strong className="text-white">18 ans</strong> pour les fonctionnalités d&apos;achat</li>
+                <li>✅ Ne pas être banni de l&apos;Application</li>
                 <li>✅ Respecter les lois canadiennes et québécoises</li>
-                <li>✅ Fournir des informations exactes lors de l'inscription</li>
+                <li>✅ Fournir des informations exactes lors de l&apos;inscription</li>
               </ul>
             </div>
           </section>
@@ -70,7 +70,7 @@ export const TermsOfService: React.FC = () => {
               exactes, complètes et à jour lors de votre inscription.
             </p>
             <p className="text-white/80 leading-relaxed mb-4">
-              <strong>3.2 Un compte par personne:</strong> Chaque personne ne peut créer qu'un seul compte.
+              <strong>3.2 Un compte par personne:</strong> Chaque personne ne peut créer qu&apos;un seul compte.
               Les comptes multiples peuvent être supprimés.
             </p>
             <p className="text-white/80 leading-relaxed mb-4">
@@ -94,13 +94,13 @@ export const TermsOfService: React.FC = () => {
             <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
               <ul className="space-y-2 text-white/70">
                 <li>❌ Publier du contenu illégal, haineux, violent ou harcelant</li>
-                <li>❌ Usurper l'identité d'une autre personne</li>
+                <li>❌ Usurper l&apos;identité d&apos;une autre personne</li>
                 <li>❌ Spammer ou envoyer des messages non sollicités</li>
                 <li>❌ Violer les droits de propriété intellectuelle</li>
-                <li>❌ Harceler, intimider ou menacer d'autres utilisateurs</li>
-                <li>❌ Publier du contenu d'exploitation de mineurs</li>
+                <li>❌ Harceler, intimider ou menacer d&apos;autres utilisateurs</li>
+                <li>❌ Publier du contenu d&apos;exploitation de mineurs</li>
                 <li>❌ Utiliser des bots ou automatisation non autorisée</li>
-                <li>❌ Contourner les systèmes de sécurité de l'Application</li>
+                <li>❌ Contourner les systèmes de sécurité de l&apos;Application</li>
               </ul>
             </div>
           </section>
@@ -117,7 +117,7 @@ export const TermsOfService: React.FC = () => {
             <p className="text-white/80 leading-relaxed mb-4">
               <strong>5.2 Licence accordée:</strong> En publiant du contenu, vous accordez à Zyeuté
               une licence mondiale, non-exclusive, gratuite et transférable pour utiliser, reproduire,
-              distribuer et afficher votre contenu dans le cadre de l'exploitation de l'Application.
+              distribuer et afficher votre contenu dans le cadre de l&apos;exploitation de l&apos;Application.
             </p>
             <p className="text-white/80 leading-relaxed">
               <strong>5.3 Responsabilité:</strong> Vous êtes seul responsable du contenu que vous publiez.
@@ -130,14 +130,14 @@ export const TermsOfService: React.FC = () => {
               6. Propriété Intellectuelle de Zyeuté
             </h2>
             <p className="text-white/80 leading-relaxed mb-4">
-              L'Application, son design, ses fonctionnalités, et tous les éléments suivants sont la
+              L&apos;Application, son design, ses fonctionnalités, et tous les éléments suivants sont la
               propriété exclusive de Zyeuté Inc.:
             </p>
             <div className="bg-gold-500/10 border border-gold-500/30 rounded-xl p-6">
               <ul className="space-y-2 text-white/70">
                 <li>⚜️ Logo Zyeuté® (marque déposée)</li>
                 <li>🦫 Mascotte Ti-Guy™</li>
-                <li>💡 Système de "Feux" (Fire Rating)</li>
+                <li>💡 Système de &quot;Feux&quot; (Fire Rating)</li>
                 <li>🎨 Interface utilisateur et design</li>
                 <li>💻 Code source et algorithmes</li>
               </ul>
@@ -147,23 +147,23 @@ export const TermsOfService: React.FC = () => {
           {/* Section 7: Virtual Currency */}
           <section className="mb-10">
             <h2 className="text-2xl font-bold text-gold-400 mb-4">
-              7. Monnaie Virtuelle ("Cennes")
+              7. Monnaie Virtuelle (&quot;Cennes&quot;)
             </h2>
             <p className="text-white/80 leading-relaxed mb-4">
-              <strong>7.1 Achat:</strong> Les "cennes" sont une monnaie virtuelle utilisée pour acheter
-              des cadeaux virtuels sur l'Application.
+              <strong>7.1 Achat:</strong> Les &quot;cennes&quot; sont une monnaie virtuelle utilisée pour acheter
+              des cadeaux virtuels sur l&apos;Application.
             </p>
             <p className="text-white/80 leading-relaxed mb-4">
               <strong>7.2 Non remboursable:</strong> Les achats de cennes sont <strong>finaux et non
               remboursables</strong>, sauf si requis par la loi.
             </p>
             <p className="text-white/80 leading-relaxed mb-4">
-              <strong>7.3 Aucune valeur réelle:</strong> Les cennes n'ont <strong>aucune valeur monétaire
-              réelle</strong> et ne peuvent être échangées contre de l'argent.
+              <strong>7.3 Aucune valeur réelle:</strong> Les cennes n&apos;ont <strong>aucune valeur monétaire
+              réelle</strong> et ne peuvent être échangées contre de l&apos;argent.
             </p>
             <p className="text-white/80 leading-relaxed">
               <strong>7.4 Révocation:</strong> Nous nous réservons le droit de révoquer les cennes en cas
-              de violation des conditions ou d'activité frauduleuse.
+              de violation des conditions ou d&apos;activité frauduleuse.
             </p>
           </section>
 
@@ -174,14 +174,14 @@ export const TermsOfService: React.FC = () => {
             </h2>
             <p className="text-white/80 leading-relaxed mb-4">
               <strong>8.1 Par vous:</strong> Vous pouvez supprimer votre compte à tout moment via les
-              paramètres de l'Application.
+              paramètres de l&apos;Application.
             </p>
             <p className="text-white/80 leading-relaxed mb-4">
               <strong>8.2 Par nous:</strong> Nous nous réservons le droit de suspendre ou résilier votre
               compte en cas de violation de ces conditions, sans préavis.
             </p>
             <p className="text-white/80 leading-relaxed">
-              <strong>8.3 Effet:</strong> Après résiliation, vous perdez l'accès à votre compte et
+              <strong>8.3 Effet:</strong> Après résiliation, vous perdez l&apos;accès à votre compte et
               votre contenu. Nous conservons certaines données conformément à notre Politique de Conservation.
             </p>
           </section>
@@ -193,11 +193,11 @@ export const TermsOfService: React.FC = () => {
             </h2>
             <div className="bg-white/5 rounded-xl p-6">
               <p className="text-white/80 leading-relaxed mb-4">
-                L'Application est fournie "TELLE QUELLE" et "SELON DISPONIBILITÉ" sans garantie d'aucune sorte.
+                L&apos;Application est fournie &quot;TELLE QUELLE&quot; et &quot;SELON DISPONIBILITÉ&quot; sans garantie d&apos;aucune sorte.
               </p>
               <p className="text-white/80 leading-relaxed mb-4">
                 Zyeuté Inc. ne sera pas responsable des dommages indirects, accessoires, spéciaux ou
-                consécutifs découlant de votre utilisation de l'Application.
+                consécutifs découlant de votre utilisation de l&apos;Application.
               </p>
               <p className="text-white/70 text-sm italic">
                 Dans la mesure maximale permise par la loi applicable.
@@ -230,9 +230,9 @@ export const TermsOfService: React.FC = () => {
               importantes seront notifiées par:
             </p>
             <ul className="space-y-2 text-white/70 ml-6">
-              <li>• Notification dans l'Application</li>
+              <li>• Notification dans l&apos;Application</li>
               <li>• Email à votre adresse enregistrée</li>
-              <li>• Bannière sur la page d'accueil</li>
+              <li>• Bannière sur la page d&apos;accueil</li>
             </ul>
             <p className="text-white/80 leading-relaxed mt-4">
               Votre utilisation continue après modifications constitue votre acceptation des nouvelles

@@ -261,7 +261,7 @@ export const Achievements: React.FC = () => {
                   : 'bg-white/5 text-white/60 hover:bg-white/10'
               )}
             >
-              Débloqués d'abord
+              Débloqués d&apos;abord
             </button>
             <button
               onClick={() => setSortBy('rarity')}

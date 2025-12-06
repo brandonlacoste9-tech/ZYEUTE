@@ -53,9 +53,9 @@ export const PrivacyPolicy: React.FC = () => {
             
             <h3 className="text-xl font-semibold text-white mb-3">1.1 Informations de Profil</h3>
             <ul className="space-y-2 text-white/70 mb-6 ml-6">
-              <li>• Nom d'utilisateur, nom d'affichage, email</li>
+              <li>• Nom d&apos;utilisateur, nom d&apos;affichage, email</li>
               <li>• Avatar, bio, ville, région</li>
-              <li>• Date de naissance (pour vérification d'âge)</li>
+              <li>• Date de naissance (pour vérification d&apos;âge)</li>
             </ul>
 
             <h3 className="text-xl font-semibold text-white mb-3">1.2 Contenu Publié</h3>
@@ -67,7 +67,7 @@ export const PrivacyPolicy: React.FC = () => {
 
             <h3 className="text-xl font-semibold text-white mb-3">1.3 Données Techniques</h3>
             <ul className="space-y-2 text-white/70 mb-6 ml-6">
-              <li>• Adresse IP, type d'appareil, système d'exploitation</li>
+              <li>• Adresse IP, type d&apos;appareil, système d&apos;exploitation</li>
               <li>• Navigateur, langue, fuseau horaire</li>
               <li>• Cookies et technologies similaires</li>
             </ul>
@@ -87,7 +87,7 @@ export const PrivacyPolicy: React.FC = () => {
               <div className="bg-white/5 rounded-xl p-6">
                 <p className="text-white font-semibold mb-2">🎯 Fournir le Service</p>
                 <p className="text-white/70">
-                  Afficher ton contenu, connecter avec d'autres utilisateurs, fonctionnalités sociales
+                  Afficher ton contenu, connecter avec d&apos;autres utilisateurs, fonctionnalités sociales
                 </p>
               </div>
               <div className="bg-white/5 rounded-xl p-6">
@@ -123,7 +123,7 @@ export const PrivacyPolicy: React.FC = () => {
               3. Partage des Informations
             </h2>
             <p className="text-white/80 leading-relaxed mb-4">
-              <strong>3.1 Avec d'autres utilisateurs:</strong> Ton contenu public est visible selon
+              <strong>3.1 Avec d&apos;autres utilisateurs:</strong> Ton contenu public est visible selon
               tes paramètres de confidentialité.
             </p>
             <p className="text-white/80 leading-relaxed mb-4">
@@ -133,7 +133,7 @@ export const PrivacyPolicy: React.FC = () => {
             <ul className="space-y-2 text-white/70 ml-6 mb-4">
               <li>• Fournisseurs de services (Supabase, Google Cloud) - sous NDA</li>
               <li>• Processeurs de paiement (Stripe) - pour achats uniquement</li>
-              <li>• Services d'analytics (anonymisé)</li>
+              <li>• Services d&apos;analytics (anonymisé)</li>
             </ul>
             <p className="text-white/80 leading-relaxed">
               <strong>3.3 Raisons légales:</strong> Nous pouvons divulguer tes informations si requis
@@ -170,7 +170,7 @@ export const PrivacyPolicy: React.FC = () => {
                   <span className="text-white/60 text-sm">Format JSON téléchargeable</span>
                 </li>
                 <li>
-                  <strong>✅ Opposition:</strong> T'opposer au traitement de tes données
+                  <strong>✅ Opposition:</strong> T&apos;opposer au traitement de tes données
                   <br />
                   <span className="text-white/60 text-sm">Contact: privacy@zyeute.com</span>
                 </li>
@@ -240,7 +240,7 @@ export const PrivacyPolicy: React.FC = () => {
               </p>
               <p className="text-white/80 leading-relaxed">
                 <strong>Protection spéciale:</strong> Contenu sensible automatiquement masqué pour
-                les mineurs. Fonctionnalités d'achat réservées aux 18+.
+                les mineurs. Fonctionnalités d&apos;achat réservées aux 18+.
               </p>
             </div>
           </section>
@@ -263,7 +263,7 @@ export const PrivacyPolicy: React.FC = () => {
                 <p className="text-white/60 text-sm">Préférences (langue, thème, edge lighting)</p>
               </div>
               <div className="bg-white/5 rounded-xl p-4">
-                <p className="text-white font-semibold mb-1">📊 Cookies d'Analyse</p>
+                <p className="text-white font-semibold mb-1">📊 Cookies d&apos;Analyse</p>
                 <p className="text-white/60 text-sm">Statistiques anonymes (avec consentement)</p>
               </div>
             </div>
@@ -284,7 +284,7 @@ export const PrivacyPolicy: React.FC = () => {
               <ol className="space-y-2 text-white/70 list-decimal list-inside">
                 <li>Connecte-toi à ton compte</li>
                 <li>Va dans Paramètres → Sécurité</li>
-                <li>Clique "Télécharger mes données" (GDPR export)</li>
+                <li>Clique &quot;Télécharger mes données&quot; (GDPR export)</li>
                 <li>Ou contacte: <a href="mailto:privacy@zyeute.com" className="text-gold-400 hover:underline">privacy@zyeute.com</a></li>
               </ol>
               <p className="text-white/70 mt-4">
@@ -305,7 +305,7 @@ export const PrivacyPolicy: React.FC = () => {
             </p>
             <p className="text-white/80 leading-relaxed">
               <strong>Transferts:</strong> Si transfert vers un pays tiers, nous utilisons des clauses
-              contractuelles types de l'UE et garantissons un niveau de protection équivalent.
+              contractuelles types de l&apos;UE et garantissons un niveau de protection équivalent.
             </p>
           </section>
 

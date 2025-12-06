@@ -419,7 +419,7 @@ export const Moderation: React.FC = () => {
 
         {/* Moderation Queue */}
         <div className="space-y-4">
-          <h2 className="text-white text-xl font-bold">File d'attente</h2>
+          <h2 className="text-white text-xl font-bold">File d&apos;attente</h2>
 
           {isLoading ? (
             <div className="card-edge p-8 text-center">

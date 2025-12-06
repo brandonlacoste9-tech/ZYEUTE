@@ -436,10 +436,10 @@ export const Settings: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-white font-semibold">
-                    Éclairage d'accent de l'app
+                    Éclairage d&apos;accent de l&apos;app
                   </p>
                   <p className="text-sm text-leather-400 mt-0.5">
-                    Couleur de bordure personnalisable autour de l'app
+                    Couleur de bordure personnalisable autour de l&apos;app
                   </p>
                 </div>
               </div>
@@ -550,9 +550,9 @@ export const Settings: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-white font-medium group-hover:text-gold-400 transition-colors">
-                    Réinitialiser à l'or par défaut
+                    Réinitialiser à l&apos;or par défaut
                   </p>
-                  <p className="text-sm text-leather-400">Retourner à la couleur d'origine</p>
+                  <p className="text-sm text-leather-400">Retourner à la couleur d&apos;origine</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">

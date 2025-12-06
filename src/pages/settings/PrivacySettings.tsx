@@ -98,7 +98,7 @@ export const PrivacySettings: React.FC = () => {
           <h3 className="text-white font-semibold mb-2">💡 Conseils de sécurité</h3>
           <ul className="space-y-2 text-leather-300 text-sm">
             <li>• Utilise un mot de passe fort et unique</li>
-            <li>• Active l'authentification à deux facteurs</li>
+            <li>• Active l&apos;authentification à deux facteurs</li>
             <li>• Ne partage jamais ton mot de passe</li>
             <li>• Vérifie régulièrement tes paramètres de confidentialité</li>
           </ul>
