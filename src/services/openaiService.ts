@@ -79,7 +79,7 @@ export async function generateHashtags(topic: string): Promise<string[]> {
  * Analyze an image (stub for compatibility)
  * Note: OpenAI Vision could be implemented here if needed
  */
-export async function analyzeImage(file: File): Promise<any> {
+export async function analyzeImage(_file: File): Promise<any> {
   // Moderation is handled by moderationService.ts
   return { safe: true, labels: ['image', 'content'] };
 }

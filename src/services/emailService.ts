@@ -54,7 +54,7 @@ export const generateMarketingEmail = async (prompt: string): Promise<{ subject:
 export const sendMarketingEmail = async (
   recipients: string[],
   subject: string,
-  body: string
+  _body: string
 ): Promise<void> => {
   // Integration with Resend would go here
   emailServiceLogger.debug(`Sending email to ${recipients.length} recipients`);

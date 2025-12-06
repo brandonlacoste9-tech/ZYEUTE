@@ -5,9 +5,11 @@
  * Integration: Submits tasks to Colony OS for processing
  */
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { createClient } = require('@supabase/supabase-js');
-const { submitTask } = require('./lib/colony-client');
+import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
+import { submitTask } from './lib/colony-client.js';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -22,7 +24,7 @@ const COLONIES_SERVER_HOST = process.env.COLONIES_SERVER_HOST;
 const COLONIES_USER_PRVKEY = process.env.COLONIES_USER_PRVKEY;
 const COLONIES_COLONY_NAME = process.env.COLONIES_COLONY_NAME || 'zyeute-colony';
 
-exports.handler = async (event, context) => {
+export const handler = async (event, _context) => {
   const signature = event.headers['stripe-signature'] || event.headers['Stripe-Signature'];
 
   if (!signature) {

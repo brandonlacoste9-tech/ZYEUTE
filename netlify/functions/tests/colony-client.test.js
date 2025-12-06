@@ -1,10 +1,11 @@
+/* eslint-env jest */
 /**
  * Tests for Colony OS Client
  * 
  * Tests timeout handling, error recovery, and signature generation
  */
 
-const { submitTask, getTaskStatus } = require('../lib/colony-client');
+import { submitTask } from '../lib/colony-client.js';
 
 describe('Colony OS Client - Timeout Handling', () => {
   test('should timeout after specified duration', async () => {

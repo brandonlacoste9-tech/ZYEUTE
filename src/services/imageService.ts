@@ -3,7 +3,6 @@
  * Uses OpenAI DALL-E 3 with robust fallback and demo modes
  */
 
-import { supabase } from '../lib/supabase';
 import { logger } from '@/lib/logger';
 
 const imageServiceLogger = logger.withContext('ImageService');
@@ -104,7 +103,7 @@ export async function generateImage(
 /**
  * Remix an existing image
  */
-export async function remixImage(imageUrl: string, mode: 'quebec' | 'meme' | 'vintage'): Promise<string | null> {
+export async function remixImage(imageUrl: string, _mode: 'quebec' | 'meme' | 'vintage'): Promise<string | null> {
   toast.info('Remix en cours... 🎨');
   await new Promise(resolve => setTimeout(resolve, 2500));
   
