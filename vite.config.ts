@@ -21,7 +21,6 @@ export default defineConfig({
         entryFileNames: 'static/[name]-[hash].js',
         chunkFileNames: 'static/[name]-[hash].js',
         assetFileNames: 'static/[name]-[hash][extname]',
-        
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'supabase': ['@supabase/supabase-js'],
