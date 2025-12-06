@@ -97,7 +97,7 @@ serve(async (req) => {
       mode: 'subscription',
       success_url: `${baseUrl}/premium?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/premium?canceled=true`,
-      customer_email: customerEmail,
+      customer_email: customerEmail,     locale: 'fr-CA',
       metadata: {
         userId: user.id,
         tier: tier,
