@@ -57,7 +57,7 @@ export async function generateHashtags(topic: string): Promise<string[]> {
 /**
  * Analyze an image (stub for compatibility)
  */
-export async function analyzeImage(file: File): Promise<any> {
+export async function analyzeImage(_file: File): Promise<any> {
   // This functionality is now better handled by moderationService.ts
   // Keeping this stub to prevent breaking changes in legacy code
   return { safe: true, labels: ['image', 'content'] };

@@ -149,7 +149,7 @@ export async function purchaseProduct(productId: string, price: number): Promise
 /**
  * Handle successful payment (called from success redirect)
  */
-export async function handlePaymentSuccess(sessionId: string): Promise<void> {
+export async function handlePaymentSuccess(_sessionId: string): Promise<void> {
   try {
     // Verify payment with backend
     // const { data } = await supabase.functions.invoke('verify-payment', {

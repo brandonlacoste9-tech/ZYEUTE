@@ -30,21 +30,21 @@
  * }
  * ```
  */
-async function signPayload(payload, privateKey) {
+async function signPayload(_payload, _privateKey) {
   throw new Error('Ed25519 signature not yet implemented. Use colony-client.js HMAC for MVP.');
 }
 
 /**
  * Verify Ed25519 signature
  * 
- * @param {string} payload - Request payload
- * @param {string} signature - Base64-encoded signature
- * @param {string} publicKey - Ed25519 public key
+ * @param {string} _payload - Request payload
+ * @param {string} _signature - Base64-encoded signature
+ * @param {string} _publicKey - Ed25519 public key
  * @returns {boolean} - True if signature is valid
  * 
  * TODO: Implement using @noble/ed25519 or similar library
  */
-async function verifySignature(payload, signature, publicKey) {
+async function verifySignature(_payload, _signature, _publicKey) {
   throw new Error('Ed25519 verification not yet implemented.');
 }
 

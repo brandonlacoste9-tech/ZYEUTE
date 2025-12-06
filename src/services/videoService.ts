@@ -63,7 +63,7 @@ export async function processVideo(
  * Generate captions for video using AI
  * Uses Gemini for speech-to-text (mock for now)
  */
-export async function generateCaptions(file: File): Promise<string[]> {
+export async function generateCaptions(_file: File): Promise<string[]> {
   // Simulate AI processing
   await new Promise(resolve => setTimeout(resolve, 1500));
 
