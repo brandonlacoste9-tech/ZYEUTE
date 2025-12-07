@@ -68,7 +68,7 @@ export const Moderation: React.FC = () => {
       }
 
       const { data: userData } = await supabase
-        .from('user_profiles')
+        .from('users')
         .select('*')
         .eq('id', user.id)
         .single();

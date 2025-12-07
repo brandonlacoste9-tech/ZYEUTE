@@ -30,7 +30,7 @@ export const MutedAccountsSettings: React.FC = () => {
 
     try {
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('users')
         .select('id, username, display_name, avatar_url')
         .ilike('username', `%${query}%`)
         .limit(10);

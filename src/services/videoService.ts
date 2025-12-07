@@ -63,7 +63,7 @@ export async function processVideo(
  * Generate captions for video using AI
  * Uses Gemini for speech-to-text (mock for now)
  */
-export async function generateCaptions(file: File): Promise<string[]> {
+export async function generateCaptions(_file: File): Promise<string[]> {
   // Simulate AI processing
   await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -79,7 +79,7 @@ export async function generateCaptions(file: File): Promise<string[]> {
 /**
  * Smart trim - Remove dead air and boring parts
  */
-export async function smartTrim(file: File): Promise<{ start: number; end: number }[]> {
+export async function smartTrim(_file: File): Promise<{ start: number; end: number }[]> {
   // Simulate AI analysis
   await new Promise(resolve => setTimeout(resolve, 1000));
 
