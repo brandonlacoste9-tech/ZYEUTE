@@ -9,10 +9,10 @@ const sanitizeLogger = logger.withContext('Sanitize');
 
 /**
  * Sanitize HTML content to prevent XSS attacks
- * 
+ *
  * IMPORTANT: This function strips ALL HTML tags for maximum security.
  * For user-generated content (comments, captions), use sanitizeText() instead.
- * 
+ *
  * Note: CodeQL may flag regex patterns as incomplete, but this is a false positive
  * because we remove ALL HTML tags at the end (<[^>]*>) which catches any edge cases.
  * The intermediate steps are defense-in-depth layers.
@@ -21,7 +21,7 @@ export function sanitizeHTML(input: string): string {
   if (!input) return '';
 
   let sanitized = input;
-  
+
   // Defense layer 1: Remove script tags (multiple passes for nested tags)
   // Note: Final HTML strip catches any edge cases, this is defense-in-depth
   let previousLength = 0;
@@ -30,7 +30,7 @@ export function sanitizeHTML(input: string): string {
     sanitized = sanitized.replace(/<script[^>]*>[\s\S]*?<\/script[^>]*>/gi, '');
     sanitized = sanitized.replace(/<script[^>]*>/gi, '');
   }
-  
+
   // Defense layer 2: Remove event handlers (multiple passes)
   // Note: Final HTML strip catches any edge cases, this is defense-in-depth
   previousLength = 0;
@@ -39,16 +39,16 @@ export function sanitizeHTML(input: string): string {
     sanitized = sanitized.replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '');
     sanitized = sanitized.replace(/\bon\w+\s*=\s*[^\s>"']*/gi, '');
   }
-  
+
   // Defense layer 3: Remove dangerous protocols
   sanitized = sanitized.replace(/javascript:/gi, 'removed:');
   sanitized = sanitized.replace(/data:/gi, 'removed:'); // Catches data:text/html and all data: URLs
   sanitized = sanitized.replace(/vbscript:/gi, 'removed:');
-  
+
   // Final defense: Remove ALL HTML tags for maximum safety
   // This catches any XSS attempts that bypassed previous layers
   sanitized = sanitized.replace(/<[^>]*>/g, '');
-  
+
   return sanitized.trim();
 }
 
@@ -74,10 +74,10 @@ export function sanitizeText(input: string): string {
  */
 export function sanitizeUsername(input: string): string {
   if (!input) return '';
-  
+
   // Remove any non-alphanumeric characters except underscore and hyphen
   const sanitized = input.replace(/[^a-zA-Z0-9_-]/g, '');
-  
+
   // Limit length
   return sanitized.slice(0, 30);
 }
@@ -87,17 +87,17 @@ export function sanitizeUsername(input: string): string {
  */
 export function sanitizeEmail(input: string): string {
   if (!input) return '';
-  
+
   // Basic email validation and sanitization
   const sanitized = input.toLowerCase().trim();
-  
+
   // Check basic email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(sanitized)) {
     sanitizeLogger.warn('Invalid email format:', input);
     return '';
   }
-  
+
   return sanitized;
 }
 
@@ -106,16 +106,16 @@ export function sanitizeEmail(input: string): string {
  */
 export function sanitizeURL(input: string): string {
   if (!input) return '';
-  
+
   try {
     const url = new URL(input);
-    
+
     // Only allow http and https protocols
     if (!['http:', 'https:'].includes(url.protocol)) {
       sanitizeLogger.warn('Invalid URL protocol:', input);
       return '';
     }
-    
+
     return url.toString();
   } catch (error) {
     sanitizeLogger.warn('Invalid URL:', input);
@@ -128,14 +128,14 @@ export function sanitizeURL(input: string): string {
  */
 export function sanitizeFileName(input: string): string {
   if (!input) return '';
-  
+
   // Remove path traversal attempts
   let sanitized = input.replace(/\.\./g, '');
-  sanitized = sanitized.replace(/[\/\\]/g, '');
-  
+  sanitized = sanitized.replace(/[/\\]/g, '');
+
   // Only allow safe characters
   sanitized = sanitized.replace(/[^a-zA-Z0-9._-]/g, '_');
-  
+
   // Limit length
   return sanitized.slice(0, 255);
 }
@@ -145,16 +145,16 @@ export function sanitizeFileName(input: string): string {
  */
 export function sanitizePhoneNumber(input: string): string {
   if (!input) return '';
-  
+
   // Remove all non-digit characters except + at the start
   const sanitized = input.replace(/[^\d+]/g, '');
-  
+
   // Ensure + is only at the start
   if (sanitized.includes('+')) {
     const parts = sanitized.split('+');
     return '+' + parts.join('');
   }
-  
+
   return sanitized;
 }
 
@@ -163,16 +163,16 @@ export function sanitizePhoneNumber(input: string): string {
  */
 export function sanitizeJSON<T = any>(input: string): T | null {
   if (!input) return null;
-  
+
   try {
     const parsed = JSON.parse(input);
-    
+
     // Check for prototype pollution
     if (parsed.__proto__ || parsed.constructor || parsed.prototype) {
       sanitizeLogger.error('Potential prototype pollution detected');
       return null;
     }
-    
+
     return parsed as T;
   } catch (error) {
     sanitizeLogger.error('Invalid JSON:', error);
@@ -198,7 +198,14 @@ export function validateFileUpload(
 ): FileValidationResult {
   const {
     maxSize = 10 * 1024 * 1024, // 10MB default
-    allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'],
+    allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'video/mp4',
+      'video/webm',
+    ],
     allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4', '.webm'],
   } = options;
 
@@ -243,19 +250,19 @@ export function checkRateLimit(
 ): boolean {
   const now = Date.now();
   const timestamps = rateLimitMap.get(key) || [];
-  
+
   // Remove old timestamps outside the window
-  const validTimestamps = timestamps.filter(ts => now - ts < windowMs);
-  
+  const validTimestamps = timestamps.filter((ts) => now - ts < windowMs);
+
   // Check if limit exceeded
   if (validTimestamps.length >= maxRequests) {
     sanitizeLogger.warn(`Rate limit exceeded for key: ${key}`);
     return false;
   }
-  
+
   // Add new timestamp
   validTimestamps.push(now);
   rateLimitMap.set(key, validTimestamps);
-  
+
   return true;
 }

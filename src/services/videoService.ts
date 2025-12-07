@@ -34,7 +34,7 @@ export async function processVideo(
   options: VideoEditOptions = {}
 ): Promise<VideoProcessResult> {
   // Simulate processing time
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   // Create object URL for preview
   const url = URL.createObjectURL(file);
@@ -44,16 +44,16 @@ export async function processVideo(
     url,
     duration: 30, // Mock duration
     thumbnail: url,
-    captions: options.addCaptions ? [
-      'Bienvenue sur Zyeuté! 🔥',
-      'Le meilleur contenu québécois',
-      'Abonne-toi! ⚜️'
-    ] : undefined,
-    highlights: options.removeDeadAir ? [
-      { start: 0, end: 5 },
-      { start: 10, end: 15 },
-      { start: 20, end: 30 }
-    ] : undefined,
+    captions: options.addCaptions
+      ? ['Bienvenue sur Zyeuté! 🔥', 'Le meilleur contenu québécois', 'Abonne-toi! ⚜️']
+      : undefined,
+    highlights: options.removeDeadAir
+      ? [
+          { start: 0, end: 5 },
+          { start: 10, end: 15 },
+          { start: 20, end: 30 },
+        ]
+      : undefined,
   };
 
   return result;
@@ -63,32 +63,32 @@ export async function processVideo(
  * Generate captions for video using AI
  * Uses Gemini for speech-to-text (mock for now)
  */
-export async function generateCaptions(file: File): Promise<string[]> {
+export async function generateCaptions(_file: File): Promise<string[]> {
   // Simulate AI processing
-  await new Promise(resolve => setTimeout(resolve, 1500));
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
   // Mock captions
   return [
     'Salut tout le monde!',
-    'C\'est malade ce contenu!',
-    'N\'oublie pas de liker! 🔥',
-    'Abonne-toi pour plus! ⚜️'
+    "C'est malade ce contenu!",
+    "N'oublie pas de liker! 🔥",
+    'Abonne-toi pour plus! ⚜️',
   ];
 }
 
 /**
  * Smart trim - Remove dead air and boring parts
  */
-export async function smartTrim(file: File): Promise<{ start: number; end: number }[]> {
+export async function smartTrim(_file: File): Promise<{ start: number; end: number }[]> {
   // Simulate AI analysis
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   // Mock highlights (in seconds)
   return [
     { start: 0, end: 5 },
     { start: 8, end: 15 },
     { start: 18, end: 25 },
-    { start: 28, end: 35 }
+    { start: 28, end: 35 },
   ];
 }
 
@@ -100,8 +100,8 @@ export async function addBackgroundMusic(
   musicTrack: 'upbeat' | 'chill' | 'epic' | 'quebec'
 ): Promise<string> {
   // Mock implementation
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   videoServiceLogger.debug(`Adding ${musicTrack} music to video...`);
   return URL.createObjectURL(videoFile);
 }
@@ -111,8 +111,8 @@ export async function addBackgroundMusic(
  */
 export async function cropToVertical(file: File): Promise<string> {
   // Mock implementation
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
   return URL.createObjectURL(file);
 }
 
@@ -124,34 +124,38 @@ export async function extractThumbnail(file: File, timeInSeconds: number = 0): P
     const video = document.createElement('video');
     video.preload = 'metadata';
     video.src = URL.createObjectURL(file);
-    
+
     video.onloadedmetadata = () => {
       video.currentTime = timeInSeconds;
     };
-    
+
     video.onseeked = () => {
       const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      
+
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         reject(new Error('Failed to get canvas context'));
         return;
       }
-      
+
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((blob) => {
-        if (blob) {
-          resolve(URL.createObjectURL(blob));
-        } else {
-          reject(new Error('Failed to create thumbnail'));
-        }
-      }, 'image/jpeg', 0.9);
-      
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(URL.createObjectURL(blob));
+          } else {
+            reject(new Error('Failed to create thumbnail'));
+          }
+        },
+        'image/jpeg',
+        0.9
+      );
+
       URL.revokeObjectURL(video.src);
     };
-    
+
     video.onerror = () => {
       reject(new Error('Failed to load video'));
     };
@@ -171,7 +175,7 @@ export async function getVideoMetadata(file: File): Promise<{
     const video = document.createElement('video');
     video.preload = 'metadata';
     video.src = URL.createObjectURL(file);
-    
+
     video.onloadedmetadata = () => {
       resolve({
         duration: video.duration,
@@ -181,7 +185,7 @@ export async function getVideoMetadata(file: File): Promise<{
       });
       URL.revokeObjectURL(video.src);
     };
-    
+
     video.onerror = () => {
       reject(new Error('Failed to load video metadata'));
     };
@@ -197,4 +201,3 @@ export default {
   extractThumbnail,
   getVideoMetadata,
 };
-

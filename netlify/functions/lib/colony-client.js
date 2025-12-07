@@ -1,25 +1,25 @@
 /**
  * Colony OS Client Library for Netlify Functions
- * 
+ *
  * Provides functions to submit tasks to Colony OS Server
- * 
+ *
  * SECURITY NOTE (MVP):
  * Currently using simplified HMAC-SHA256 signatures for MVP.
  * Colony OS expects Ed25519 cryptographic signatures in production.
- * 
+ *
  * TODO (Phase 2.2 Security Hardening):
  * - Implement proper Ed25519 signature generation
  * - Use @noble/ed25519 or similar library
  * - Match Colony OS signature verification exactly
- * 
+ *
  * See: colony-crypto.js for upgrade path
  */
 
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 /**
  * Submit a task to Colony OS Server
- * 
+ *
  * @param {Object} funcSpec - Function specification
  * @param {string} funcSpec.funcname - Function name (e.g., 'validate_revenue')
  * @param {Array} funcSpec.args - Function arguments
@@ -35,7 +35,7 @@ async function submitTask(funcSpec, serverHost, colonyName, userPrvkey, timeout 
   // Create AbortController for timeout handling
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
-  
+
   try {
     // Construct the full function spec
     const fullSpec = {
@@ -44,7 +44,7 @@ async function submitTask(funcSpec, serverHost, colonyName, userPrvkey, timeout 
       priority: funcSpec.priority || 5,
       maxexectime: funcSpec.maxexectime || 30,
       colonyname: colonyName,
-      ...funcSpec
+      ...funcSpec,
     };
 
     // Sign the request (simplified - in production use pycolonies crypto)
@@ -75,7 +75,7 @@ async function submitTask(funcSpec, serverHost, colonyName, userPrvkey, timeout 
 
     const result = await response.json();
     console.log('✅ Task submitted to Colony OS:', result.processid || result.id);
-    
+
     return result;
   } catch (error) {
     if (error.name === 'AbortError') {
@@ -91,7 +91,7 @@ async function submitTask(funcSpec, serverHost, colonyName, userPrvkey, timeout 
 
 /**
  * Get task status from Colony OS Server
- * 
+ *
  * @param {string} processId - Process ID
  * @param {string} serverHost - Colony OS Server host URL
  * @param {string} userPrvkey - User private key for signing
@@ -102,7 +102,7 @@ async function getTaskStatus(processId, serverHost, userPrvkey, timeout = 3000) 
   // Create AbortController for timeout handling
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
-  
+
   try {
     const timestamp = Date.now();
     const signature = crypto
@@ -136,8 +136,4 @@ async function getTaskStatus(processId, serverHost, userPrvkey, timeout = 3000) 
   }
 }
 
-module.exports = {
-  submitTask,
-  getTaskStatus,
-};
-
+export { submitTask, getTaskStatus };

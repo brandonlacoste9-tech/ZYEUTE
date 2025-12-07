@@ -3,15 +3,19 @@
  * Creates a Stripe checkout session for premium subscriptions
  */
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { createClient } = require('@supabase/supabase-js');
+import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-exports.handler = async (event, context) => {
+// Check if Stripe secret key is configured
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
+
+export const handler = async (event, context) => {
   // Handle CORS
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -37,6 +41,17 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Check if Stripe is configured
+    if (!stripe) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.',
+        }),
+      };
+    }
+
     // Get auth token from request
     const authHeader = event.headers.authorization || event.headers.Authorization;
     if (!authHeader) {
@@ -49,7 +64,10 @@ exports.handler = async (event, context) => {
 
     // Verify user with Supabase
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       return {
@@ -138,4 +156,3 @@ exports.handler = async (event, context) => {
     };
   }
 };
-
