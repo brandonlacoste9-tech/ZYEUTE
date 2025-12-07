@@ -1,19 +1,22 @@
 /**
  * Netlify Function: Stripe Webhook Handler
  * Handles Stripe webhook events for subscription management
- * 
+ *
  * Integration: Submits tasks to Colony OS for processing
  */
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { createClient } = require('@supabase/supabase-js');
-const { submitTask } = require('./lib/colony-client');
+import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
+import { submitTask } from './lib/colony-client.js';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
 
+// Check if Stripe is configured
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 // Colony OS configuration
@@ -22,13 +25,21 @@ const COLONIES_SERVER_HOST = process.env.COLONIES_SERVER_HOST;
 const COLONIES_USER_PRVKEY = process.env.COLONIES_USER_PRVKEY;
 const COLONIES_COLONY_NAME = process.env.COLONIES_COLONY_NAME || 'zyeute-colony';
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
   const signature = event.headers['stripe-signature'] || event.headers['Stripe-Signature'];
 
   if (!signature) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: 'Missing signature' }),
+    };
+  }
+
+  // Check if Stripe is configured
+  if (!stripe || !webhookSecret) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Stripe webhook is not configured' }),
     };
   }
 
@@ -51,14 +62,17 @@ exports.handler = async (event, context) => {
         );
 
         console.log(`✅ Stripe event ${stripeEvent.type} submitted to Colony OS`);
-        
+
         // Return immediately to Stripe (non-blocking)
         return {
           statusCode: 200,
           body: JSON.stringify({ received: true, method: 'colony_os' }),
         };
       } catch (colonyError) {
-        console.error('⚠️ Colony OS submission failed, falling back to direct processing:', colonyError);
+        console.error(
+          '⚠️ Colony OS submission failed, falling back to direct processing:',
+          colonyError
+        );
         // Fall through to direct processing
       }
     }
@@ -102,9 +116,8 @@ exports.handler = async (event, context) => {
       }
 
       // Also try to create subscription record in subscriptions table (for tracking)
-      const { error: subError } = await supabaseAdmin
-        .from('subscriptions')
-        .upsert({
+      const { error: subError } = await supabaseAdmin.from('subscriptions').upsert(
+        {
           subscriber_id: userId,
           creator_id: userId, // Self-subscription for premium tiers
           status: 'active',
@@ -112,9 +125,11 @@ exports.handler = async (event, context) => {
           stripe_customer_id: session.customer,
           current_period_start: currentPeriodStart,
           current_period_end: currentPeriodEnd,
-        }, {
+        },
+        {
           onConflict: 'stripe_subscription_id',
-        });
+        }
+      );
 
       if (subError) {
         console.warn('Note: Could not create subscription record:', subError);
@@ -178,4 +193,3 @@ exports.handler = async (event, context) => {
     };
   }
 };
-
