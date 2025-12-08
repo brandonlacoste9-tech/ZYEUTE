@@ -1,5 +1,9 @@
 # 🚨 App Not Loading - Quick Fix
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 ## What "No Screen" Could Mean
 
 1. **Blank white/black screen** → JavaScript error

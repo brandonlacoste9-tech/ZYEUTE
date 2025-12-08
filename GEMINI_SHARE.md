@@ -1,5 +1,9 @@
 # 🐝 Colony OS Worker Bee System - Share with Gemini
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 ## Message for Gemini
 
 Hey Gemini! 👋

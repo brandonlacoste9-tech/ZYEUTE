@@ -1,5 +1,9 @@
 # VS Code Cloud Agent - Code Quality Improvements
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Hey VS Code! 👋
 
 I need your help with systematic code quality improvements across the Zyeute codebase. You're the best at this kind of systematic, methodical work.

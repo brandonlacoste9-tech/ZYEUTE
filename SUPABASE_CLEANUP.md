@@ -1,5 +1,9 @@
 # 🧹 Supabase Cleanup Guide
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 ## 🎯 Goal: Clean up tangled Supabase configuration
 
 ---

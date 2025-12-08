@@ -1,5 +1,9 @@
 # VS Code - Start Code Quality Improvements NOW
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Hey VS Code! 👋
 
 While the team is deploying Colony OS infrastructure, I need you to start the code quality improvements immediately. This work can happen in parallel with deployment.

@@ -1,5 +1,9 @@
 # Multi-Agent Integration Checklist
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 **Date:** December 2, 2025  
 **Status:** Integrating work from multiple agents
 

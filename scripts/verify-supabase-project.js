@@ -40,7 +40,7 @@ if (actualProjectId === EXPECTED_PROJECT_ID) {
 } else if (WRONG_PROJECT_IDS.includes(actualProjectId)) {
   console.error(`❌ WRONG PROJECT! Using ${actualProjectId} instead of ${EXPECTED_PROJECT_ID}`);
   console.error('   This is likely Krypttrac or another project!');
-  console.error('\n🔧 Fix: Update VITE_SUPABASE_URL in Netlify environment variables to:');
+  console.error('\n🔧 Fix: Update VITE_SUPABASE_URL in Vercel environment variables to:');
   console.error(`   ${EXPECTED_PROJECT_URL}`);
 } else {
   console.warn(`⚠️  Unknown project ID: ${actualProjectId}`);

@@ -10,7 +10,7 @@ IGNORE_DIRS = {
     "node_modules", ".git", ".next", "dist", "build", ".vscode", ".idea",
     "marketplace", "gamification", # Explicitly ignoring cut features
     "public", "assets", "images",
-    ".expo", "__pycache__", "venv", ".venv", "env", "coverage", ".netlify",
+    ".expo", "__pycache__", "venv", ".venv", "env", "coverage",
     "web-build", ".pnp"
 }
 

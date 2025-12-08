@@ -24,7 +24,7 @@ console.log('=' .repeat(60));
 const EXPECTED_SUPABASE_PROJECT = 'vuanulvyqkfefmjcikfk';
 const EXPECTED_SUPABASE_URL = `https://${EXPECTED_SUPABASE_PROJECT}.supabase.co`;
 const PRODUCTION_DOMAIN = 'https://zyeute.com';
-const NETLIFY_DOMAIN = 'https://zyeute-netlify.netlify.app';
+const VERCEL_DOMAIN = 'https://zyeute.vercel.app'; // Updated from Netlify
 const EXPECTED_CALLBACK_PATH = '/auth/callback';
 const EXPECTED_GOOGLE_CALLBACK = `${EXPECTED_SUPABASE_URL}/auth/v1/callback`;
 
@@ -147,12 +147,12 @@ console.log(`   Redirect URLs:`);
 console.log(`     - ${PRODUCTION_DOMAIN}`);
 console.log(`     - ${PRODUCTION_DOMAIN}${EXPECTED_CALLBACK_PATH}`);
 console.log(`     - ${PRODUCTION_DOMAIN}/**`);
-console.log(`     - ${NETLIFY_DOMAIN}`);
-console.log(`     - ${NETLIFY_DOMAIN}${EXPECTED_CALLBACK_PATH}`);
-console.log(`     - ${NETLIFY_DOMAIN}/**`);
+console.log(`     - ${VERCEL_DOMAIN}`);
+console.log(`     - ${VERCEL_DOMAIN}${EXPECTED_CALLBACK_PATH}`);
+console.log(`     - ${VERCEL_DOMAIN}/**`);
 console.log(`     - http://localhost:5173${EXPECTED_CALLBACK_PATH} (for dev)`);
 console.log(`     - http://localhost:5173/** (for dev)`);
-console.log(`\n   ⚠️  Remove any Vercel URLs (brandonlacoste9-tech-zyeute-*.vercel.app)`);
+console.log(`\n   ⚠️  Keep only production Vercel URL, remove old preview URLs if any`);
 
 console.log('\n🔧 Google Cloud Console Settings:');
 console.log(`   Authorized redirect URIs:`);
@@ -164,9 +164,9 @@ console.log('\nPlease verify these in Supabase Dashboard:');
 console.log('□ Site URL is set to:', PRODUCTION_DOMAIN);
 console.log('□ Redirect URLs include:', `${PRODUCTION_DOMAIN}${EXPECTED_CALLBACK_PATH}`);
 console.log('□ Redirect URLs include:', `${PRODUCTION_DOMAIN}/**`);
-console.log('□ Redirect URLs include:', `${NETLIFY_DOMAIN}${EXPECTED_CALLBACK_PATH}`);
-console.log('□ Redirect URLs include:', `${NETLIFY_DOMAIN}/**`);
-console.log('□ ALL Vercel URLs removed from Redirect URLs');
+console.log('□ Redirect URLs include:', `${VERCEL_DOMAIN}${EXPECTED_CALLBACK_PATH}`);
+console.log('□ Redirect URLs include:', `${VERCEL_DOMAIN}/**`);
+console.log('□ ALL old deployment URLs removed from Redirect URLs');
 console.log('□ Google OAuth provider is enabled');
 console.log('\nPlease verify these in Google Cloud Console:');
 console.log('□ Authorized redirect URI:', EXPECTED_GOOGLE_CALLBACK);
@@ -175,7 +175,7 @@ console.log('□ OAuth 2.0 Client ID is configured in Supabase');
 console.log('\n' + '='.repeat(60));
 console.log('✅ Verification complete!');
 console.log('\nIf any checks failed, please:');
-console.log('1. Update environment variables in Netlify/Vercel');
+console.log('1. Update environment variables in Vercel');
 console.log('2. Verify Supabase Dashboard → Authentication → URL Configuration');
 console.log('3. Verify Google Cloud Console → OAuth 2.0 Client → Authorized redirect URIs');
 

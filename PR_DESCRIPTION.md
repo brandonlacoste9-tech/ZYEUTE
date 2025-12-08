@@ -1,5 +1,9 @@
 # feat(infra): Associate main branch with 'dev-preview-main' Supabase branch
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 ## 📋 Summary
 
 This PR implements Supabase database branching for isolated preview environments in Zyeuté. The main Git branch is now associated with a dedicated Supabase branch called `dev-preview-main`, allowing developers to test changes in isolation without affecting the production database.
