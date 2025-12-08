@@ -1,5 +1,9 @@
 # Comet - START TESTING NOW 🐝
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Hey Comet! The app is live at `https://zyeute.netlify.app` and you have it on your screen. Time to validate everything!
 
 ---

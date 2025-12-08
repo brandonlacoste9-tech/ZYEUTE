@@ -1,5 +1,9 @@
 # Colony OS Phase 1 Implementation - COMPLETE
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 **Status:** Phase 1 Complete  
 **Date:** December 2, 2025  
 **Commit:** 0097636

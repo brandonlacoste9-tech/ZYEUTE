@@ -1,5 +1,9 @@
 # ⚡ Quick Stripe Setup Checklist
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 ## ✅ Step 1: Stripe Products Created
 - ✅ Bronze: $4.99 CAD/month → `price_1SZuC6CzqBvMqSYF419Lh1xg`
 - ✅ Silver: $9.99 CAD/month → `price_1SZuCACzqBvMqSYFpfpfFc9M`

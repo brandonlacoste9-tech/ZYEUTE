@@ -1,5 +1,9 @@
 # 🌐 Domain & DNS Check - After Removing Vercel
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 ## ✅ Quick Check: Is Your Domain Pointing to Netlify?
 
 ### Step 1: Check Where DNS Points

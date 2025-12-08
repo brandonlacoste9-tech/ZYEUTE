@@ -1,5 +1,9 @@
 # Phase 2.1 Critical Fixes - COMPLETE
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 **Date:** December 2, 2025  
 **Status:** All 4 Critical Fixes Implemented  
 **Production Readiness:** 85% → 95%

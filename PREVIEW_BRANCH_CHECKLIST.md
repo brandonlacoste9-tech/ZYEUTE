@@ -1,5 +1,9 @@
 # ✅ Supabase Preview Branch Setup Checklist
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Use this checklist to ensure your preview branch is properly configured for the Zyeuté project.
 
 ---

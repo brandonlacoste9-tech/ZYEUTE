@@ -1,5 +1,9 @@
 # ✅ Supabase OAuth Verification Checklist (Updated for Netlify)
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 _Last updated: 2025-12-01_
 
 ---

@@ -1,5 +1,9 @@
 # 🐝 Colony OS Worker Bee System
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Distributed task execution system for Zyeuté using Supabase queue and GitHub self-hosted runners.
 
 ## Architecture

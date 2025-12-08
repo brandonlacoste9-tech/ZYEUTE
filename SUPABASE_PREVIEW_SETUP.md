@@ -1,5 +1,9 @@
 # 🌿 Supabase Preview Branches Setup Guide
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 This guide explains how to set up and use Supabase database branches for isolated preview environments in Zyeuté.
 
 ---

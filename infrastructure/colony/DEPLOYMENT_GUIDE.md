@@ -1,5 +1,9 @@
 # Colony OS Deployment Guide
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Complete guide for deploying Colony OS Finance Bee system.
 
 ## Prerequisites
