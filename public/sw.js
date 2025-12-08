@@ -15,7 +15,8 @@ const urlsToCache = [
 // Install event - cache assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches
+      .open(CACHE_NAME)
       .then((cache) => {
         console.log('✅ Opened cache');
         return cache.addAll(urlsToCache);
@@ -59,7 +60,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Skip Vercel Live feedback script (not needed on Netlify)
+  // Skip Vercel Live feedback script
   if (event.request.url.includes('vercel.live') || event.request.url.includes('_next-live')) {
     return;
   }
@@ -71,17 +72,17 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
+    caches.match(event.request).then((response) => {
+      // Cache hit - return response
+      if (response) {
+        return response;
+      }
 
-        // Clone the request
-        const fetchRequest = event.request.clone();
+      // Clone the request
+      const fetchRequest = event.request.clone();
 
-        return fetch(fetchRequest).then((response) => {
+      return fetch(fetchRequest)
+        .then((response) => {
           // Check if valid response
           if (!response || response.status !== 200 || response.type !== 'basic') {
             return response;
@@ -91,21 +92,24 @@ self.addEventListener('fetch', (event) => {
           const responseToCache = response.clone();
 
           // Cache the new response
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
 
           return response;
-        }).catch(() => {
+        })
+        .catch(() => {
           // Return offline page if available
           return caches.match('/offline.html').then((offlineResponse) => {
-            return offlineResponse || new Response('Offline - Pas de connexion internet 📵', {
-              headers: { 'Content-Type': 'text/plain' }
-            });
+            return (
+              offlineResponse ||
+              new Response('Offline - Pas de connexion internet 📵', {
+                headers: { 'Content-Type': 'text/plain' },
+              })
+            );
           });
         });
-      })
+    })
   );
 });
 
@@ -122,9 +126,7 @@ self.addEventListener('push', (event) => {
     data: data.url ? { url: data.url } : {},
   };
 
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
 // Notification click event
@@ -134,19 +136,18 @@ self.addEventListener('notificationclick', (event) => {
   const urlToOpen = event.notification.data?.url || '/';
 
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clientList) => {
-        // Check if app is already open
-        for (const client of clientList) {
-          if (client.url === urlToOpen && 'focus' in client) {
-            return client.focus();
-          }
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Check if app is already open
+      for (const client of clientList) {
+        if (client.url === urlToOpen && 'focus' in client) {
+          return client.focus();
         }
-        // Open new window
-        if (clients.openWindow) {
-          return clients.openWindow(urlToOpen);
-        }
-      })
+      }
+      // Open new window
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
   );
 });
 
@@ -164,4 +165,3 @@ async function uploadPendingPosts() {
 }
 
 console.log('✅ Service Worker loaded - Zyeuté PWA ready! 🇨🇦⚜️');
-

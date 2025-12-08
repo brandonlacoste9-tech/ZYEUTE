@@ -52,39 +52,13 @@ export async function subscribeToPremium(tier: 'bronze' | 'silver' | 'gold'): Pr
   }
 
   try {
-    // Try Netlify Function first (if deployed), fallback to Supabase Edge Function
-    const netlifyFunctionUrl = import.meta.env.VITE_NETLIFY_FUNCTION_URL || '/.netlify/functions/create-checkout-session';
-    const useNetlify = import.meta.env.VITE_USE_NETLIFY_FUNCTIONS === 'true' || window.location.hostname.includes('netlify');
-
-    let data: any;
-    let error: any;
-
-    if (useNetlify) {
-      // Use Netlify Function
-      const { data: { session } } = await supabase.auth.getSession();
-      const response = await fetch(netlifyFunctionUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token || ''}`,
-        },
-        body: JSON.stringify({ tier }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP ${response.status}`);
-      }
-
-      data = await response.json();
-    } else {
-      // Use Supabase Edge Function
-      const result = await supabase.functions.invoke('create-checkout-session', {
-        body: { tier },
-      });
-      data = result.data;
-      error = result.error;
-    }
+    // Use Supabase Edge Function or Vercel API Route
+    // TODO Phase 2: Replace with Vercel API Route
+    const result = await supabase.functions.invoke('create-checkout-session', {
+      body: { tier },
+    });
+    const data = result.data;
+    const error = result.error;
 
     if (error) {
       stripeServiceLogger.error('Function error:', error);
