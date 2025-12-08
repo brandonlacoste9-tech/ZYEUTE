@@ -7,7 +7,7 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY environment variable is required');
+  throw new Error('STRIPE_SECRET_KEY environment variable is required for create-checkout-session function');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 

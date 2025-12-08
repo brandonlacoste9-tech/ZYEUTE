@@ -10,7 +10,7 @@ import { createClient } from '@supabase/supabase-js';
 import { submitTask } from './lib/colony-client.js';
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY environment variable is required');
+  throw new Error('STRIPE_SECRET_KEY environment variable is required for stripe-webhook function');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
