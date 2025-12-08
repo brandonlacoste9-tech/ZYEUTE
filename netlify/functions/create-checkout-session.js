@@ -6,6 +6,9 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY environment variable is required');
+}
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
