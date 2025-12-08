@@ -1,5 +1,8 @@
 # 🧹 Cleanup Summary - VS Code Improvements Integration
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
 ## ✅ Completed Tasks
 
 ### 1. Enhanced Supabase URL Logging
