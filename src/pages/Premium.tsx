@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { Header } from '../components/Header';
 import { BottomNav } from '../components/BottomNav';
 import { Button } from '../components/Button';
+import { SubscribeButton } from '../components/SubscribeButton';
 import { subscribeToPremium } from '../services/stripeService';
 import { usePremium } from '../hooks/usePremium';
 import { toast } from '../components/Toast';
@@ -15,7 +16,6 @@ import { useHaptics } from '../hooks/useHaptics';
 import { logger } from '../lib/logger';
 
 const premiumLogger = logger.withContext('Premium');
-
 
 type SubscriptionTier = 'free' | 'bronze' | 'silver' | 'gold';
 
@@ -80,12 +80,12 @@ export default function Premium() {
 
   const handleSubscribe = async (tier: SubscriptionTier) => {
     if (tier === 'free' || tier === currentTier) return;
-    
+
     try {
       await subscribeToPremium(tier);
     } catch (error: any) {
       premiumLogger.error('Subscription error:', error);
-      toast.error('Erreur lors de l\'abonnement. Réessaie plus tard.');
+      toast.error("Erreur lors de l'abonnement. Réessaie plus tard.");
     }
   };
 
@@ -108,9 +108,7 @@ export default function Premium() {
           <h1 className="text-4xl font-black text-gold-400 mb-2 embossed tracking-tight">
             Zyeuté VIP
           </h1>
-          <p className="text-leather-200 text-lg embossed">
-            L&apos;expérience premium québécoise
-          </p>
+          <p className="text-leather-200 text-lg embossed">L&apos;expérience premium québécoise</p>
         </div>
         {/* Gold accent lines */}
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gold-gradient" />
@@ -118,6 +116,23 @@ export default function Premium() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Test SubscribeButton - Phase 3 Integration */}
+        <div className="leather-card rounded-2xl p-6 mb-8 stitched text-center">
+          <h3 className="text-xl font-bold text-gold-400 mb-4">Phase 3: Stripe Integration Test</h3>
+          <p className="text-leather-300 mb-4">Test the new SubscribeButton component:</p>
+          <div className="flex gap-4 justify-center">
+            <SubscribeButton priceId="price_test_bronze" className="px-6 py-3">
+              Test Bronze Subscription
+            </SubscribeButton>
+            <SubscribeButton priceId="price_test_silver" className="px-6 py-3">
+              Test Silver Subscription
+            </SubscribeButton>
+            <SubscribeButton priceId="price_test_gold" className="px-6 py-3">
+              Test Gold Subscription
+            </SubscribeButton>
+          </div>
+        </div>
+
         {/* Current Status Banner */}
         {currentTier !== 'free' && (
           <div className="leather-card rounded-2xl p-6 mb-8 stitched text-center">
@@ -131,9 +146,7 @@ export default function Premium() {
                 Membre {currentTier.toUpperCase()}
               </span>
             </div>
-            <p className="text-leather-300 mt-4">
-              Merci de supporter Zyeuté! 🇨🇦⚜️
-            </p>
+            <p className="text-leather-300 mt-4">Merci de supporter Zyeuté! 🇨🇦⚜️</p>
           </div>
         )}
 
@@ -141,7 +154,8 @@ export default function Premium() {
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {tiers.map((tier) => {
             const isCurrentTier = currentTier === tier.id;
-            const isUpgrade = tier.id === 'gold' || (tier.id === 'silver' && currentTier === 'bronze');
+            const isUpgrade =
+              tier.id === 'gold' || (tier.id === 'silver' && currentTier === 'bronze');
 
             return (
               <div
@@ -158,26 +172,22 @@ export default function Premium() {
                 )}
 
                 {/* Tier Icon */}
-                <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${tier.gradient} flex items-center justify-center mb-4 glow-gold-subtle`}>
+                <div
+                  className={`w-16 h-16 rounded-full bg-gradient-to-br ${tier.gradient} flex items-center justify-center mb-4 glow-gold-subtle`}
+                >
                   <span className="text-3xl">{tier.emoji}</span>
                 </div>
 
                 {/* Tier Name */}
-                <h3 className="text-2xl font-black text-gold-400 mb-2 embossed">
-                  {tier.name}
-                </h3>
+                <h3 className="text-2xl font-black text-gold-400 mb-2 embossed">{tier.name}</h3>
 
                 {/* Price */}
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-white embossed">
-                      ${tier.price}
-                    </span>
+                    <span className="text-4xl font-black text-white embossed">${tier.price}</span>
                     <span className="text-leather-300">/mois</span>
                   </div>
-                  <p className="text-leather-400 text-sm mt-1">
-                    CAD · Annule quand tu veux
-                  </p>
+                  <p className="text-leather-400 text-sm mt-1">CAD · Annule quand tu veux</p>
                 </div>
 
                 {/* Features */}
@@ -201,11 +211,11 @@ export default function Premium() {
                     isCurrentTier
                       ? 'bg-leather-700 text-leather-400 cursor-not-allowed'
                       : tier.id === 'gold'
-                      ? 'btn-gold glow-gold'
-                      : 'btn-leather hover:btn-gold'
+                        ? 'btn-gold glow-gold'
+                        : 'btn-leather hover:btn-gold'
                   }`}
                 >
-                  {isCurrentTier ? '✓ Ton plan actuel' : isUpgrade ? '⬆️ Améliorer' : 'S\'abonner'}
+                  {isCurrentTier ? '✓ Ton plan actuel' : isUpgrade ? '⬆️ Améliorer' : "S'abonner"}
                 </button>
               </div>
             );
@@ -301,36 +311,69 @@ export default function Premium() {
             <details className="group">
               <summary className="flex items-center justify-between cursor-pointer text-white font-bold py-3 border-b border-leather-700">
                 <span>Puis-je annuler à tout moment?</span>
-                <svg className="w-5 h-5 text-gold-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-5 h-5 text-gold-500 transition-transform group-open:rotate-180"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </summary>
               <p className="text-leather-300 text-sm py-3">
-                Oui! Tu peux annuler ton abonnement à tout moment depuis tes paramètres. Tu garderas l&apos;accès jusqu&apos;à la fin de ta période payée.
+                Oui! Tu peux annuler ton abonnement à tout moment depuis tes paramètres. Tu garderas
+                l&apos;accès jusqu&apos;à la fin de ta période payée.
               </p>
             </details>
 
             <details className="group">
               <summary className="flex items-center justify-between cursor-pointer text-white font-bold py-3 border-b border-leather-700">
                 <span>Puis-je changer de plan?</span>
-                <svg className="w-5 h-5 text-gold-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-5 h-5 text-gold-500 transition-transform group-open:rotate-180"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </summary>
               <p className="text-leather-300 text-sm py-3">
-                Absolument! Tu peux améliorer ou réduire ton plan à tout moment. Les changements prennent effet immédiatement.
+                Absolument! Tu peux améliorer ou réduire ton plan à tout moment. Les changements
+                prennent effet immédiatement.
               </p>
             </details>
 
             <details className="group">
               <summary className="flex items-center justify-between cursor-pointer text-white font-bold py-3 border-b border-leather-700">
                 <span>Les paiements sont-ils sécurisés?</span>
-                <svg className="w-5 h-5 text-gold-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-5 h-5 text-gold-500 transition-transform group-open:rotate-180"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </summary>
               <p className="text-leather-300 text-sm py-3">
-                Oui! Tous les paiements sont traités par Stripe, le leader mondial des paiements en ligne. Nous ne stockons jamais tes informations bancaires.
+                Oui! Tous les paiements sont traités par Stripe, le leader mondial des paiements en
+                ligne. Nous ne stockons jamais tes informations bancaires.
               </p>
             </details>
           </div>

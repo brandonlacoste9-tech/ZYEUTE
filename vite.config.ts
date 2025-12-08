@@ -18,20 +18,16 @@ export default defineConfig({
     sourcemap: false,
     rollupOptions: {
       output: {
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash][extname]',
         entryFileNames: 'static/[name]-[hash].js',
         chunkFileNames: 'static/[name]-[hash].js',
         assetFileNames: 'static/[name]-[hash][extname]',
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'supabase': ['@supabase/supabase-js'],
-          'stripe': ['@stripe/stripe-js', '@stripe/react-stripe-js'],
-          'openai': ['openai'],
+          supabase: ['@supabase/supabase-js'],
+          stripe: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
+          openai: ['openai'],
         },
       },
     },
   },
 });
-

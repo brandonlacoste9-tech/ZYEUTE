@@ -36,12 +36,12 @@
     "build:all": "npm run build --workspace=packages/kernel-node && npm run build --workspace=packages/bee-node",
     "docs": "npx tsx scripts/generate-docs.ts",
     "docs:generate": "npm run docs",
-        "prepare": "husky install"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.74",
-    "@stripe/react-stripe-js": "^2.8.0",
-    "@stripe/stripe-js": "^4.0.0",
+    "@stripe/react-stripe-js": "^2.9.0",
+    "@stripe/stripe-js": "^4.10.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.45.0",
     "@types/dompurify": "^3.0.5",
@@ -61,6 +61,7 @@
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.28.1",
+    "@netlify/functions": "^5.1.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^20.10.0",
     "@types/react": "^18.3.5",
@@ -74,9 +75,9 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
-        "husky": "^8.0.0",
-        "lint-staged": "^15.0.0",
+    "husky": "^8.0.0",
     "jsdom": "^25.0.1",
+    "lint-staged": "^15.0.0",
     "postcss": "^8.4.47",
     "prettier": "^3.4.2",
     "serve": "^14.2.4",
