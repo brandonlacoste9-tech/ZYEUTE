@@ -15,7 +15,7 @@
  * See: colony-crypto.js for upgrade path
  */
 
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 /**
  * Submit a task to Colony OS Server
@@ -136,8 +136,5 @@ async function getTaskStatus(processId, serverHost, userPrvkey, timeout = 3000) 
   }
 }
 
-module.exports = {
-  submitTask,
-  getTaskStatus,
-};
+export { submitTask, getTaskStatus };
 
