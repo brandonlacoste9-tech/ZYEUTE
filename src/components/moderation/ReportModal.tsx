@@ -5,14 +5,13 @@
 
 import React, { useState } from 'react';
 import { Button } from '../Button';
-import { supabase } from '../../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { toast } from '../Toast';
 import { cn } from '../../lib/utils';
 import type { User } from '../../types';
 import { logger } from '../../lib/logger';
 
 const reportModalLogger = logger.withContext('ReportModal');
-
 
 type ReportType =
   | 'bullying'
@@ -75,7 +74,7 @@ const REPORT_OPTIONS: ReportOption[] = [
     id: 'fraud',
     label: 'Fraude ou arnaque',
     emoji: '💸',
-    description: 'Tentative d\'escroquerie, fausses promesses',
+    description: "Tentative d'escroquerie, fausses promesses",
   },
   {
     id: 'misinformation',
@@ -93,7 +92,7 @@ const REPORT_OPTIONS: ReportOption[] = [
     id: 'self_harm',
     label: 'Automutilation ou suicide',
     emoji: '💔',
-    description: 'Contenu encourageant l\'automutilation',
+    description: "Contenu encourageant l'automutilation",
   },
   {
     id: 'other',
@@ -135,7 +134,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
     try {
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         toast.error('Tu dois être connecté pour signaler');
         return;
@@ -182,7 +183,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
       });
 
       toast.success('Signalement envoyé! Notre équipe va le réviser. 🛡️');
-      
+
       // Reset form
       setSelectedType(null);
       setDetails('');
@@ -190,7 +191,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
       onClose();
     } catch (error: any) {
       reportModalLogger.error('Error submitting report:', error);
-      
+
       if (error.message?.includes('not found')) {
         toast.error('La table "content_reports" n\'existe pas. Exécute le script SQL!');
       } else {
@@ -284,9 +285,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                   className="w-5 h-5 rounded border-white/20 text-red-500 focus:ring-red-500"
                 />
                 <div>
-                  <p className="text-white font-semibold">
-                    Bloquer @{reportedUser.username}
-                  </p>
+                  <p className="text-white font-semibold">Bloquer @{reportedUser.username}</p>
                   <p className="text-white/60 text-sm">
                     Cette personne ne pourra plus te voir ni interagir avec toi
                   </p>
@@ -298,7 +297,11 @@ export const ReportModal: React.FC<ReportModalProps> = ({
           {/* Information Box */}
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
             <div className="flex gap-3">
-              <svg className="w-6 h-6 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-6 h-6 text-blue-400 flex-shrink-0"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
               </svg>
               <div className="flex-1">
@@ -317,12 +320,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
         {/* Footer */}
         <div className="p-6 border-t border-white/10 bg-black/50">
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
+            <Button variant="outline" className="flex-1" onClick={onClose} disabled={isSubmitting}>
               Annuler
             </Button>
             <Button
@@ -346,4 +344,3 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 };
 
 export default ReportModal;
-

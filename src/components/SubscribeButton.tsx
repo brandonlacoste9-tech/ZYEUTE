@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { Button } from './Button';
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 interface SubscribeButtonProps {
   priceId: string;
@@ -24,6 +24,7 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
     setIsLoading(true);
 
     try {
+      const supabase = createClient();
       const response = await fetch('/.netlify/functions/create-checkout-session', {
         method: 'POST',
         headers: {

@@ -3,13 +3,19 @@
  * Tracks and awards achievements, manages tiers, rewards users
  */
 
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 
 const achievementServiceLogger = logger.withContext('AchievementService');
 import { toast } from '../components/Toast';
 
-export type AchievementCategory = 'cultural' | 'regional' | 'engagement' | 'tiguy' | 'elite' | 'seasonal';
+export type AchievementCategory =
+  | 'cultural'
+  | 'regional'
+  | 'engagement'
+  | 'tiguy'
+  | 'elite'
+  | 'seasonal';
 export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type UserTier = 'novice' | 'vrai' | 'pur_laine' | 'legende' | 'icone';
 
@@ -65,6 +71,7 @@ const TIER_THRESHOLDS = {
  */
 export async function getAllAchievements(): Promise<Achievement[]> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('achievements')
       .select('*')
@@ -84,6 +91,7 @@ export async function getAllAchievements(): Promise<Achievement[]> {
  */
 export async function getUserAchievements(userId: string): Promise<UserAchievement[]> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('user_achievements')
       .select('*, achievement:achievements(*)')
@@ -102,6 +110,7 @@ export async function getUserAchievements(userId: string): Promise<UserAchieveme
  */
 export async function getUserTier(userId: string): Promise<TierInfo | null> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('user_profiles')
       .select('total_points, current_tier')
@@ -144,6 +153,7 @@ export async function awardAchievement(
   showNotification = true
 ): Promise<boolean> {
   try {
+    const supabase = createClient();
     // Call Supabase function to award achievement
     const { data, error } = await supabase.rpc('award_achievement', {
       p_user_id: userId,
@@ -162,8 +172,10 @@ export async function awardAchievement(
 
       if (achievement) {
         // Show achievement notification
-        toast.success(`🏆 ${achievement.icon} ${achievement.name_fr} débloqué! +${achievement.points} pts`);
-        
+        toast.success(
+          `🏆 ${achievement.icon} ${achievement.name_fr} débloqué! +${achievement.points} pts`
+        );
+
         // Dispatch custom event for achievement modal
         window.dispatchEvent(
           new CustomEvent('achievement-unlocked', {
@@ -193,12 +205,10 @@ export async function checkAchievements(
   try {
     // Get all achievements
     const achievements = await getAllAchievements();
-    
+
     // Get user's current achievements
     const userAchievements = await getUserAchievements(userId);
-    const earnedIds = userAchievements
-      .filter((ua) => ua.is_earned)
-      .map((ua) => ua.achievement_id);
+    const earnedIds = userAchievements.filter((ua) => ua.is_earned).map((ua) => ua.achievement_id);
 
     // Check each achievement
     for (const achievement of achievements) {
@@ -206,11 +216,7 @@ export async function checkAchievements(
       if (earnedIds.includes(achievement.id)) continue;
 
       // Check if condition is met
-      const isMet = await checkAchievementCondition(
-        userId,
-        achievement.unlock_condition,
-        trigger
-      );
+      const isMet = await checkAchievementCondition(userId, achievement.unlock_condition, trigger);
 
       if (isMet) {
         await awardAchievement(userId, achievement.id);
@@ -230,6 +236,7 @@ async function checkAchievementCondition(
   trigger: { type: string; data?: any }
 ): Promise<boolean> {
   try {
+    const supabase = createClient();
     const conditionType = condition.type;
 
     // Match trigger type to condition type
@@ -320,10 +327,7 @@ async function checkAchievementCondition(
           const now = new Date();
           const targetDate = condition.date; // Format: "MM-DD"
           const [month, day] = targetDate.split('-');
-          return (
-            now.getMonth() + 1 === parseInt(month) &&
-            now.getDate() === parseInt(day)
-          );
+          return now.getMonth() + 1 === parseInt(month) && now.getDate() === parseInt(day);
         }
         break;
 
@@ -334,7 +338,7 @@ async function checkAchievementCondition(
             .select('created_at')
             .eq('id', userId)
             .single();
-          
+
           if (data) {
             const accountAge = Date.now() - new Date(data.created_at).getTime();
             const days = accountAge / (1000 * 60 * 60 * 24);
@@ -366,6 +370,7 @@ export async function getAchievementStats(userId: string): Promise<{
   recent_achievements: UserAchievement[];
 }> {
   try {
+    const supabase = createClient();
     const [allAchievements, userAchievements, tierInfo] = await Promise.all([
       getAllAchievements(),
       getUserAchievements(userId),
@@ -410,9 +415,12 @@ export async function getAchievementStats(userId: string): Promise<{
  */
 export async function getLeaderboard(limit = 100): Promise<any[]> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('user_profiles')
-      .select('id, username, avatar_url, total_points, current_tier, achievement_count, is_verified')
+      .select(
+        'id, username, avatar_url, total_points, current_tier, achievement_count, is_verified'
+      )
       .order('total_points', { ascending: false })
       .limit(limit);
 
@@ -429,6 +437,7 @@ export async function getLeaderboard(limit = 100): Promise<any[]> {
  */
 export async function getUserRank(userId: string): Promise<number> {
   try {
+    const supabase = createClient();
     const { data: userData } = await supabase
       .from('user_profiles')
       .select('total_points')
@@ -459,4 +468,3 @@ export default {
   getLeaderboard,
   getUserRank,
 };
-

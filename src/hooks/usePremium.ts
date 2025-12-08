@@ -4,11 +4,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { logger } from '../lib/logger';
 
 const usePremiumLogger = logger.withContext('UsePremium');
-
 
 export type PremiumTier = 'free' | 'bronze' | 'silver' | 'gold';
 
@@ -80,8 +79,11 @@ export function usePremium() {
 
   const loadPremiumStatus = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
         setStatus({
           tier: 'free',
@@ -146,4 +148,3 @@ export function usePremium() {
 }
 
 export default usePremium;
-

@@ -5,16 +5,18 @@
 
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/client';
 
 const moderationServiceLogger = logger.withContext('ModerationService');
-import { supabase } from '../lib/supabase';
 
 // Initialize OpenAI
 const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-const openai = apiKey ? new OpenAI({
-  apiKey: apiKey,
-  dangerouslyAllowBrowser: true
-}) : null;
+const openai = apiKey
+  ? new OpenAI({
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true,
+    })
+  : null;
 
 export type ModerationSeverity = 'safe' | 'low' | 'medium' | 'high' | 'critical';
 export type ModerationAction = 'allow' | 'flag' | 'hide' | 'remove' | 'ban';
@@ -126,24 +128,30 @@ export async function analyzeText(text: string): Promise<ModerationResult> {
 
     if (!openai) {
       moderationServiceLogger.warn('⚠️ No OpenAI API Key. Skipping moderation.');
-      return { is_safe: true, severity: 'safe', categories: [], confidence: 0, reason: 'Modération inactive', action: 'allow' };
+      return {
+        is_safe: true,
+        severity: 'safe',
+        categories: [],
+        confidence: 0,
+        reason: 'Modération inactive',
+        action: 'allow',
+      };
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: 'gpt-4o',
       messages: [
-        { role: "system", content: MODERATION_PROMPT },
-        { role: "user", content: `TEXTE: "${text}"` }
+        { role: 'system', content: MODERATION_PROMPT },
+        { role: 'user', content: `TEXTE: "${text}"` },
       ],
-      response_format: { type: "json_object" }
+      response_format: { type: 'json_object' },
     });
-    
+
     const resultText = response.choices[0].message.content;
-    if (!resultText) throw new Error("No response from OpenAI");
+    if (!resultText) throw new Error('No response from OpenAI');
 
     const moderationResult: ModerationResult = JSON.parse(resultText);
     return moderationResult;
-
   } catch (error) {
     moderationServiceLogger.error('Error in analyzeText:', error);
     // Fail open - allow content if moderation fails
@@ -165,36 +173,55 @@ export async function analyzeText(text: string): Promise<ModerationResult> {
 export async function analyzeImage(imageUrl: string): Promise<ModerationResult> {
   try {
     if (!openai) {
-      return { is_safe: true, severity: 'safe', categories: [], confidence: 0, reason: 'Modération inactive', action: 'allow' };
+      return {
+        is_safe: true,
+        severity: 'safe',
+        categories: [],
+        confidence: 0,
+        reason: 'Modération inactive',
+        action: 'allow',
+      };
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: 'gpt-4o',
       messages: [
-        { role: "system", content: MODERATION_PROMPT },
-        { 
-          role: "user", 
+        { role: 'system', content: MODERATION_PROMPT },
+        {
+          role: 'user',
           content: [
-            { type: "text", text: "Analyse cette image pour détecter: Nudité, violence, haine, drogues, armes." },
-            { type: "image_url", image_url: { url: imageUrl } }
-          ]
-        }
+            {
+              type: 'text',
+              text: 'Analyse cette image pour détecter: Nudité, violence, haine, drogues, armes.',
+            },
+            { type: 'image_url', image_url: { url: imageUrl } },
+          ],
+        },
       ],
       max_tokens: 300,
     });
 
-    const resultText = response.choices[0].message.content || "{}";
+    const resultText = response.choices[0].message.content || '{}';
     // Cleanup JSON if needed (sometimes model adds markdown)
-    const cleanJson = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
-    
+    const cleanJson = resultText
+      .replace(/```json/g, '')
+      .replace(/```/g, '')
+      .trim();
+
     try {
       const moderationResult: ModerationResult = JSON.parse(cleanJson);
       return moderationResult;
     } catch (e) {
-      moderationServiceLogger.error("Failed to parse JSON from vision response", resultText);
-      return { is_safe: true, severity: 'safe', categories: [], confidence: 50, reason: 'Analyse incertaine', action: 'allow' };
+      moderationServiceLogger.error('Failed to parse JSON from vision response', resultText);
+      return {
+        is_safe: true,
+        severity: 'safe',
+        categories: [],
+        confidence: 50,
+        reason: 'Analyse incertaine',
+        action: 'allow',
+      };
     }
-
   } catch (error) {
     moderationServiceLogger.error('Error in analyzeImage:', error);
     return {
@@ -202,7 +229,7 @@ export async function analyzeImage(imageUrl: string): Promise<ModerationResult> 
       severity: 'safe',
       categories: [],
       confidence: 0,
-      reason: 'Erreur d\'analyse d\'image',
+      reason: "Erreur d'analyse d'image",
       action: 'allow',
     };
   }
@@ -216,7 +243,7 @@ export async function analyzeVideo(videoUrl: string): Promise<ModerationResult> 
     // For now, return safe (video analysis requires frame extraction)
     // TODO: Implement frame extraction and analysis
     moderationServiceLogger.debug('Video analysis not yet implemented:', videoUrl);
-    
+
     return {
       is_safe: true,
       severity: 'safe',
@@ -224,7 +251,7 @@ export async function analyzeVideo(videoUrl: string): Promise<ModerationResult> 
       confidence: 50,
       reason: 'Analyse vidéo en développement',
       action: 'allow',
-      context_note: 'L\'analyse complète des vidéos arrive bientôt',
+      context_note: "L'analyse complète des vidéos arrive bientôt",
     };
   } catch (error) {
     moderationServiceLogger.error('Error in analyzeVideo:', error);
@@ -233,7 +260,7 @@ export async function analyzeVideo(videoUrl: string): Promise<ModerationResult> 
       severity: 'safe',
       categories: [],
       confidence: 0,
-      reason: 'Erreur d\'analyse vidéo',
+      reason: "Erreur d'analyse vidéo",
       action: 'allow',
     };
   }
@@ -303,6 +330,7 @@ async function logModeration(
   result: ModerationResult
 ): Promise<void> {
   try {
+    const supabase = createClient();
     await supabase.from('moderation_logs').insert({
       content_type: contentType,
       content_id: contentId,
@@ -322,11 +350,9 @@ async function logModeration(
 /**
  * Handle content violation (add strike, ban if needed)
  */
-async function handleViolation(
-  userId: string,
-  result: ModerationResult
-): Promise<void> {
+async function handleViolation(userId: string, result: ModerationResult): Promise<void> {
   try {
+    const supabase = createClient();
     // Get current user strikes
     const { data: strikeData } = await supabase
       .from('user_strikes')
@@ -365,7 +391,7 @@ async function handleViolation(
     // Update or create strike record
     if (strikeData) {
       const strikes = [...(strikeData.strikes || []), newStrike];
-      
+
       await supabase
         .from('user_strikes')
         .update({
@@ -388,7 +414,7 @@ async function handleViolation(
 
     // Create notification for user
     let notificationMessage = `⚠️ Avertissement ${newStrikeCount}/5: ${result.reason}`;
-    
+
     if (newStrikeCount === 2) {
       notificationMessage += ' | Suspension 24h';
     } else if (newStrikeCount === 3) {
@@ -418,11 +444,8 @@ export async function isUserBanned(userId: string): Promise<{
   until?: string;
 }> {
   try {
-    const { data } = await supabase
-      .from('user_strikes')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+    const supabase = createClient();
+    const { data } = await supabase.from('user_strikes').select('*').eq('user_id', userId).single();
 
     if (!data) {
       return { isBanned: false };

@@ -4,7 +4,7 @@
 
 import React, { useState, useRef, useEffect, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { Avatar } from '../Avatar';
 import { validateSearchQuery, sanitizeText } from '../../lib/validation';
 import { toast } from '../Toast';
@@ -12,7 +12,6 @@ import type { Post, User } from '../../types';
 import { logger } from '../../lib/logger';
 
 const searchBarLogger = logger.withContext('SearchBar');
-
 
 interface SearchBarProps {
   onSearchChange?: (query: string) => void;
@@ -78,10 +77,12 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
           .limit(5);
 
         if (users) {
-          searchResults.push(...users.map(user => ({
-            type: 'user' as const,
-            data: user,
-          })));
+          searchResults.push(
+            ...users.map((user) => ({
+              type: 'user' as const,
+              data: user,
+            }))
+          );
         }
 
         // Search posts by caption
@@ -92,10 +93,12 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
           .limit(5);
 
         if (posts) {
-          searchResults.push(...posts.map(post => ({
-            type: 'post' as const,
-            data: post,
-          })));
+          searchResults.push(
+            ...posts.map((post) => ({
+              type: 'post' as const,
+              data: post,
+            }))
+          );
         }
 
         // If query starts with #, add hashtag suggestion
@@ -137,7 +140,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
 
   // Save search to recent
   const saveRecentSearch = (searchQuery: string) => {
-    const recent = [searchQuery, ...recentSearches.filter(s => s !== searchQuery)].slice(0, 10);
+    const recent = [searchQuery, ...recentSearches.filter((s) => s !== searchQuery)].slice(0, 10);
     setRecentSearches(recent);
     localStorage.setItem('recentSearches', JSON.stringify(recent));
   };
@@ -229,11 +232,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
           className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-white/10 rounded-2xl overflow-hidden z-50 max-h-[400px] overflow-y-auto card-edge"
         >
           {/* Loading */}
-          {isLoading && (
-            <div className="p-4 text-center text-white/60">
-              Recherche...
-            </div>
-          )}
+          {isLoading && <div className="p-4 text-center text-white/60">Recherche...</div>}
 
           {/* Results */}
           {!isLoading && results.length > 0 && (
@@ -316,8 +315,18 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
                   onClick={() => handleRecentClick(search)}
                   className="w-full flex items-center gap-3 p-3 hover:bg-white/5 transition-colors text-left"
                 >
-                  <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-5 h-5 text-white/40"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   <p className="text-white">{search}</p>
                 </button>
@@ -343,4 +352,3 @@ export const SearchBar = memo(SearchBarComponent, (prevProps, nextProps) => {
 SearchBar.displayName = 'SearchBar';
 
 export default SearchBar;
-

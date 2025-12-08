@@ -3,7 +3,7 @@
  * All data fetching functions are centralized here for maintainability and consistency
  */
 
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import type { Post, User, Story } from '@/types';
 
@@ -14,7 +14,10 @@ const apiLogger = logger.withContext('API');
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const { data: { user: authUser } } = await supabase.auth.getUser();
+    const supabase = createClient();
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
     if (!authUser) return null;
 
     // Try to fetch existing profile
@@ -32,11 +35,12 @@ export async function getCurrentUser(): Promise<User | null> {
     // If profile doesn't exist (error code PGRST116 = not found), create it
     if (error && error.code === 'PGRST116') {
       apiLogger.info('Profile not found, creating new profile for user:', authUser.id);
-      
+
       // Extract username from email or use a default
       const email = authUser.email || '';
       const username = email.split('@')[0] || `user_${authUser.id.slice(0, 8)}`;
-      const displayName = authUser.user_metadata?.full_name || authUser.user_metadata?.name || username;
+      const displayName =
+        authUser.user_metadata?.full_name || authUser.user_metadata?.name || username;
 
       // Create the profile
       const { data: newProfile, error: createError } = await supabase
@@ -74,6 +78,7 @@ export async function getCurrentUser(): Promise<User | null> {
  */
 export async function getFeedPosts(page: number = 0, limit: number = 20): Promise<Post[]> {
   try {
+    const supabase = createClient();
     const start = page * limit;
     const end = start + limit - 1;
 
@@ -82,20 +87,22 @@ export async function getFeedPosts(page: number = 0, limit: number = 20): Promis
     // Query publications directly instead of posts view to avoid RLS/view issues
     const { data, error } = await supabase
       .from('publications')
-      .select(`
+      .select(
+        `
         *,
         user:user_profiles!user_id(*)
-      `)
-      .eq('visibilite', 'public')  // Only show public posts
-      .is('est_masque', null)      // Not hidden
-      .is('deleted_at', null)      // Not deleted
+      `
+      )
+      .eq('visibilite', 'public') // Only show public posts
+      .is('est_masque', null) // Not hidden
+      .is('deleted_at', null) // Not deleted
       .order('created_at', { ascending: false })
       .range(start, end);
 
-    apiLogger.debug('Query result:', { 
-      dataCount: data?.length || 0, 
+    apiLogger.debug('Query result:', {
+      dataCount: data?.length || 0,
       error: error?.message || null,
-      firstItem: data?.[0] 
+      firstItem: data?.[0],
     });
 
     if (error) {
@@ -104,7 +111,7 @@ export async function getFeedPosts(page: number = 0, limit: number = 20): Promis
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       });
       return [];
     }
@@ -119,22 +126,26 @@ export async function getFeedPosts(page: number = 0, limit: number = 20): Promis
       const mapped = {
         id: pub.id,
         user_id: pub.user_id,
-        type: pub.media_url?.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'photo',  // Infer type from media_url
+        type: pub.media_url?.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'photo', // Infer type from media_url
         media_url: pub.media_url || '',
-        caption: pub.content || null,  // Map content to caption
-        hashtags: null,  // TODO: Extract from content or join hashtags table
-        region: null,  // TODO: Map from region field if exists
-        city: null,  // TODO: Map from city field if exists
+        caption: pub.content || null, // Map content to caption
+        hashtags: null, // TODO: Extract from content or join hashtags table
+        region: null, // TODO: Map from region field if exists
+        city: null, // TODO: Map from city field if exists
         fire_count: pub.reactions_count || 0,
         comment_count: pub.comments_count || 0,
         created_at: pub.created_at,
-        user: pub.user,  // Already joined
+        user: pub.user, // Already joined
         // Keep original fields for compatibility
         ...pub,
         visibility: pub.visibilite,
         is_hidden: pub.est_masque,
       };
-      apiLogger.debug('Mapped post:', { id: mapped.id, caption: mapped.caption, user: mapped.user?.username });
+      apiLogger.debug('Mapped post:', {
+        id: mapped.id,
+        caption: mapped.caption,
+        user: mapped.user?.username,
+      });
       return mapped;
     }) as Post[];
 
@@ -156,20 +167,13 @@ export async function getUserProfile(
   currentUserId?: string
 ): Promise<User | null> {
   try {
+    const supabase = createClient();
     let query;
 
     if (usernameOrId === 'me' && currentUserId) {
-      query = supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', currentUserId)
-        .single();
+      query = supabase.from('user_profiles').select('*').eq('id', currentUserId).single();
     } else {
-      query = supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('username', usernameOrId)
-        .single();
+      query = supabase.from('user_profiles').select('*').eq('username', usernameOrId).single();
     }
 
     const { data, error } = await query;
@@ -191,6 +195,7 @@ export async function getUserProfile(
  */
 export async function getPostById(postId: string): Promise<Post | null> {
   try {
+    const supabase = createClient();
     // Query publications directly instead of posts view
     const { data, error } = await supabase
       .from('publications')
@@ -233,12 +238,13 @@ export async function getPostById(postId: string): Promise<Post | null> {
  */
 export async function getUserPosts(userId: string): Promise<Post[]> {
   try {
+    const supabase = createClient();
     // Query publications directly instead of posts view to avoid RLS/view issues
     const { data, error } = await supabase
       .from('publications')
       .select('*, user:user_profiles!user_id(*)')
       .eq('user_id', userId)
-      .is('deleted_at', null)  // Not deleted
+      .is('deleted_at', null) // Not deleted
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -279,6 +285,7 @@ export async function getStories(
   currentUserId?: string
 ): Promise<Array<{ user: User; story?: Story; isViewed?: boolean }>> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('stories')
       .select('*, user:user_profiles!user_id(*)')
@@ -337,6 +344,7 @@ export async function getStories(
  */
 export async function checkFollowing(followerId: string, followingId: string): Promise<boolean> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('follows')
       .select('*')
@@ -366,6 +374,7 @@ export async function toggleFollow(
   isFollowing: boolean
 ): Promise<boolean> {
   try {
+    const supabase = createClient();
     if (isFollowing) {
       // Unfollow: delete the follow record
       const { error } = await supabase
@@ -403,6 +412,7 @@ export async function toggleFollow(
  */
 export async function togglePostFire(postId: string, userId: string): Promise<boolean> {
   try {
+    const supabase = createClient();
     // Check if user already fired this post
     const { data: existingFire } = await supabase
       .from('fires')
@@ -443,4 +453,3 @@ export async function togglePostFire(postId: string, userId: string): Promise<bo
     return false;
   }
 }
-

@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import DOMPurify from 'dompurify';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
-import { supabase } from '../../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { toast } from '../Toast';
 import { moderateContent } from '../../services/moderationService';
 import { getTimeAgo, formatNumber } from '../../lib/utils';
@@ -16,7 +16,6 @@ import type { Comment as CommentType, User } from '../../types';
 import { logger } from '../../lib/logger';
 
 const commentThreadLogger = logger.withContext('CommentThread');
-
 
 interface CommentThreadProps {
   comment: CommentType;
@@ -125,7 +124,7 @@ const CommentThreadComponent: React.FC<CommentThreadProps> = ({
         toast.warning('⚠️ Ton commentaire sera révisé');
       }
 
-      const { data, error } = await supabase
+      const { data, error } = (await supabase
         .from('comments')
         .insert({
           post_id: postId,
@@ -134,18 +133,13 @@ const CommentThreadComponent: React.FC<CommentThreadProps> = ({
           parent_id: comment.id,
         } as any)
         .select('*, user:user_profiles!user_id(*)')
-        .single() as { data: CommentType | null; error: any };
+        .single()) as { data: CommentType | null; error: any };
 
       if (error) throw error;
 
       if (data) {
         // Log moderation with content ID
-        await moderateContent(
-          { text: sanitizedText },
-          'comment',
-          currentUser.id,
-          data.id
-        );
+        await moderateContent({ text: sanitizedText }, 'comment', currentUser.id, data.id);
 
         setReplies([...replies, data as CommentType]);
         setReplyCount(replyCount + 1);
@@ -180,12 +174,10 @@ const CommentThreadComponent: React.FC<CommentThreadProps> = ({
           .eq('user_id', currentUser.id);
       } else {
         // Like
-        await supabase
-          .from('comment_likes')
-          .insert({
-            comment_id: comment.id,
-            user_id: currentUser.id,
-          } as any);
+        await supabase.from('comment_likes').insert({
+          comment_id: comment.id,
+          user_id: currentUser.id,
+        } as any);
       }
     } catch (error) {
       commentThreadLogger.error('Error liking comment:', error);
@@ -216,19 +208,17 @@ const CommentThreadComponent: React.FC<CommentThreadProps> = ({
               {comment.user.display_name || comment.user.username}
             </span>
           )}
-          <span className="text-white/40 text-xs">
-            {getTimeAgo(new Date(comment.created_at))}
-          </span>
+          <span className="text-white/40 text-xs">{getTimeAgo(new Date(comment.created_at))}</span>
         </div>
 
         {/* Comment text - sanitized for XSS protection */}
-        <p 
+        <p
           className="text-white text-sm mb-2 break-words"
-          dangerouslySetInnerHTML={{ 
+          dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(comment.content || comment.text || '', {
               ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'br'],
-              ALLOWED_ATTR: []
-            })
+              ALLOWED_ATTR: [],
+            }),
           }}
         />
 
@@ -241,8 +231,18 @@ const CommentThreadComponent: React.FC<CommentThreadProps> = ({
               hasLiked ? 'text-gold-400' : 'text-white/60 hover:text-white'
             }`}
           >
-            <svg className="w-4 h-4" fill={hasLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            <svg
+              className="w-4 h-4"
+              fill={hasLiked ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
             </svg>
             {likes > 0 && <span>{formatNumber(likes)}</span>}
           </button>
@@ -338,4 +338,3 @@ export const CommentThread = React.memo(CommentThreadComponent, (prevProps, next
 CommentThread.displayName = 'CommentThread';
 
 export default CommentThread;
-

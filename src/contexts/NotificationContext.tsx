@@ -3,13 +3,12 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { toast } from '../components/Toast';
-import type { Notification} from '../types';
+import type { Notification } from '../types';
 import { logger } from '../lib/logger';
 
 const notificationContextLogger = logger.withContext('NotificationContext');
-
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -28,15 +27,20 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Get current user
   useEffect(() => {
+    const supabase = createClient();
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setCurrentUserId(user?.id || null);
     };
 
     fetchUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setCurrentUserId(session?.user?.id || null);
     });
 
@@ -48,13 +52,16 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!currentUserId) return;
 
     try {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('notifications')
-        .select(`
+        .select(
+          `
           *,
           actor:user_profiles!actor_id(*),
           post:posts!post_id(*)
-        `)
+        `
+        )
         .eq('user_id', currentUserId)
         .order('created_at', { ascending: false })
         .limit(50);
@@ -63,7 +70,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       if (data) {
         setNotifications(data);
-        const unread = data.filter(n => !n.is_read).length;
+        const unread = data.filter((n) => !n.is_read).length;
         setUnreadCount(unread);
       }
     } catch (error) {
@@ -82,6 +89,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     if (!currentUserId) return;
 
+    const supabase = createClient();
     const channel = supabase
       .channel(`notifications_${currentUserId}`)
       .on(
@@ -107,8 +115,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
 
           // Add to notifications
-          setNotifications(prev => [newNotification, ...prev]);
-          setUnreadCount(prev => prev + 1);
+          setNotifications((prev) => [newNotification, ...prev]);
+          setUnreadCount((prev) => prev + 1);
 
           // Show toast notification
           showNotificationToast(newNotification);
@@ -129,6 +137,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!currentUserId) return;
 
     try {
+      const supabase = createClient();
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
@@ -138,10 +147,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (error) throw error;
 
       // Update local state
-      setNotifications(prev =>
-        prev.map(n => (n.id === notificationId ? { ...n, is_read: true } : n))
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
       );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
       notificationContextLogger.error('Error marking notification as read:', error);
     }
@@ -152,6 +161,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!currentUserId) return;
 
     try {
+      const supabase = createClient();
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
@@ -161,9 +171,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (error) throw error;
 
       // Update local state
-      setNotifications(prev =>
-        prev.map(n => ({ ...n, is_read: true }))
-      );
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
 
       toast.success('Toutes les notifications marquées comme lues!');
@@ -232,4 +240,3 @@ export const useNotifications = () => {
   }
   return context;
 };
-

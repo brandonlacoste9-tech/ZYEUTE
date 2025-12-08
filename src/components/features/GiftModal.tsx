@@ -6,14 +6,13 @@
 import React, { useState } from 'react';
 import { Button } from '../Button';
 import { Avatar } from '../Avatar';
-import { supabase } from '../../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { toast } from '../Toast';
 import { cn } from '../../lib/utils';
 import type { User } from '../../types';
 import { logger } from '../../lib/logger';
 
 const giftModalLogger = logger.withContext('GiftModal');
-
 
 interface Gift {
   id: string;
@@ -26,20 +25,20 @@ interface Gift {
 const GIFTS: Gift[] = [
   // Common (1-5$)
   { id: 'poutine', name: 'Poutine', emoji: '🍟', price: 2, rarity: 'common' },
-  { id: 'maple', name: 'Sirop d\'érable', emoji: '🍁', price: 3, rarity: 'common' },
+  { id: 'maple', name: "Sirop d'érable", emoji: '🍁', price: 3, rarity: 'common' },
   { id: 'beaver', name: 'Castor', emoji: '🦫', price: 5, rarity: 'common' },
   { id: 'hockey', name: 'Hockey', emoji: '🏒', price: 5, rarity: 'common' },
-  
+
   // Rare (10-20$)
   { id: 'tourtiere', name: 'Tourtière', emoji: '🥧', price: 10, rarity: 'rare' },
   { id: 'fleurdelys', name: 'Fleur-de-lys', emoji: '⚜️', price: 15, rarity: 'rare' },
   { id: 'caribou', name: 'Caribou', emoji: '🦌', price: 20, rarity: 'rare' },
-  
+
   // Epic (25-50$)
   { id: 'chateau', name: 'Château Frontenac', emoji: '🏰', price: 25, rarity: 'epic' },
   { id: 'aurora', name: 'Aurore boréale', emoji: '🌌', price: 35, rarity: 'epic' },
   { id: 'sthubert', name: 'St-Hubert', emoji: '🍗', price: 50, rarity: 'epic' },
-  
+
   // Legendary (100$+)
   { id: 'laurentides', name: 'Les Laurentides', emoji: '🏔️', price: 100, rarity: 'legendary' },
   { id: 'vipquebec', name: 'VIP Québec', emoji: '👑', price: 250, rarity: 'legendary' },
@@ -59,12 +58,7 @@ interface GiftModalProps {
   onClose: () => void;
 }
 
-export const GiftModal: React.FC<GiftModalProps> = ({
-  recipient,
-  postId,
-  isOpen,
-  onClose,
-}) => {
+export const GiftModal: React.FC<GiftModalProps> = ({ recipient, postId, isOpen, onClose }) => {
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -77,47 +71,45 @@ export const GiftModal: React.FC<GiftModalProps> = ({
 
     setIsSending(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         toast.error('Tu dois être connecté!');
         return;
       }
 
       // Create gift record
-      const { error } = await supabase
-        .from('gifts')
-        .insert({
-          sender_id: user.id,
-          recipient_id: recipient.id,
-          post_id: postId,
-          gift_type: selectedGift.id,
-          gift_name: selectedGift.name,
-          gift_emoji: selectedGift.emoji,
-          price: selectedGift.price,
-          message: message.trim() || null,
-        });
+      const { error } = await supabase.from('gifts').insert({
+        sender_id: user.id,
+        recipient_id: recipient.id,
+        post_id: postId,
+        gift_type: selectedGift.id,
+        gift_name: selectedGift.name,
+        gift_emoji: selectedGift.emoji,
+        price: selectedGift.price,
+        message: message.trim() || null,
+      });
 
       if (error) throw error;
 
       // Create notification
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: recipient.id,
-          actor_id: user.id,
-          type: 'gift',
-          message: `t'a envoyé un ${selectedGift.name} ${selectedGift.emoji}!`,
-        });
+      await supabase.from('notifications').insert({
+        user_id: recipient.id,
+        actor_id: user.id,
+        type: 'gift',
+        message: `t'a envoyé un ${selectedGift.name} ${selectedGift.emoji}!`,
+      });
 
       toast.success(`${selectedGift.emoji} Cadeau envoyé! ${selectedGift.name}`);
       onClose();
     } catch (error: any) {
       giftModalLogger.error('Error sending gift:', error);
-      
+
       if (error.message?.includes('not found')) {
         toast.error('La table "gifts" n\'existe pas encore. Crée-la dans Supabase!');
       } else {
-        toast.error('Erreur lors de l\'envoi du cadeau');
+        toast.error("Erreur lors de l'envoi du cadeau");
       }
     } finally {
       setIsSending(false);
@@ -140,7 +132,7 @@ export const GiftModal: React.FC<GiftModalProps> = ({
               </svg>
             </button>
           </div>
-          
+
           {/* Recipient */}
           <div className="flex items-center gap-3">
             <Avatar src={recipient.avatar_url} size="md" isVerified={recipient.is_verified} />
@@ -167,7 +159,9 @@ export const GiftModal: React.FC<GiftModalProps> = ({
                     : 'border-white/10 bg-white/5 hover:bg-white/10'
                 )}
               >
-                <div className={`text-4xl mb-2 p-2 rounded-lg bg-gradient-to-br ${RARITY_STYLES[gift.rarity]}`}>
+                <div
+                  className={`text-4xl mb-2 p-2 rounded-lg bg-gradient-to-br ${RARITY_STYLES[gift.rarity]}`}
+                >
                   {gift.emoji}
                 </div>
                 <p className="text-white text-sm font-semibold truncate">{gift.name}</p>
@@ -181,7 +175,9 @@ export const GiftModal: React.FC<GiftModalProps> = ({
             <div className="card-edge p-6 mb-4">
               <h3 className="text-white font-bold mb-3">Cadeau sélectionné:</h3>
               <div className="flex items-center gap-4 mb-4">
-                <div className={`text-5xl p-3 rounded-xl bg-gradient-to-br ${RARITY_STYLES[selectedGift.rarity]}`}>
+                <div
+                  className={`text-5xl p-3 rounded-xl bg-gradient-to-br ${RARITY_STYLES[selectedGift.rarity]}`}
+                >
                   {selectedGift.emoji}
                 </div>
                 <div className="flex-1">
@@ -208,12 +204,7 @@ export const GiftModal: React.FC<GiftModalProps> = ({
         {/* Footer */}
         <div className="p-6 border-t border-white/10 bg-black/50">
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={onClose}
-              disabled={isSending}
-            >
+            <Button variant="outline" className="flex-1" onClick={onClose} disabled={isSending}>
               Annuler
             </Button>
             <Button
@@ -239,4 +230,3 @@ export const GiftModal: React.FC<GiftModalProps> = ({
 };
 
 export default GiftModal;
-

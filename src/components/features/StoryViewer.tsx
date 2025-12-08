@@ -6,13 +6,12 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar } from '../Avatar';
 import { VideoPlayer } from './VideoPlayer';
-import { supabase } from '../../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { getTimeAgo } from '../../lib/utils';
 import type { Story, User } from '../../types';
 import { logger } from '../../lib/logger';
 
 const storyViewerLogger = logger.withContext('StoryViewer');
-
 
 interface StoryViewerProps {
   stories: Story[];
@@ -31,7 +30,7 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
   const [isPaused, setIsPaused] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [showReplyInput, setShowReplyInput] = useState(false);
-  
+
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
@@ -50,7 +49,7 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
           handleNext();
           return 0;
         }
-        return prev + (100 / (duration * 10));
+        return prev + 100 / (duration * 10);
       });
     }, 100);
 
@@ -68,7 +67,9 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
     const markAsViewed = async () => {
       if (!currentStory) return;
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user || user.id === currentStory.user_id) return;
 
       // TODO: Create story_views table and insert view
@@ -140,7 +141,9 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
     if (!replyText.trim() || !currentStory) return;
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // TODO: Create story_replies table
@@ -150,7 +153,7 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
       setShowReplyInput(false);
     } catch (error) {
       storyViewerLogger.error('Error sending reply:', error);
-      toast.error('Erreur lors de l\'envoi');
+      toast.error("Erreur lors de l'envoi");
     }
   };
 
@@ -175,7 +178,7 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
   }
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black z-50 flex items-center justify-center"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -184,14 +187,12 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
       {/* Progress Bars */}
       <div className="absolute top-0 left-0 right-0 z-50 flex gap-1 p-2">
         {stories.map((_, index) => (
-          <div
-            key={index}
-            className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden"
-          >
+          <div key={index} className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
             <div
               className="h-full bg-white transition-all"
               style={{
-                width: index < currentIndex ? '100%' : index === currentIndex ? `${progress}%` : '0%',
+                width:
+                  index < currentIndex ? '100%' : index === currentIndex ? `${progress}%` : '0%',
               }}
             />
           </div>
@@ -223,10 +224,7 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
         </div>
 
         {/* Close button */}
-        <button
-          onClick={onClose}
-          className="p-2 hover:bg-white/10 rounded-full transition-colors"
-        >
+        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
           <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
           </svg>
@@ -234,7 +232,7 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
       </div>
 
       {/* Story Content */}
-      <div 
+      <div
         className="relative w-full max-w-md aspect-[9/16] rounded-2xl overflow-hidden edge-glow-strong"
         onClick={handleScreenClick}
       >
@@ -247,11 +245,7 @@ const StoryViewerComponent: React.FC<StoryViewerProps> = ({
             onEnded={handleNext}
           />
         ) : (
-          <img
-            src={currentStory.media_url}
-            alt="Story"
-            className="w-full h-full object-cover"
-          />
+          <img src={currentStory.media_url} alt="Story" className="w-full h-full object-cover" />
         )}
 
         {/* Pause indicator */}
@@ -343,4 +337,3 @@ export const StoryViewer = memo(StoryViewerComponent, (prevProps, nextProps) => 
 StoryViewer.displayName = 'StoryViewer';
 
 export default StoryViewer;
-

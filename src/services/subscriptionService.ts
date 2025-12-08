@@ -3,7 +3,7 @@
  * Handles subscriptions, tiers, payments, and revenue tracking
  */
 
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 
 const subscriptionServiceLogger = logger.withContext('SubscriptionService');
@@ -64,6 +64,7 @@ export interface RevenueSummary {
  */
 export async function getCreatorTiers(creatorId: string): Promise<SubscriptionTier[]> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('subscription_tiers')
       .select('*')
@@ -94,6 +95,7 @@ export async function createSubscriptionTier(
   }
 ): Promise<SubscriptionTier | null> {
   try {
+    const supabase = createClient();
     if (tier.price < 4.99) {
       toast.error('Le prix minimum est 4.99$ CAD');
       return null;
@@ -110,7 +112,7 @@ export async function createSubscriptionTier(
       .single();
 
     if (error) throw error;
-    
+
     toast.success(`Abonnement "${tier.name_fr}" créé!`);
     return data;
   } catch (error: any) {
@@ -123,11 +125,9 @@ export async function createSubscriptionTier(
 /**
  * Check if user is subscribed to creator
  */
-export async function isSubscribedTo(
-  subscriberId: string,
-  creatorId: string
-): Promise<boolean> {
+export async function isSubscribedTo(subscriberId: string, creatorId: string): Promise<boolean> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase.rpc('is_subscribed_to', {
       p_subscriber_id: subscriberId,
       p_creator_id: creatorId,
@@ -146,6 +146,7 @@ export async function isSubscribedTo(
  */
 export async function getUserSubscriptions(userId: string): Promise<Subscription[]> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('subscriptions')
       .select('*, tier:subscription_tiers(*)')
@@ -165,9 +166,12 @@ export async function getUserSubscriptions(userId: string): Promise<Subscription
  */
 export async function getCreatorSubscribers(creatorId: string): Promise<any[]> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('subscriptions')
-      .select('*, subscriber:users(id, username, avatar_url, is_verified), tier:subscription_tiers(name_fr, price)')
+      .select(
+        '*, subscriber:users(id, username, avatar_url, is_verified), tier:subscription_tiers(name_fr, price)'
+      )
       .eq('creator_id', creatorId)
       .eq('status', 'active')
       .order('created_at', { ascending: false });
@@ -189,6 +193,7 @@ export async function subscribeToCreator(
   tierId: string
 ): Promise<boolean> {
   try {
+    const supabase = createClient();
     // Check if already subscribed
     const isSubscribed = await isSubscribedTo(subscriberId, creatorId);
     if (isSubscribed) {
@@ -257,7 +262,7 @@ export async function subscribeToCreator(
     return true;
   } catch (error: any) {
     subscriptionServiceLogger.error('Error subscribing:', error);
-    toast.error('Erreur lors de l\'abonnement');
+    toast.error("Erreur lors de l'abonnement");
     return false;
   }
 }
@@ -270,6 +275,7 @@ export async function unsubscribeFromCreator(
   creatorId: string
 ): Promise<boolean> {
   try {
+    const supabase = createClient();
     const { error } = await supabase
       .from('subscriptions')
       .update({
@@ -286,7 +292,7 @@ export async function unsubscribeFromCreator(
     return true;
   } catch (error) {
     subscriptionServiceLogger.error('Error unsubscribing:', error);
-    toast.error('Erreur lors de l\'annulation');
+    toast.error("Erreur lors de l'annulation");
     return false;
   }
 }
@@ -296,6 +302,7 @@ export async function unsubscribeFromCreator(
  */
 export async function getCreatorRevenue(creatorId: string): Promise<RevenueSummary> {
   try {
+    const supabase = createClient();
     // Get user stats
     const { data: userData } = await supabase
       .from('user_profiles')
@@ -326,8 +333,10 @@ export async function getCreatorRevenue(creatorId: string): Promise<RevenueSumma
       .gte('created_at', firstDayLastMonth.toISOString())
       .lt('created_at', firstDayThisMonth.toISOString());
 
-    const thisMonthTotal = thisMonthEarnings?.reduce((sum, e) => sum + parseFloat(e.creator_net), 0) || 0;
-    const lastMonthTotal = lastMonthEarnings?.reduce((sum, e) => sum + parseFloat(e.creator_net), 0) || 0;
+    const thisMonthTotal =
+      thisMonthEarnings?.reduce((sum, e) => sum + parseFloat(e.creator_net), 0) || 0;
+    const lastMonthTotal =
+      lastMonthEarnings?.reduce((sum, e) => sum + parseFloat(e.creator_net), 0) || 0;
 
     return {
       total_earnings: userData?.total_earnings || 0,
@@ -358,6 +367,7 @@ export async function getCreatorEarnings(
   limit = 50
 ): Promise<CreatorEarnings[]> {
   try {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('creator_earnings')
       .select('*')
@@ -376,11 +386,9 @@ export async function getCreatorEarnings(
 /**
  * Request payout
  */
-export async function requestPayout(
-  creatorId: string,
-  amount: number
-): Promise<boolean> {
+export async function requestPayout(creatorId: string, amount: number): Promise<boolean> {
   try {
+    const supabase = createClient();
     const minimumPayout = 100; // $100 CAD minimum
 
     if (amount < minimumPayout) {
@@ -444,6 +452,7 @@ export async function markPostExclusive(
   previewText?: string
 ): Promise<boolean> {
   try {
+    const supabase = createClient();
     const { error } = await supabase.from('exclusive_content').insert({
       post_id: postId,
       creator_id: creatorId,
@@ -465,11 +474,9 @@ export async function markPostExclusive(
 /**
  * Check if user can view exclusive content
  */
-export async function canViewExclusiveContent(
-  userId: string,
-  postId: string
-): Promise<boolean> {
+export async function canViewExclusiveContent(userId: string, postId: string): Promise<boolean> {
   try {
+    const supabase = createClient();
     // Get exclusive content info
     const { data: exclusive } = await supabase
       .from('exclusive_content')
@@ -480,11 +487,7 @@ export async function canViewExclusiveContent(
     if (!exclusive) return true; // Not exclusive
 
     // Check if user is creator
-    const { data: post } = await supabase
-      .from('posts')
-      .select('user_id')
-      .eq('id', postId)
-      .single();
+    const { data: post } = await supabase.from('posts').select('user_id').eq('id', postId).single();
 
     if (post?.user_id === userId) return true; // Creator can view own content
 
@@ -510,4 +513,3 @@ export default {
   markPostExclusive,
   canViewExclusiveContent,
 };
-

@@ -5,13 +5,12 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../Button';
-import { supabase } from '../../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { toast } from '../Toast';
 import { generateId } from '../../lib/utils';
 import { logger } from '../../lib/logger';
 
 const storyCreatorLogger = logger.withContext('StoryCreator');
-
 
 export const StoryCreator: React.FC = () => {
   const navigate = useNavigate();
@@ -50,7 +49,7 @@ export const StoryCreator: React.FC = () => {
   // Upload story
   const handleUpload = async () => {
     if (!file) {
-      toast.warning('Sélectionne un fichier d\'abord!');
+      toast.warning("Sélectionne un fichier d'abord!");
       return;
     }
 
@@ -59,7 +58,9 @@ export const StoryCreator: React.FC = () => {
 
     try {
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (!user) {
         toast.error('Tu dois être connecté!');
@@ -72,9 +73,7 @@ export const StoryCreator: React.FC = () => {
       const fileName = `${user.id}_${generateId()}.${fileExt}`;
       const filePath = `stories/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('stories')
-        .upload(filePath, file);
+      const { error: uploadError } = await supabase.storage.from('stories').upload(filePath, file);
 
       if (uploadError) {
         if (uploadError.message.includes('not found')) {
@@ -84,24 +83,22 @@ export const StoryCreator: React.FC = () => {
       }
 
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('stories')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('stories').getPublicUrl(filePath);
 
       // Calculate expiry (24 hours from now)
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
       // Create story record
-      const { error: insertError } = await supabase
-        .from('stories')
-        .insert({
-          user_id: user.id,
-          media_url: publicUrl,
-          type: file.type.startsWith('video/') ? 'video' : 'photo',
-          duration: file.type.startsWith('video/') ? 15 : 5,
-          expires_at: expiresAt.toISOString(),
-        });
+      const { error: insertError } = await supabase.from('stories').insert({
+        user_id: user.id,
+        media_url: publicUrl,
+        type: file.type.startsWith('video/') ? 'video' : 'photo',
+        duration: file.type.startsWith('video/') ? 15 : 5,
+        expires_at: expiresAt.toISOString(),
+      });
 
       if (insertError) throw insertError;
 
@@ -109,7 +106,7 @@ export const StoryCreator: React.FC = () => {
       setTimeout(() => navigate('/'), 1000);
     } catch (error: any) {
       storyCreatorLogger.error('Error uploading story:', error);
-      toast.error(error.message || 'Erreur lors de l\'upload');
+      toast.error(error.message || "Erreur lors de l'upload");
     } finally {
       setIsUploading(false);
     }
@@ -119,9 +116,7 @@ export const StoryCreator: React.FC = () => {
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="card-edge p-6 mb-4">
-          <h2 className="text-white text-2xl font-bold mb-6 text-center">
-            Créer une Story ✨
-          </h2>
+          <h2 className="text-white text-2xl font-bold mb-6 text-center">Créer une Story ✨</h2>
 
           {/* Hidden file input */}
           <input
@@ -136,19 +131,9 @@ export const StoryCreator: React.FC = () => {
           {preview ? (
             <div className="relative aspect-[9/16] rounded-xl overflow-hidden bg-gray-900 mb-6 edge-glow">
               {file?.type.startsWith('video/') ? (
-                <video
-                  src={preview}
-                  autoPlay
-                  loop
-                  muted
-                  className="w-full h-full object-cover"
-                />
+                <video src={preview} autoPlay loop muted className="w-full h-full object-cover" />
               ) : (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
+                <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               )}
 
               {/* Change button */}
@@ -216,4 +201,3 @@ export const StoryCreator: React.FC = () => {
 };
 
 export default StoryCreator;
-

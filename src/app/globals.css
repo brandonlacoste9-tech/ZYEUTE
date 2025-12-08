@@ -1,0 +1,344 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold-50: #FFF9E5;
+  --color-gold-100: #FFF2CC;
+  --color-gold-200: #FFE699;
+  --color-gold-300: #FFD966;
+  --color-gold-400: #FFCC33;
+  --color-gold-500: #FFBF00;
+  --color-gold-600: #E6AC00;
+  --color-gold-700: #CC9900;
+  --color-gold-800: #B38600;
+  --color-gold-900: #997300;
+  --color-gold-950: #664D00;
+  
+  --color-leather-50: #fdf8f6;
+  --color-leather-100: #f2e8e5;
+  --color-leather-200: #eaddd7;
+  --color-leather-300: #e0cec7;
+  --color-leather-400: #d2bab0;
+  --color-leather-500: #a18e87;
+  --color-leather-600: #84746f;
+  --color-leather-700: #655955;
+  --color-leather-800: #463e3b;
+  --color-leather-900: #2a2523;
+  --color-leather-950: #0d0c0b;
+}
+
+:root {
+  --edge-color: #FFBF00;
+  --glow-intensity: 50%;
+}
+
+@layer base {
+  body {
+    @apply text-white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Base: Dark Pebbled Leather Texture */
+    background-color: #0d0c0b;
+    background-image: 
+      /* Pebbled grain pattern */
+      radial-gradient(circle at 20% 30%, rgba(30, 25, 20, 0.4) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(20, 15, 10, 0.4) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(25, 20, 15, 0.3) 0%, transparent 60%),
+      /* Fine pebbled texture */
+      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='pebble'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.04 0 0 0 0 0.03 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23pebble)' opacity='0.15'/%3E%3C/svg%3E"),
+      /* Subtle gold ambient glow */
+      radial-gradient(circle at 50% 50%, rgba(255, 191, 0, 0.02) 0%, transparent 50%);
+  }
+}
+
+@layer utilities {
+  /* --- LAYERED LEATHER TEXTURE SYSTEM --- */
+  
+  /* Base: Dark Pebbled Leather (for main backgrounds) */
+  .leather-overlay {
+    background-color: #0d0c0b;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(30, 25, 20, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(20, 15, 10, 0.3) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='pebble-base'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.04 0 0 0 0 0.03 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23pebble-base)' opacity='0.12'/%3E%3C/svg%3E");
+  }
+
+  /* Layer 1: Medium Brown Suede (for standard cards) */
+  .leather-card {
+    background-color: #2a2523;
+    background-image: 
+      /* Suede nap texture */
+      radial-gradient(circle at 30% 40%, rgba(60, 50, 45, 0.3) 0%, transparent 40%),
+      radial-gradient(circle at 70% 60%, rgba(50, 40, 35, 0.3) 0%, transparent 40%),
+      /* Fine suede grain */
+      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='suede'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0 0.05 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23suede)' opacity='0.2'/%3E%3C/svg%3E");
+    @apply border border-neutral-800 relative overflow-hidden;
+    box-shadow: 
+      0 4px 20px rgba(0,0,0,0.7), 
+      inset 0 1px 0 rgba(255,255,255,0.03),
+      inset 0 -1px 0 rgba(0,0,0,0.5);
+  }
+
+  /* Layer 2: Reddish-Brown Suede (for elevated cards, welcome cards) */
+  .leather-card-elevated {
+    background-color: #3d2e28;
+    background-image: 
+      /* Warmer suede texture */
+      radial-gradient(circle at 25% 35%, rgba(80, 60, 50, 0.25) 0%, transparent 45%),
+      radial-gradient(circle at 75% 65%, rgba(70, 50, 40, 0.25) 0%, transparent 45%),
+      /* Fine reddish suede grain */
+      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='suede-red'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.07 0 0 0 0 0.05 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23suede-red)' opacity='0.18'/%3E%3C/svg%3E");
+    @apply border border-neutral-700 relative overflow-hidden;
+    box-shadow: 
+      0 6px 25px rgba(0,0,0,0.8), 
+      inset 0 1px 0 rgba(255,255,255,0.04),
+      inset 0 -1px 0 rgba(0,0,0,0.6),
+      0 0 0 1px rgba(255, 191, 0, 0.05);
+  }
+
+  /* Subtle leather for inputs and secondary elements */
+  .leather-subtle {
+    background-color: #1a1512;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='leather-subtle'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.03 0 0 0 0 0.02 0 0 0 0 0.01 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23leather-subtle)' opacity='0.1'/%3E%3C/svg%3E");
+  }
+
+  /* Enhanced Gold Stitching - Stands out against all leather textures */
+  .stitched {
+    position: relative;
+    /* Base dark thread */
+    border: 2px dashed rgba(179, 134, 0, 0.4);
+    /* Shadow for depth */
+    box-shadow: 
+      0 0 0 3px rgba(13, 12, 11, 0.9),
+      inset 0 0 15px rgba(0,0,0,0.6),
+      0 2px 4px rgba(0,0,0,0.4);
+  }
+  
+  .stitched::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    /* Gold thread highlight */
+    border: 1px dashed rgba(255, 191, 0, 0.5);
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow: 0 0 8px rgba(255, 191, 0, 0.2);
+  }
+  
+  .stitched::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    /* Outer glow */
+    border: 1px dashed rgba(255, 191, 0, 0.2);
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  
+  .stitched-subtle {
+    border: 1px dashed rgba(255, 191, 0, 0.25);
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+  }
+
+  /* Stitching for elevated cards - brighter gold */
+  .leather-card-elevated.stitched {
+    border-color: rgba(255, 191, 0, 0.5);
+  }
+  
+  .leather-card-elevated.stitched::before {
+    border-color: rgba(255, 191, 0, 0.7);
+    box-shadow: 0 0 12px rgba(255, 191, 0, 0.3);
+  }
+
+  /* Gold Gradient Text/Borders */
+  .text-gold-gradient {
+    @apply bg-gradient-to-b from-gold-300 to-gold-600 bg-clip-text text-transparent;
+  }
+  
+  .bg-gold-gradient {
+    @apply bg-gradient-to-b from-gold-400 to-gold-600;
+  }
+
+  .border-gold-gradient {
+    border-image: linear-gradient(to bottom, #FFD966, #B38600) 1;
+  }
+
+  /* Embossed/Debossed Effects */
+  .embossed {
+    text-shadow: 0 1px 1px rgba(0,0,0,0.8), 0 -1px 1px rgba(255,255,255,0.1);
+  }
+  
+  .debossed {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  /* Premium Buttons with Leather Texture */
+  .btn-leather {
+    background-color: #2a2523;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(60, 50, 45, 0.2) 0%, transparent 60%),
+      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='btn-leather'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.0' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.04 0 0 0 0 0.03 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23btn-leather)' opacity='0.15'/%3E%3C/svg%3E");
+    @apply text-gold-400 border border-neutral-700 transition-all duration-300;
+    box-shadow: 
+      0 4px 6px rgba(0,0,0,0.4), 
+      inset 0 1px 0 rgba(255,255,255,0.03),
+      inset 0 -1px 0 rgba(0,0,0,0.5);
+  }
+  
+  .btn-leather:hover {
+    background-color: #3d2e28;
+    @apply border-gold-500/50 text-gold-300;
+    transform: translateY(-1px);
+    box-shadow: 
+      0 6px 12px rgba(0,0,0,0.5), 
+      0 0 10px rgba(255, 191, 0, 0.15),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  
+  .btn-leather:active {
+    transform: translateY(0px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+  }
+
+  .btn-gold {
+    @apply bg-gradient-to-b from-gold-400 to-gold-600 text-black font-bold shadow-lg;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  }
+  
+  .btn-gold:hover {
+    @apply from-gold-300 to-gold-500;
+    box-shadow: 0 0 15px rgba(255, 191, 0, 0.4);
+  }
+
+  /* Premium Inputs with Subtle Leather */
+  .input-premium {
+    background-color: #1a1512;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='input-leather'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.02 0 0 0 0 0.015 0 0 0 0 0.01 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23input-leather)' opacity='0.08'/%3E%3C/svg%3E");
+    @apply w-full border border-neutral-700 rounded-xl px-4 py-3 text-gold-100 placeholder-neutral-500 transition-all;
+    box-shadow: 
+      inset 0 2px 4px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.02);
+  }
+  
+  .input-premium:focus {
+    @apply border-gold-500/80 outline-none ring-1 ring-gold-500/50;
+    box-shadow: 
+      inset 0 2px 4px rgba(0,0,0,0.6), 
+      0 0 10px rgba(255, 191, 0, 0.15),
+      inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+
+  /* --- EXISTING UTILITIES (Preserved) --- */
+  
+  /* Glass morphism */
+  .glass-card {
+    @apply bg-neutral-900/80 backdrop-blur-xl border border-white/5;
+  }
+
+  .glass-nav {
+    @apply bg-black/90 backdrop-blur-xl border-t border-white/5;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+  }
+
+  /* Story ring */
+  .story-ring {
+    @apply bg-gradient-to-tr from-gold-600 via-gold-400 to-gold-200;
+    box-shadow: 0 0 10px rgba(255, 191, 0, 0.3);
+  }
+
+  /* Safe areas */
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+  /* Hide scrollbar */
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* Mobile Responsiveness Utilities */
+  /* Prevent text cutoff */
+  .text-wrap-mobile {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  /* Ensure touch targets are at least 44x44px */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent horizontal scroll */
+  .no-horizontal-scroll {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Responsive images */
+  .img-responsive {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Mobile-friendly container */
+  .mobile-container {
+    max-width: 100vw;
+    overflow-x: hidden;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Edge Lighting Effects */
+  .edge-glow {
+    box-shadow: 0 0 10px var(--edge-color), inset 0 0 5px var(--edge-color);
+    border: 1px solid var(--edge-color);
+  }
+
+  .edge-glow-strong {
+    box-shadow: 0 0 20px var(--edge-color), inset 0 0 10px var(--edge-color);
+    border: 2px solid var(--edge-color);
+  }
+  
+  .glow-gold {
+    box-shadow: 0 0 15px rgba(255, 191, 0, 0.3);
+  }
+
+  /* Card with Edge Lighting */
+  .card-edge {
+    @apply bg-neutral-900/80 backdrop-blur-xl border border-gold-500/30 rounded-2xl;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  }
+}
+
+@layer components {
+  .theme-gold { --edge-color: #FFBF00; }
+  .theme-blue { --edge-color: #0066CC; }
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fade-in-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+.animate-fade-in { animation: fade-in 0.5s ease-out; }
+.animate-fade-in-up { 
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0; /* Start hidden, animation will make it visible */
+}
+

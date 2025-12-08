@@ -1,7 +1,7 @@
 /**
  * Admin role checking utilities
  * Checks both user_profiles.is_admin and auth.users metadata for admin role
- * 
+ *
  * Admin-only areas that should be protected:
  * - Moderation tools (content reports, user strikes, bans)
  * - Database cleanup scripts and maintenance operations
@@ -10,11 +10,11 @@
  * - Analytics dashboards with sensitive data
  * - Email campaign management
  * - System configuration changes
- * 
+ *
  * These should be enforced in both UI (ProtectedAdminRoute) and API routes (RLS policies)
  */
 
-import { supabase } from './supabase';
+import { createClient } from '@/lib/supabase/client';
 import { logger } from './logger';
 
 const adminLogger = logger.withContext('Admin');
@@ -22,7 +22,7 @@ const adminLogger = logger.withContext('Admin');
 /**
  * Check if current user is an admin
  * Checks both user_profiles.is_admin and auth.users metadata
- * 
+ *
  * Use this to protect:
  * - Moderation tools
  * - Database cleanup scripts
@@ -34,8 +34,12 @@ const adminLogger = logger.withContext('Admin');
  */
 export async function checkIsAdmin(): Promise<boolean> {
   try {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+    const supabase = createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       adminLogger.debug('No authenticated user');
       return false;
@@ -84,8 +88,12 @@ export async function getAdminStatus(): Promise<{
   user: any | null;
 }> {
   try {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+    const supabase = createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return { isAdmin: false, user: null };
     }
@@ -117,4 +125,3 @@ export async function useAdminCheck(): Promise<{
     };
   }
 }
-

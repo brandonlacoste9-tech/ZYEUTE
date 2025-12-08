@@ -3,7 +3,7 @@
  * Uses OpenAI DALL-E 3 with robust fallback and demo modes
  */
 
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 
 const imageServiceLogger = logger.withContext('ImageService');
@@ -28,21 +28,21 @@ export async function generateImage(
 ): Promise<ImageGenerationResult | null> {
   // 1. Validation
   if (!prompt.trim()) {
-    toast.error('Décris ton image d\'abord! 🎨');
+    toast.error("Décris ton image d'abord! 🎨");
     return null;
   }
 
   // 2. Demo Mode (if no API key)
   if (!openaiKey) {
     imageServiceLogger.warn('⚠️ No OpenAI API Key found. Using Demo Mode.');
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate delay
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate delay
+
     toast.success('🎨 Mode Démo: Image générée!');
     return {
       url: `https://picsum.photos/seed/${encodeURIComponent(prompt)}/1024/1024`,
       prompt,
       style,
-      revised_prompt: `(Démo) ${prompt} - Style ${style} québécois`
+      revised_prompt: `(Démo) ${prompt} - Style ${style} québécois`,
     };
   }
 
@@ -56,15 +56,15 @@ export async function generateImage(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openaiKey}`
+        Authorization: `Bearer ${openaiKey}`,
       },
       body: JSON.stringify({
         model: 'dall-e-3',
         prompt: enhancedPrompt,
         n: 1,
         size: '1024x1024',
-        quality: 'standard'
-      })
+        quality: 'standard',
+      }),
     });
 
     if (!response.ok) {
@@ -84,19 +84,18 @@ export async function generateImage(
       url: imageUrl,
       prompt,
       revised_prompt: revisedPrompt || enhancedPrompt,
-      style
+      style,
     };
-
   } catch (error: any) {
     imageServiceLogger.error('Image generation error:', error);
     toast.error('Erreur de création. Réessaie!');
-    
+
     // Fallback to demo image
     return {
       url: `https://picsum.photos/seed/${encodeURIComponent(prompt)}/1024/1024`,
       prompt,
       style,
-      revised_prompt: `(Fallback) ${prompt}`
+      revised_prompt: `(Fallback) ${prompt}`,
     };
   }
 }
@@ -104,10 +103,13 @@ export async function generateImage(
 /**
  * Remix an existing image
  */
-export async function remixImage(imageUrl: string, mode: 'quebec' | 'meme' | 'vintage'): Promise<string | null> {
+export async function remixImage(
+  imageUrl: string,
+  mode: 'quebec' | 'meme' | 'vintage'
+): Promise<string | null> {
   toast.info('Remix en cours... 🎨');
-  await new Promise(resolve => setTimeout(resolve, 2500));
-  
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+
   // Return original for demo, in prod would be processed URL
   return imageUrl;
 }
