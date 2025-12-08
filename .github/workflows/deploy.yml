@@ -117,8 +117,7 @@ jobs:
         run: echo "No tests configured yet. Add 'npm test' script and test files to enable testing."
 
   # Job 4: Deploy Preview (for PRs)
-  # Preview deployments use the 'dev-preview-main' Supabase branch
-  # This provides an isolated database environment for testing changes
+  # Note: Preview deployments will be configured with Vercel in Phase 2
   deploy-preview:
     name: Deploy Preview (PR)
     runs-on: ubuntu-latest
@@ -135,31 +134,11 @@ jobs:
           name: dist
           path: dist/
       
-      - name: Deploy to Netlify (Preview)
-        run: echo "Deploy preview build to Netlify here. Install Netlify CLI and use 'netlify deploy --dir=dist'"
-        # To enable preview deployments with Supabase branching:
-        # 1. Create the Supabase preview branch: supabase branches create dev-preview-main
-        # 2. Add these secrets to GitHub repo:
-        #    - NETLIFY_AUTH_TOKEN: Your Netlify personal access token
-        #    - NETLIFY_SITE_ID: Your Netlify site ID
-        #    - VITE_SUPABASE_URL_PREVIEW: Preview branch URL
-        #    - VITE_SUPABASE_ANON_KEY_PREVIEW: Preview branch anon key
-        # 3. Uncomment the steps below
-        #
-        # - name: Install Netlify CLI
-        #   run: npm install -g netlify-cli
-        # - name: Deploy to Netlify Preview
-        #   run: netlify deploy --dir=dist --message="PR #${{ github.event.pull_request.number }}"
-        #   env:
-        #     NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        #     NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        #     # Use preview branch Supabase credentials for isolated testing
-        #     VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL_PREVIEW }}
-        #     VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY_PREVIEW }}
-        #
-        # See SUPABASE_PREVIEW_SETUP.md for detailed setup instructions
+      - name: Placeholder for Vercel deployment
+        run: echo "Preview deployment will be configured with Vercel in Phase 2"
 
   # Job 5: Deploy Production (on push to main)
+  # Note: Production deployments will be configured with Vercel in Phase 2
   deploy-production:
     name: Deploy Production
     runs-on: ubuntu-latest
@@ -176,27 +155,5 @@ jobs:
           name: dist
           path: dist/
       
-      - name: Deploy to Netlify (Production)
-        run: echo "Deploy production build to Netlify here. Install Netlify CLI and use 'netlify deploy --prod --dir=dist'"
-        # To enable: Add NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID as secrets
-        # Then uncomment:
-        # - name: Install Netlify CLI
-        #   run: npm install -g netlify-cli
-        # - name: Deploy to Netlify
-        #   run: netlify deploy --prod --dir=dist --message="Production deploy from ${{ github.sha }}"
-        #   env:
-        #     NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        #     NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-
-# Environment variables and secrets needed:
-# - NETLIFY_AUTH_TOKEN: Your Netlify personal access token
-# - NETLIFY_SITE_ID: Your Netlify site ID
-# 
-# To add secrets:
-# 1. Go to your GitHub repo → Settings → Secrets and variables → Actions
-# 2. Click "New repository secret"
-# 3. Add NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID
-#
-# To get these values:
-# 1. NETLIFY_AUTH_TOKEN: Netlify dashboard → User settings → Applications → Personal access tokens
-# 2. NETLIFY_SITE_ID: Netlify dashboard → Your site → Site settings → General → Site details → API ID
+      - name: Placeholder for Vercel deployment
+        run: echo "Production deployment will be configured with Vercel in Phase 2"
