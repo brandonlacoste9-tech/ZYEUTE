@@ -84,7 +84,7 @@ export const ColonyTriggerButton: React.FC = () => {
             type="text"
             value={command}
             onChange={(e) => setCommand(e.target.value)}
-            placeholder="e.g., npm run build, task-netlify-refresh.sh, echo 'Hello Colony'"
+            placeholder="e.g., npm run build, deploy-app.sh, echo 'Hello Colony'"
             className="w-full px-4 py-2 bg-neutral-800 border border-gold-500/30 rounded-lg text-white placeholder-stone-500 focus:outline-none focus:border-gold-500"
             onKeyPress={(e) => {
               if (e.key === 'Enter' && !loading) {

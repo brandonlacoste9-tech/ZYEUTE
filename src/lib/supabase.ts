@@ -33,7 +33,7 @@ if (detectedProjectRef) {
     supabaseLogger.error('   Current: kihxqurnmyxnsyqgpdaw');
     supabaseLogger.error('   Expected: vuanulvyqkfefmjcikfk');
     supabaseLogger.error('   Action: Update VITE_SUPABASE_URL to: https://vuanulvyqkfefmjcikfk.supabase.co');
-    supabaseLogger.error('   Platforms: Check Netlify and Vercel environment variables');
+    supabaseLogger.error('   Platforms: Check Vercel environment variables');
   } else if (detectedProjectRef === 'vuanulvyqkfefmjcikfk') {
     supabaseLogger.info('✅ Using correct Supabase project: vuanulvyqkfefmjcikfk');
   } else if (supabaseUrl.includes('demo.supabase.co')) {
@@ -51,7 +51,7 @@ if (detectedProjectRef) {
 // Warn about missing credentials but don't crash
 if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
   supabaseLogger.warn('⚠️ Missing Supabase credentials! Using demo mode.');
-  supabaseLogger.warn('   Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local or Netlify environment variables');
+  supabaseLogger.warn('   Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local or Vercel environment variables');
 } else {
   // Show that key is set (but don't expose the actual key)
   supabaseLogger.info('Anon key:', supabaseAnonKey.substring(0, 20) + '...' + ' ✅ Set');

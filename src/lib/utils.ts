@@ -185,7 +185,7 @@ export function validateSupabaseUrl(url: string, expectedRef: string = 'vuanulvy
     utilsLogger.error('   Current: kihxqurnmyxnsyqgpdaw');
     utilsLogger.error(`   Expected: ${expectedRef}`);
     utilsLogger.error(`   Action: Update VITE_SUPABASE_URL to: https://${expectedRef}.supabase.co`);
-    utilsLogger.error('   Platforms: Check Netlify and Vercel environment variables');
+    utilsLogger.error('   Platforms: Check Vercel environment variables');
   } else if (projectRef === expectedRef) {
     utilsLogger.debug(`✅ Using correct Supabase project: ${expectedRef}`);
   } else if (url.includes('demo.supabase.co')) {
