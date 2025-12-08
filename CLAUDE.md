@@ -2573,7 +2573,7 @@ git status
 
 ## 🚀 Deployment
 
-> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel only; Netlify artifacts and CLI are unsupported.
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.
 
 ### Deploying to Vercel
 

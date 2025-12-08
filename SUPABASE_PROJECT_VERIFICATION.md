@@ -1,7 +1,7 @@
 # 🔍 Supabase Project Verification Guide
 
 > **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
-> Update all references to use Vercel Dashboard instead of Netlify.
+> This document is retained for historical reference only.
 
 ## Why This Matters
 

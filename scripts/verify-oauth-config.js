@@ -24,7 +24,7 @@ console.log('=' .repeat(60));
 const EXPECTED_SUPABASE_PROJECT = 'vuanulvyqkfefmjcikfk';
 const EXPECTED_SUPABASE_URL = `https://${EXPECTED_SUPABASE_PROJECT}.supabase.co`;
 const PRODUCTION_DOMAIN = 'https://zyeute.com';
-const VERCEL_DOMAIN = 'https://zyeute.vercel.app'; // Updated from Netlify
+const VERCEL_DOMAIN = 'https://zyeute.vercel.app';
 const EXPECTED_CALLBACK_PATH = '/auth/callback';
 const EXPECTED_GOOGLE_CALLBACK = `${EXPECTED_SUPABASE_URL}/auth/v1/callback`;
 
@@ -152,7 +152,7 @@ console.log(`     - ${VERCEL_DOMAIN}${EXPECTED_CALLBACK_PATH}`);
 console.log(`     - ${VERCEL_DOMAIN}/**`);
 console.log(`     - http://localhost:5173${EXPECTED_CALLBACK_PATH} (for dev)`);
 console.log(`     - http://localhost:5173/** (for dev)`);
-console.log(`\n   ⚠️  Keep only production Vercel URL, remove old preview URLs if any`);
+console.log(`\n   ⚠️  Remove any temporary preview deployment URLs (e.g., brandonlacoste9-tech-zyeute-xyz.vercel.app)`);
 
 console.log('\n🔧 Google Cloud Console Settings:');
 console.log(`   Authorized redirect URIs:`);
