@@ -1,5 +1,9 @@
 # Multi-Agent Progress Report
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 **Date:** December 2, 2025  
 **Status:** Parallel Work Complete  
 **Production Readiness:** 97%

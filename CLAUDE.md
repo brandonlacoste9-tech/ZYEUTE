@@ -2573,6 +2573,8 @@ git status
 
 ## 🚀 Deployment
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.
+
 ### Deploying to Vercel
 
 **Recommended** for Zyeuté - zero config, automatic deployments.
@@ -2592,47 +2594,22 @@ vercel login
 #### 3. Deploy
 
 ```bash
-<<<<<<< HEAD
-# Deploy to preview
-vercel
-
-# Deploy to production
-=======
 # First deployment (interactive setup)
 vercel
 
 # Production deployment
->>>>>>> 6e1bc52ae8d2bd229e3286e6ca216f4a95c7eb68
 vercel --prod
 ```
 
 #### 4. Configure Environment Variables
 
-<<<<<<< HEAD
-In Vercel Dashboard:
-1. Go to Project Settings → Environment Variables
-2. Add all variables from `.env.local`:
-=======
 In Vercel dashboard:
 1. Go to **Project Settings > Environment Variables**
 2. Add all required variables:
->>>>>>> 6e1bc52ae8d2bd229e3286e6ca216f4a95c7eb68
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
    - `VITE_OPENAI_API_KEY`
    - `VITE_STRIPE_PUBLIC_KEY`
-<<<<<<< HEAD
-
-#### 5. Automatic Deployments
-
-Vercel automatically deploys on:
-- Push to `main` branch → Production
-- Push to other branches → Preview
-- Pull requests → Preview
-
-### Deploying to Netlify
-
-=======
 3. Set environment: **Production** / **Preview** / **Development**
 
 #### 5. Configure Build Settings
@@ -2666,126 +2643,6 @@ Vercel automatically deploys on:
 
 ---
 
-### Deploying to Netlify
-
-Alternative to Vercel.
-
->>>>>>> 6e1bc52ae8d2bd229e3286e6ca216f4a95c7eb68
-#### 1. Install Netlify CLI
-
-```bash
-npm i -g netlify-cli
-```
-
-<<<<<<< HEAD
-#### 2. Login
-=======
-#### 2. Login to Netlify
->>>>>>> 6e1bc52ae8d2bd229e3286e6ca216f4a95c7eb68
-
-```bash
-netlify login
-```
-
-<<<<<<< HEAD
-#### 3. Deploy
-
-```bash
-# Build first
-npm run build
-
-# Deploy
-netlify deploy --prod --dir=dist
-```
-
-#### 4. Configure Environment Variables
-
-In Netlify Dashboard:
-1. Site Settings → Environment Variables
-2. Add all required variables
-
-### Pre-Deployment Checklist
-
-- [ ] All environment variables configured
-- [ ] Build succeeds locally (`npm run build`)
-- [ ] Type checking passes (`npm run type-check`)
-- [ ] No console errors in production build
-- [ ] API keys are production keys (not test keys)
-- [ ] Supabase RLS policies are configured
-- [ ] Stripe webhooks configured (if using)
-- [ ] Custom domain configured (if applicable)
-- [ ] Analytics/monitoring set up
-
-### Post-Deployment
-
-1. **Verify deployment**:
-   - Check all pages load
-   - Test authentication
-   - Test key features (posts, payments, etc.)
-
-2. **Monitor**:
-   - Check Vercel/Netlify logs
-   - Monitor error tracking (Sentry, etc.)
-   - Check API usage (OpenAI, Stripe)
-
-3. **Set up custom domain** (optional):
-   ```bash
-   # Vercel
-   vercel domains add zyeute.com
-
-   # Netlify
-   netlify domains:add zyeute.com
-   ```
-=======
-#### 3. Initialize Site
-
-```bash
-netlify init
-```
-
-#### 4. Configure Build
-
-`netlify.toml` (create in project root):
-
-```toml
-[build]
-  command = "npm run build"
-  publish = "dist"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-[build.environment]
-  NODE_VERSION = "20"
-```
-
-#### 5. Deploy
-
-```bash
-# Deploy preview
-netlify deploy
-
-# Deploy to production
-netlify deploy --prod
-```
-
-#### 6. Environment Variables
-
-```bash
-# Set via CLI
-netlify env:set VITE_SUPABASE_URL "your-url"
-netlify env:set VITE_SUPABASE_ANON_KEY "your-key"
-
-# Or in Netlify dashboard:
-# Site Settings > Environment Variables
-```
-
-**Netlify Dashboard**: [app.netlify.com](https://app.netlify.com)
-
----
-
 ### Pre-Deployment Checklist
 
 Before deploying to production:
@@ -2797,7 +2654,7 @@ Before deploying to production:
 - [ ] All tests passing (if applicable)
 
 **Environment**:
-- [ ] All environment variables set in deployment platform
+- [ ] All environment variables set in Vercel
 - [ ] Production API keys configured (not dev/test keys)
 - [ ] `.env` files NOT committed to git
 
@@ -2834,9 +2691,6 @@ Before deploying to production:
 ```bash
 # Vercel
 vercel logs
-
-# Netlify
-netlify logs
 ```
 
 #### Monitor Performance
@@ -2860,9 +2714,6 @@ Sentry.init({
 ```bash
 # Vercel: Rollback to previous deployment
 # Go to dashboard > Deployments > Click previous > "Promote to Production"
-
-# Netlify: Rollback
-netlify rollback
 ```
 
 ---
@@ -2885,12 +2736,6 @@ netlify rollback
    ```
 4. Wait for DNS propagation (up to 48h)
 5. SSL automatically configured
-
-#### Netlify
-
-1. Go to **Site Settings > Domain Management**
-2. Add custom domain
-3. Update DNS records:
    ```
    Type: A
    Name: @

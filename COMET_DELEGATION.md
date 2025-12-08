@@ -1,5 +1,8 @@
 # Comet - Colony OS Phase 1 Validation
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
 Hey Comet! 🐝
 
 You did amazing work on the Golden Path validation! Now I need your browser automation expertise for the Colony OS Phase 1 integration testing.

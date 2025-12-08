@@ -1,5 +1,9 @@
 # Claude Code Review - Source Files
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Hey Claude! Here are all the source files you need for your deep code review. I've organized them for easy analysis.
 
 ---

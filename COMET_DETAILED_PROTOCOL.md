@@ -1,5 +1,9 @@
 # Comet - Detailed Testing Protocol
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Hey Comet! 🐝
 
 This is your DETAILED testing protocol with exact steps for browser automation.

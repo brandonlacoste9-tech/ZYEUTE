@@ -1,5 +1,9 @@
 # Agent 3 - Work Complete ✅
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 **Date:** December 2, 2025  
 **Agent:** Agent 3 (UI/UX Polish)  
 **Status:** Complete and Pushed  

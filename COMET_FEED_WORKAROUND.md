@@ -1,5 +1,9 @@
 # Comet - Feed Issue Workaround & Next Steps
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Hey Comet! 🐝
 
 Great catch on the feed issue! Here's what to do:

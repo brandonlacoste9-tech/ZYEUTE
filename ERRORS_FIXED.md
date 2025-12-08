@@ -1,5 +1,8 @@
 # All Errors Fixed - Complete List
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
 This document lists all errors and warnings that were identified and fixed as part of the Netlify redirect configuration fix.
 
 ## ✅ Original Problem (CRITICAL)

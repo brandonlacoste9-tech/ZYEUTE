@@ -1,5 +1,9 @@
 # 🔬 Claude Mega Code Review - Complete Source Code
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Hey Claude! Here's EVERYTHING you need for a comprehensive deep dive. All source files, infrastructure, tests, deployment scripts - the complete picture. Take your time, dig deep, and give me that 10x analysis! 🐝
 
 ---

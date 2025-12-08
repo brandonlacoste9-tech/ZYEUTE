@@ -12,7 +12,7 @@ Before you begin, make sure you have:
 - A **Supabase** account ([sign up here](https://supabase.com))
 - A **Stripe** account ([sign up here](https://stripe.com))
 - An **OpenAI** API key ([get one here](https://platform.openai.com/api-keys))
-- A **Vercel** or **Netlify** account for deployment (optional)
+- A **Vercel** account for deployment (optional)
 
 ---
 
@@ -235,7 +235,9 @@ Use these test card numbers:
 
 ## 🚀 Part 5: Deployment
 
-### Option A: Vercel (Recommended)
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel only; Netlify artifacts and CLI are unsupported.
+
+### Deploying to Vercel
 
 ```bash
 # Install Vercel CLI
@@ -252,19 +254,6 @@ vercel env add VITE_STRIPE_PUBLIC_KEY
 
 # Redeploy with new env vars
 vercel --prod
-```
-
-### Option B: Netlify
-
-```bash
-# Install Netlify CLI
-npm i -g netlify-cli
-
-# Deploy
-netlify deploy --prod
-
-# Add environment variables in Netlify Dashboard:
-# Site settings → Environment variables
 ```
 
 ### Important: Update Supabase URLs

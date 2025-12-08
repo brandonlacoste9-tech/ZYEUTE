@@ -1,5 +1,8 @@
 # PR Summary: Fix Netlify Redirect Configuration
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
 ## 🎯 Objective
 
 Fix the persistent black screen issue on the deployed Netlify app by correcting redirect rules to prevent static asset interception.

@@ -5,6 +5,9 @@ All notable changes to Zyeuté will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+> **⚠️ DEPLOYMENT NOTE**: As of December 2025, Zyeuté deploys exclusively with Vercel.  
+> Historical Netlify references below are retained for documentation purposes only.
+
 ## [Unreleased]
 
 ### Added

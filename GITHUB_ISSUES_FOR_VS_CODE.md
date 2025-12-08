@@ -1,5 +1,9 @@
 # 📋 GitHub Issues for VS Code Cloud Agent
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 ## Issue #1: Replace console.log with logger utility and standardize error handling
 
 **Title:** Replace all console.log with logger utility and standardize error handling

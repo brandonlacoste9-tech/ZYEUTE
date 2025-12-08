@@ -1,5 +1,9 @@
 # 🚀 New Agent Work Complete - Performance & Security Hardening
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 **Completion Date:** December 2, 2025  
 **Agent:** New Agent (Agent 4)  
 **Total Time:** ~3.5 hours  

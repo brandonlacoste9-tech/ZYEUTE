@@ -1,5 +1,9 @@
 # Colony OS Security Upgrade Path
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 **Current Status:** MVP with simplified HMAC signatures  
 **Target Status:** Production with Ed25519 signatures  
 **Priority:** Phase 2.2 Security Hardening

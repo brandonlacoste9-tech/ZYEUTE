@@ -1,5 +1,9 @@
 # Agent 3 - Step-by-Step Instructions (START NOW)
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 Hey Agent 3! Here are your exact instructions. Follow these step-by-step.
 
 ---

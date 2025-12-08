@@ -1,5 +1,9 @@
 # Comet - Session Complete & Transition Plan
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 **Date:** December 2, 2025  
 **Status:** Golden Path Validation Complete → Ready for Colony OS Testing  
 **Next Phase:** Colony OS Phase 1 Integration Testing

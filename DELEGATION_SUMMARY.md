@@ -1,5 +1,9 @@
 # Multi-Agent Delegation Summary
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
+
 **Date:** December 2, 2025  
 **Status:** All delegation messages ready  
 **Phase:** Colony OS Phase 1 Complete → Team Review

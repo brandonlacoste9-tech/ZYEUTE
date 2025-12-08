@@ -1,5 +1,8 @@
 # 🔍 Black Screen Root Cause Analysis
 
+> **⚠️ DEPLOYMENT NOTE**: Zyeuté now deploys with Vercel; Netlify artifacts and CLI are unsupported.  
+> This document is retained for historical reference only.
+
 ## Problem Statement
 
 Users were experiencing a black screen when visiting the deployed Zyeuté app after new deployments. The app would work initially, but after subsequent deploys, browsers would display a blank/black screen.
