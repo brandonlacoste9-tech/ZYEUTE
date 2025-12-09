@@ -8,13 +8,15 @@ import { Button } from './Button';
 import { createClient } from '@/lib/supabase/client';
 
 interface SubscribeButtonProps {
-  priceId: string;
+  priceId?: string;
+  tier?: string;
   className?: string;
   children?: React.ReactNode;
 }
 
 export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
   priceId,
+  tier,
   className = '',
   children,
 }) => {
@@ -31,7 +33,7 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
           'Content-Type': 'application/json',
           Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
         },
-        body: JSON.stringify({ tier: priceId }), // The backend expects "tier", not "priceId"
+        body: JSON.stringify({ tier: tier || priceId }), // The backend expects "tier"
       });
 
       const data = await response.json();
