@@ -13,7 +13,7 @@ interface PageTransitionProps {
   children: React.ReactNode;
 }
 
-const pageVariants = {
+const pageVariants: any = {
   initial: {
     opacity: 0,
     y: 10,

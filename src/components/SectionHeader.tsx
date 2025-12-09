@@ -3,8 +3,10 @@
  * Reusable header component for organizing content sections
  */
 
+'use client';
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 interface SectionHeaderProps {
@@ -15,23 +17,21 @@ interface SectionHeaderProps {
   className?: string;
 }
 
-export const SectionHeader: React.FC<SectionHeaderProps> = ({ 
-  title, 
+export const SectionHeader: React.FC<SectionHeaderProps> = ({
+  title,
   showArrow = false,
   onArrowClick,
   linkTo,
-  className 
+  className,
 }) => {
   const content = (
     <div className={cn('flex items-center gap-2 group', className)}>
-      <h2 className="text-lg text-gold-500 font-bold uppercase tracking-wider embossed">
-        {title}
-      </h2>
+      <h2 className="text-lg text-gold-500 font-bold uppercase tracking-wider embossed">{title}</h2>
       {showArrow && (
-        <svg 
+        <svg
           className="w-5 h-5 text-gold-500/70 group-hover:text-gold-400 transition-colors"
-          fill="none" 
-          stroke="currentColor" 
+          fill="none"
+          stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -42,7 +42,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
 
   if (linkTo) {
     return (
-      <Link to={linkTo} className="block px-4 mb-3 mt-6">
+      <Link href={linkTo} className="block px-4 mb-3 mt-6">
         {content}
       </Link>
     );
@@ -54,4 +54,3 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
     </div>
   );
 };
-
