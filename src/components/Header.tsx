@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '../lib/utils';
 import { useNotifications } from '../contexts/NotificationContext';
 import { Logo } from './Logo';
@@ -22,7 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   showBack = false,
   className,
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { unreadCount } = useNotifications();
 
   return (
@@ -44,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-4">
           {showBack ? (
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => router.back()}
               className="p-2 rounded-full transition-all hover:scale-110 hover:bg-gold-500/10 group"
               aria-label="Go back"
             >
@@ -75,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-3">
           {showSearch && (
             <Link
-              to="/explore"
+              href="/explore"
               className="p-2 rounded-full transition-all hover:scale-110 hover:bg-gold-500/10 group"
               aria-label="Search"
             >
@@ -96,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           <Link
-            to="/notifications"
+            href="/notifications"
             className="p-2 rounded-full transition-all hover:scale-110 hover:bg-gold-500/10 relative group"
             aria-label="Notifications"
           >
@@ -122,7 +123,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Link>
 
           <Link
-            to="/settings"
+            href="/settings"
             className="p-2 rounded-full transition-all hover:scale-110 hover:bg-gold-500/10 group"
             aria-label="Settings"
           >

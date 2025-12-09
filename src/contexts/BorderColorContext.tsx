@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * BorderColorContext - Customizable App Accent Lighting
  * Allows users to customize the border glow color around the app
@@ -51,10 +53,5 @@ export const BorderColorProvider: React.FC<{ children: React.ReactNode }> = ({ c
     defaultGold: DEFAULT_GOLD,
   };
 
-  return (
-    <BorderColorContext.Provider value={contextValue}>
-      {children}
-    </BorderColorContext.Provider>
-  );
+  return <BorderColorContext.Provider value={contextValue}>{children}</BorderColorContext.Provider>;
 };
-
