@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Notification Context - Real-time notifications using Supabase Realtime
  */

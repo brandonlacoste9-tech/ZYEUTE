@@ -6,7 +6,7 @@
 import React, { InputHTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
-interface GoldInputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface GoldInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   className?: string;
   // Size variants
   size?: 'sm' | 'md' | 'lg';
@@ -40,4 +40,3 @@ export const GoldInput = forwardRef<HTMLInputElement, GoldInputProps>(
 );
 
 GoldInput.displayName = 'GoldInput';
-

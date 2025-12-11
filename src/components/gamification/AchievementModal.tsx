@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * AchievementModal - Popup when achievement is unlocked
  * Beautiful animation and celebration!
@@ -133,22 +135,16 @@ export const AchievementModal: React.FC<AchievementModalProps> = ({
               >
                 {achievement.icon}
               </div>
-              
+
               {/* Sparkles */}
               <div className="absolute -top-2 -right-2 text-3xl animate-ping">✨</div>
               <div className="absolute -bottom-2 -left-2 text-3xl animate-ping delay-300">⭐</div>
             </div>
 
             {/* Title */}
-            <h2 className="text-3xl font-bold text-white mb-2">
-              Accomplissement Débloqué!
-            </h2>
-            <h3 className="text-2xl font-bold text-gold-400 mb-3">
-              {achievement.name_fr}
-            </h3>
-            <p className="text-white/70 text-sm mb-4 px-4">
-              {achievement.description}
-            </p>
+            <h2 className="text-3xl font-bold text-white mb-2">Accomplissement Débloqué!</h2>
+            <h3 className="text-2xl font-bold text-gold-400 mb-3">{achievement.name_fr}</h3>
+            <p className="text-white/70 text-sm mb-4 px-4">{achievement.description}</p>
 
             {/* Rewards */}
             <div className="flex items-center justify-center gap-6 py-4 px-6 bg-white/5 rounded-xl">
@@ -157,9 +153,7 @@ export const AchievementModal: React.FC<AchievementModalProps> = ({
                   <span className="text-2xl">🏆</span>
                   <div className="text-left">
                     <p className="text-xs text-white/60">Points</p>
-                    <p className="text-xl font-bold text-gold-400">
-                      +{achievement.points}
-                    </p>
+                    <p className="text-xl font-bold text-gold-400">+{achievement.points}</p>
                   </div>
                 </div>
               )}
@@ -169,18 +163,14 @@ export const AchievementModal: React.FC<AchievementModalProps> = ({
                   <span className="text-2xl">💰</span>
                   <div className="text-left">
                     <p className="text-xs text-white/60">Cennes</p>
-                    <p className="text-xl font-bold text-gold-400">
-                      +{achievement.reward_cennes}
-                    </p>
+                    <p className="text-xl font-bold text-gold-400">+{achievement.reward_cennes}</p>
                   </div>
                 </div>
               )}
             </div>
 
             {achievement.reward_description && (
-              <p className="text-white/60 text-xs mt-3 italic">
-                {achievement.reward_description}
-              </p>
+              <p className="text-white/60 text-xs mt-3 italic">{achievement.reward_description}</p>
             )}
           </div>
 
@@ -287,4 +277,3 @@ export const AchievementListener: React.FC = () => {
 };
 
 export default AchievementModal;
-

@@ -1,11 +1,11 @@
 /**
  * Colony OS Task Trigger for Zyeuté
- * 
+ *
  * Allows Zyeuté app to create tasks in the Colony OS task queue
- * 
+ *
  * Usage:
  *   import { createColonyTask } from '@/integrations/colony/zyeute-trigger';
- *   
+ *
  *   await createColonyTask({
  *     command: 'npm run build',
  *     origin: 'Zyeute',
@@ -13,7 +13,9 @@
  *   });
  */
 
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
+
+const supabase = createClient();
 
 export interface ColonyTaskInput {
   command: string;
@@ -46,7 +48,7 @@ export async function createColonyTask(input: ColonyTaskInput): Promise<ColonyTa
         origin: input.origin,
         priority: input.priority || 'normal',
         metadata: input.metadata || {},
-        status: 'pending'
+        status: 'pending',
       })
       .select()
       .single();
@@ -134,4 +136,3 @@ export async function cancelColonyTask(taskId: string): Promise<boolean> {
     return false;
   }
 }
-

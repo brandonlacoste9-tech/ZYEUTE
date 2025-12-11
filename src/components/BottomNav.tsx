@@ -3,8 +3,11 @@
  * Leather texture with gold stitching and glowing icons
  */
 
+'use client';
+
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useHaptics } from '@/hooks/useHaptics';
 import { cn } from '../lib/utils';
 
@@ -21,7 +24,12 @@ const navItems: NavItem[] = [
     label: 'Accueil',
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+        />
       </svg>
     ),
     activeIcon: (
@@ -35,7 +43,12 @@ const navItems: NavItem[] = [
     label: 'Découvrir',
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
       </svg>
     ),
     activeIcon: (
@@ -67,7 +80,12 @@ const navItems: NavItem[] = [
     label: 'Notifs',
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+        />
       </svg>
     ),
     activeIcon: (
@@ -81,7 +99,12 @@ const navItems: NavItem[] = [
     label: 'Profil',
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
       </svg>
     ),
     activeIcon: (
@@ -93,22 +116,22 @@ const navItems: NavItem[] = [
 ];
 
 export const BottomNav: React.FC = () => {
-  const location = useLocation();
+  const pathname = usePathname();
   const { tap } = useHaptics();
 
   // Helper to check if a path is active (handles profile routes)
   const isActivePath = (path: string): boolean => {
     if (path === '/profile/me') {
-      return location.pathname === '/profile/me' || location.pathname.startsWith('/profile/');
+      return pathname === '/profile/me' || pathname.startsWith('/profile/');
     }
     if (path === '/') {
-      return location.pathname === '/';
+      return pathname === '/';
     }
-    return location.pathname === path || location.pathname.startsWith(path + '/');
+    return pathname === path || pathname.startsWith(path + '/');
   };
 
   return (
-    <nav 
+    <nav
       className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
       style={{
         background: 'linear-gradient(to top, #0d0c0b 0%, #1a1815 100%)',
@@ -123,107 +146,98 @@ export const BottomNav: React.FC = () => {
         <div className="flex items-center justify-around h-16">
           {navItems.map((item) => {
             const isActive = isActivePath(item.to);
-            
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                onClick={() => tap()} // Haptic feedback on navigation
-                className={({ isActive: navLinkActive }) =>
-                  cn(
-                    'flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-300 relative',
-                    item.to === '/upload' ? '-mt-4' : '',
-                    (isActive || navLinkActive)
-                      ? 'text-gold-400' 
-                      : 'text-neutral-500 hover:text-gold-500/70'
-                  )
-                }
-              >
-              {({ isActive: navLinkActive }) => {
-                const active = isActive || navLinkActive;
-                
-                return (
-                  <>
-                    {/* Active Glow Indicator */}
-                    {active && (
-                    <>
-                      {/* Top Bar */}
-                      <div 
-                        className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full"
-                        style={{
-                          background: 'linear-gradient(90deg, #B8860B, #FFD700, #B8860B)',
-                          boxShadow: '0 0 10px rgba(255,191,0,0.6)',
-                        }}
-                      />
-                      {/* Background Glow */}
-                      <div 
-                        className="absolute inset-0 rounded-xl opacity-20"
-                        style={{
-                          background: 'radial-gradient(circle, rgba(255,191,0,0.4) 0%, transparent 70%)',
-                        }}
-                      />
-                    </>
-                  )}
 
-                    {/* Upload Button Special Styling */}
-                    {item.to === '/upload' ? (
-                      <div 
-                        className="relative p-1 rounded-full transition-all duration-300"
-                        style={{
-                          background: active 
-                            ? 'linear-gradient(135deg, #FFD700 0%, #DAA520 100%)'
-                            : 'linear-gradient(135deg, #3a3530 0%, #252320 100%)',
-                          boxShadow: active 
-                            ? '0 0 20px rgba(255,191,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3)'
-                            : '0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
-                          border: `2px solid ${active ? 'rgba(255,191,0,0.8)' : 'rgba(255,191,0,0.3)'}`,
-                        }}
-                      >
-                        <div className={active ? 'text-black' : 'text-gold-400'}>
+            return (
+              <Link
+                key={item.to}
+                href={item.to}
+                onClick={() => tap()} // Haptic feedback on navigation
+                className={cn(
+                  'flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-300 relative',
+                  item.to === '/upload' ? '-mt-4' : '',
+                  isActive ? 'text-gold-400' : 'text-neutral-500 hover:text-gold-500/70'
+                )}
+              >
+                {(() => {
+                  const active = isActive;
+
+                  return (
+                    <>
+                      {/* Active Glow Indicator */}
+                      {active && (
+                        <>
+                          {/* Top Bar */}
+                          <div
+                            className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full"
+                            style={{
+                              background: 'linear-gradient(90deg, #B8860B, #FFD700, #B8860B)',
+                              boxShadow: '0 0 10px rgba(255,191,0,0.6)',
+                            }}
+                          />
+                          {/* Background Glow */}
+                          <div
+                            className="absolute inset-0 rounded-xl opacity-20"
+                            style={{
+                              background:
+                                'radial-gradient(circle, rgba(255,191,0,0.4) 0%, transparent 70%)',
+                            }}
+                          />
+                        </>
+                      )}
+
+                      {/* Upload Button Special Styling */}
+                      {item.to === '/upload' ? (
+                        <div
+                          className="relative p-1 rounded-full transition-all duration-300"
+                          style={{
+                            background: active
+                              ? 'linear-gradient(135deg, #FFD700 0%, #DAA520 100%)'
+                              : 'linear-gradient(135deg, #3a3530 0%, #252320 100%)',
+                            boxShadow: active
+                              ? '0 0 20px rgba(255,191,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3)'
+                              : '0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
+                            border: `2px solid ${active ? 'rgba(255,191,0,0.8)' : 'rgba(255,191,0,0.3)'}`,
+                          }}
+                        >
+                          <div className={active ? 'text-black' : 'text-gold-400'}>
+                            {active ? item.activeIcon : item.icon}
+                          </div>
+                        </div>
+                      ) : (
+                        /* Icon with Glow Effect */
+                        <div
+                          className="relative z-10 transition-all duration-300"
+                          style={{
+                            filter: active ? 'drop-shadow(0 0 8px rgba(255,191,0,0.6))' : 'none',
+                          }}
+                        >
                           {active ? item.activeIcon : item.icon}
                         </div>
-                      </div>
-                    ) : (
-                      /* Icon with Glow Effect */
-                      <div 
-                        className="relative z-10 transition-all duration-300"
+                      )}
+
+                      {/* Label */}
+                      <span
+                        className={cn(
+                          'text-[10px] font-semibold tracking-wide relative z-10 transition-all duration-300',
+                          item.to === '/upload' && 'sr-only'
+                        )}
                         style={{
-                          filter: active 
-                            ? 'drop-shadow(0 0 8px rgba(255,191,0,0.6))'
-                            : 'none',
+                          textShadow: active ? '0 0 10px rgba(255,191,0,0.5)' : 'none',
                         }}
                       >
-                        {active ? item.activeIcon : item.icon}
-                      </div>
-                    )}
-
-                    {/* Label */}
-                    <span 
-                      className={cn(
-                        'text-[10px] font-semibold tracking-wide relative z-10 transition-all duration-300',
-                        item.to === '/upload' && 'sr-only'
-                      )}
-                      style={{
-                        textShadow: active ? '0 0 10px rgba(255,191,0,0.5)' : 'none',
-                      }}
-                    >
-                      {item.label}
-                    </span>
-                  </>
-                );
-              }}
-            </NavLink>
+                        {item.label}
+                      </span>
+                    </>
+                  );
+                })()}
+              </Link>
             );
           })}
         </div>
       </div>
 
       {/* Bottom Safe Area Fill */}
-      <div 
-        className="h-[env(safe-area-inset-bottom)]"
-        style={{ background: '#0d0c0b' }}
-      />
+      <div className="h-[env(safe-area-inset-bottom)]" style={{ background: '#0d0c0b' }} />
     </nav>
   );
 };

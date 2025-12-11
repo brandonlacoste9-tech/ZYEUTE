@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@/integrations/*": [
+        "./colony/integrations/*"
       ]
     }
   },
@@ -36,6 +39,12 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "packages",
+    "colony-os",
+    "playwright.config.ts",
+    "vitest.config.ts",
+    "vitest.config.integration.ts",
+    "e2e"
   ]
 }

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Ti-Guy - Premium Quebec Heritage Emblem Design
  * The Zyeuté Mascot & AI Assistant featuring the iconic beaver emblem
@@ -20,48 +22,48 @@ const TI_GUY_RESPONSES: Record<string, string[]> = {
   greeting: [
     "Allô! Moi c'est Ti-Guy, ton petit castor préféré! 🦫",
     "Salut mon ami! Comment ça va aujourd'hui? ⚜️",
-    "Heille! Content de te jaser! 🇨🇦",
+    'Heille! Content de te jaser! 🇨🇦',
   ],
   help: [
     "Je peux t'aider à naviguer l'app! Pose-moi n'importe quelle question! 💡",
     "T'as besoin d'aide? Je suis là pour toi! 🦫",
   ],
   upload: [
-    "Pour uploader une photo ou vidéo, clique sur le + en bas! 📸",
-    "Veux-tu créer du contenu? Va dans la section Upload! 🎥",
+    'Pour uploader une photo ou vidéo, clique sur le + en bas! 📸',
+    'Veux-tu créer du contenu? Va dans la section Upload! 🎥',
   ],
   fire: [
     "Les feux 🔥 c'est comme des likes, mais en plus hot! Plus t'en reçois, plus ton contenu est malade!",
     "Donne des feux aux posts que tu trouves sick! C'est notre système de rating! 🔥",
   ],
   story: [
-    "Les Stories disparaissent après 24 heures! Parfait pour du contenu éphémère! ⏰",
-    "Crée une Story en cliquant sur ton avatar en haut du feed! ✨",
+    'Les Stories disparaissent après 24 heures! Parfait pour du contenu éphémère! ⏰',
+    'Crée une Story en cliquant sur ton avatar en haut du feed! ✨',
   ],
   quebec: [
     "Zyeuté, c'est fait au Québec, pour le Québec! On célèbre notre culture! 🇨🇦⚜️",
-    "Utilise des hashtags québécois comme #514 #450 #quebec #montreal! 🏔️",
+    'Utilise des hashtags québécois comme #514 #450 #quebec #montreal! 🏔️',
   ],
   gifts: [
-    "Tu peux envoyer des cadeaux virtuels aux créateurs que tu aimes! 🎁",
+    'Tu peux envoyer des cadeaux virtuels aux créateurs que tu aimes! 🎁',
     "Les cadeaux supportent nos créateurs québécois! C'est comme un tip! 💰",
   ],
   premium: [
-    "Deviens VIP pour débloquer Ti-Guy Artiste et Studio! 👑",
-    "Les membres Or ont accès à toutes mes fonctionnalités AI! ✨",
+    'Deviens VIP pour débloquer Ti-Guy Artiste et Studio! 👑',
+    'Les membres Or ont accès à toutes mes fonctionnalités AI! ✨',
   ],
   default: [
-    "Hmm, je comprends pas trop... Peux-tu reformuler? 🤔",
-    "Je suis un petit castor, pas Google! Essaie une autre question! 😅",
+    'Hmm, je comprends pas trop... Peux-tu reformuler? 🤔',
+    'Je suis un petit castor, pas Google! Essaie une autre question! 😅',
     "Désolé, j'ai pas compris! Je suis encore en train d'apprendre! 🦫",
   ],
 };
 
 const QUICK_ACTIONS = [
-  { label: "Comment ça marche?", key: "help" },
-  { label: "Upload une photo", key: "upload" },
-  { label: "C'est quoi les feux?", key: "fire" },
-  { label: "Devenir VIP?", key: "premium" },
+  { label: 'Comment ça marche?', key: 'help' },
+  { label: 'Upload une photo', key: 'upload' },
+  { label: "C'est quoi les feux?", key: 'fire' },
+  { label: 'Devenir VIP?', key: 'premium' },
 ];
 
 export const TiGuy: React.FC = () => {
@@ -96,7 +98,7 @@ export const TiGuy: React.FC = () => {
     setIsTyping(true);
     setGenerating(true);
     setProgress(0);
-    
+
     // Simulate progress
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
@@ -104,18 +106,18 @@ export const TiGuy: React.FC = () => {
         return next;
       });
     }, 100);
-    
+
     setTimeout(() => {
       const responses = TI_GUY_RESPONSES[responseKey] || TI_GUY_RESPONSES.default;
       const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
+
       const newMessage: Message = {
         id: Date.now().toString(),
         text: randomResponse,
         sender: 'tiguy',
         timestamp: new Date(),
       };
-      
+
       setProgress(100);
       setMessages((prev) => [...prev, newMessage]);
       setIsTyping(false);
@@ -144,21 +146,49 @@ export const TiGuy: React.FC = () => {
     const lowerText = messageText.toLowerCase();
     let responseKey = 'default';
 
-    if (lowerText.includes('upload') || lowerText.includes('poster') || lowerText.includes('publier')) {
+    if (
+      lowerText.includes('upload') ||
+      lowerText.includes('poster') ||
+      lowerText.includes('publier')
+    ) {
       responseKey = 'upload';
-    } else if (lowerText.includes('feu') || lowerText.includes('fire') || lowerText.includes('like')) {
+    } else if (
+      lowerText.includes('feu') ||
+      lowerText.includes('fire') ||
+      lowerText.includes('like')
+    ) {
       responseKey = 'fire';
     } else if (lowerText.includes('story') || lowerText.includes('histoire')) {
       responseKey = 'story';
-    } else if (lowerText.includes('québec') || lowerText.includes('quebec') || lowerText.includes('montréal')) {
+    } else if (
+      lowerText.includes('québec') ||
+      lowerText.includes('quebec') ||
+      lowerText.includes('montréal')
+    ) {
       responseKey = 'quebec';
-    } else if (lowerText.includes('cadeau') || lowerText.includes('gift') || lowerText.includes('tip')) {
+    } else if (
+      lowerText.includes('cadeau') ||
+      lowerText.includes('gift') ||
+      lowerText.includes('tip')
+    ) {
       responseKey = 'gifts';
-    } else if (lowerText.includes('premium') || lowerText.includes('vip') || lowerText.includes('abonnement')) {
+    } else if (
+      lowerText.includes('premium') ||
+      lowerText.includes('vip') ||
+      lowerText.includes('abonnement')
+    ) {
       responseKey = 'premium';
-    } else if (lowerText.includes('aide') || lowerText.includes('help') || lowerText.includes('comment')) {
+    } else if (
+      lowerText.includes('aide') ||
+      lowerText.includes('help') ||
+      lowerText.includes('comment')
+    ) {
       responseKey = 'help';
-    } else if (lowerText.includes('allo') || lowerText.includes('salut') || lowerText.includes('bonjour')) {
+    } else if (
+      lowerText.includes('allo') ||
+      lowerText.includes('salut') ||
+      lowerText.includes('bonjour')
+    ) {
       responseKey = 'greeting';
     }
 
@@ -182,7 +212,8 @@ export const TiGuy: React.FC = () => {
           style={{
             background: 'linear-gradient(135deg, #1a1512 0%, #0d0a08 50%, #1a1512 100%)',
             border: '3px solid #4a3b22',
-            boxShadow: '0 0 30px rgba(0,0,0,0.8), 0 0 15px rgba(255, 191, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.05)',
+            boxShadow:
+              '0 0 30px rgba(0,0,0,0.8), 0 0 15px rgba(255, 191, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.05)',
           }}
         >
           {/* Header - Emblem Style with Beaver Logo */}
@@ -220,10 +251,7 @@ export const TiGuy: React.FC = () => {
                 >
                   Ti-Guy
                 </h3>
-                <p
-                  className="text-xs"
-                  style={{ color: '#8B7355' }}
-                >
+                <p className="text-xs" style={{ color: '#8B7355' }}>
                   QUEBEC CA 🦫
                 </p>
               </div>
@@ -235,7 +263,12 @@ export const TiGuy: React.FC = () => {
                 background: 'rgba(179, 134, 0, 0.2)',
               }}
             >
-              <svg className="w-5 h-5" style={{ color: '#B38600' }} fill="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-5 h-5"
+                style={{ color: '#B38600' }}
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
               </svg>
             </button>
@@ -275,9 +308,7 @@ export const TiGuy: React.FC = () => {
                 <div
                   className={cn(
                     'max-w-[70%] p-3 rounded-2xl text-sm',
-                    message.sender === 'user'
-                      ? 'text-black font-medium'
-                      : 'text-white'
+                    message.sender === 'user' ? 'text-black font-medium' : 'text-white'
                   )}
                   style={
                     message.sender === 'user'
@@ -306,11 +337,7 @@ export const TiGuy: React.FC = () => {
                     boxShadow: '0 0 8px rgba(255, 191, 0, 0.3)',
                   }}
                 >
-                  <img
-                    src="/ti-guy-logo.jpg"
-                    alt="Ti-Guy"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src="/ti-guy-logo.jpg" alt="Ti-Guy" className="w-full h-full object-cover" />
                 </div>
                 <div
                   className="p-3 rounded-2xl flex-1"
@@ -344,9 +371,18 @@ export const TiGuy: React.FC = () => {
                     </div>
                   ) : (
                     <div className="flex gap-1">
-                      <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '0ms' }} />
-                      <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#B38600', animationDelay: '300ms' }} />
+                      <span
+                        className="w-2 h-2 rounded-full animate-bounce"
+                        style={{ backgroundColor: '#B38600', animationDelay: '0ms' }}
+                      />
+                      <span
+                        className="w-2 h-2 rounded-full animate-bounce"
+                        style={{ backgroundColor: '#B38600', animationDelay: '150ms' }}
+                      />
+                      <span
+                        className="w-2 h-2 rounded-full animate-bounce"
+                        style={{ backgroundColor: '#B38600', animationDelay: '300ms' }}
+                      />
                     </div>
                   )}
                 </div>

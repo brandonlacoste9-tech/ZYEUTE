@@ -1,12 +1,17 @@
 /**
  * Colony OS Worker Bee Trigger Button
- * 
+ *
  * Admin-only component that allows triggering Colony OS tasks from Zyeuté UI
  */
 
 import React, { useState } from 'react';
-import { createColonyTask, getColonyTaskStatus, getRecentColonyTasks, type ColonyTask } from '@/integrations/colony/zyeute-trigger';
-import { isAdmin } from '@/lib/admin';
+import {
+  createColonyTask,
+  getColonyTaskStatus,
+  getRecentColonyTasks,
+  type ColonyTask,
+} from '../../colony/integrations/zyeute-trigger';
+import { checkIsAdmin } from '@/lib/admin';
 import { toast } from './Toast';
 
 export const ColonyTriggerButton: React.FC = () => {
@@ -22,7 +27,7 @@ export const ColonyTriggerButton: React.FC = () => {
   }, []);
 
   const checkAdmin = async () => {
-    const admin = await isAdmin();
+    const admin = await checkIsAdmin();
     setIsAdminUser(admin);
   };
 
@@ -45,8 +50,8 @@ export const ColonyTriggerButton: React.FC = () => {
         priority,
         metadata: {
           triggered_by: 'admin_ui',
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       });
 
       if (task) {
@@ -77,9 +82,7 @@ export const ColonyTriggerButton: React.FC = () => {
       <div className="space-y-4">
         {/* Command Input */}
         <div>
-          <label className="block text-sm font-semibold mb-2 text-stone-300">
-            Task Command
-          </label>
+          <label className="block text-sm font-semibold mb-2 text-stone-300">Task Command</label>
           <input
             type="text"
             value={command}
@@ -96,9 +99,7 @@ export const ColonyTriggerButton: React.FC = () => {
 
         {/* Priority Selector */}
         <div>
-          <label className="block text-sm font-semibold mb-2 text-stone-300">
-            Priority
-          </label>
+          <label className="block text-sm font-semibold mb-2 text-stone-300">Priority</label>
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value as any)}
@@ -126,10 +127,7 @@ export const ColonyTriggerButton: React.FC = () => {
             <h4 className="text-sm font-semibold mb-2 text-stone-400">Recent Tasks</h4>
             <div className="space-y-2">
               {recentTasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="p-3 bg-neutral-800/50 rounded-lg text-xs font-mono"
-                >
+                <div key={task.id} className="p-3 bg-neutral-800/50 rounded-lg text-xs font-mono">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-gold-400">{task.id.substring(0, 8)}...</span>
                     <span
@@ -137,10 +135,10 @@ export const ColonyTriggerButton: React.FC = () => {
                         task.status === 'done'
                           ? 'bg-green-500/20 text-green-400'
                           : task.status === 'error'
-                          ? 'bg-red-500/20 text-red-400'
-                          : task.status === 'running'
-                          ? 'bg-yellow-500/20 text-yellow-400'
-                          : 'bg-neutral-500/20 text-neutral-400'
+                            ? 'bg-red-500/20 text-red-400'
+                            : task.status === 'running'
+                              ? 'bg-yellow-500/20 text-yellow-400'
+                              : 'bg-neutral-500/20 text-neutral-400'
                       }`}
                     >
                       {task.status}
@@ -156,4 +154,3 @@ export const ColonyTriggerButton: React.FC = () => {
     </div>
   );
 };
-

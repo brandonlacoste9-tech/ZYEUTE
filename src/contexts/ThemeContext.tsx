@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Theme Context - Manages edge lighting colors and theme customization
  */
@@ -82,7 +84,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const root = document.documentElement;
     root.style.setProperty('--edge-color', edgeLighting);
     root.style.setProperty('--glow-intensity', `${glowIntensity}%`);
-    
+
     // Add animation class if enabled
     if (isAnimated) {
       root.classList.add('edge-animated');
@@ -139,4 +141,3 @@ export const useTheme = () => {
   }
   return context;
 };
-

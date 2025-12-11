@@ -36,27 +36,27 @@ export class CacheManager {
     contents: Array<{ parts: Array<{ text: string }> }>;
     ttlSeconds?: number;
   }): Promise<{ name: string; cacheId: string }> {
-    const model = this.client.getGenerativeModel({ 
-      model: options.model || 'models/gemini-1.5-pro' 
+    const model = this.client.getGenerativeModel({
+      model: options.model || 'models/gemini-1.5-pro',
     });
 
     // Note: The actual Gemini API cache management may differ
     // This is a conceptual implementation based on the Python examples
     // You may need to adjust based on the actual TypeScript SDK API
-    
+
     // For now, we'll simulate the cache creation
     // In production, you'd use the actual Gemini caching API
     const cacheId = `cache_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     this.cacheMap.set(options.displayName, {
       cacheId,
       createdAt: new Date(),
-      ttl: options.ttlSeconds || 604800 // Default 7 days
+      ttl: options.ttlSeconds || 604800, // Default 7 days
     });
 
     return {
       name: options.displayName,
-      cacheId
+      cacheId,
     };
   }
 
@@ -106,8 +106,8 @@ async function generateContent(options: {
 
   // Remove 'models/' prefix if present (SDK handles it)
   const modelName = options.model?.replace(/^models\//, '') || 'gemini-2.0-flash-exp';
-  const model = genAI.getGenerativeModel({ 
-    model: modelName
+  const model = genAI.getGenerativeModel({
+    model: modelName,
   });
 
   // Prepare contents
@@ -133,12 +133,16 @@ async function generateContent(options: {
   }
 
   // Format contents properly for Gemini API
-  // Gemini API expects contents as an array of parts
-  let formattedContents;
+  // Gemini API expects contents as an array of parts with role
+  let formattedContents: any;
   if (typeof contents === 'string') {
-    formattedContents = [{ parts: [{ text: contents }] }];
+    formattedContents = [{ role: 'user', parts: [{ text: contents }] }];
   } else if (Array.isArray(contents)) {
-    formattedContents = contents;
+    // Ensure all items have a role property
+    formattedContents = contents.map((item: any) => ({
+      role: item.role || 'user',
+      parts: item.parts,
+    }));
   } else {
     throw new Error('Invalid contents format');
   }
@@ -153,19 +157,20 @@ async function generateContent(options: {
 
   return {
     text: result.response.text(),
-    response: result.response
+    response: result.response,
   };
 }
 
 /**
  * Singleton Gemini client instance
  */
-export const gemini = genAI ? {
-  client: genAI,
-  cacheManager: new CacheManager(genAI),
-  getModel: (modelName: string = 'gemini-1.5-pro'): GenerativeModel => {
-    return genAI.getGenerativeModel({ model: modelName });
-  },
-  generateContent
-} : null;
-
+export const gemini = genAI
+  ? {
+      client: genAI,
+      cacheManager: new CacheManager(genAI),
+      getModel: (modelName: string = 'gemini-1.5-pro'): GenerativeModel => {
+        return genAI.getGenerativeModel({ model: modelName });
+      },
+      generateContent,
+    }
+  : null;
